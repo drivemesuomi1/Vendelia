@@ -1,0 +1,1017 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vendelia Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- Tokens (from brief) ---------- */
+:root{
+  --indigo:#3B32B3; --indigo-600:#2F279A; --indigo-50:#EEEDFA; --indigo-100:#DCDAF5;
+  --navy:#17223B; --navy-70:#4A5468; --navy-50:#6B7385;
+  --soft:#F7F8FC; --white:#FFFFFF; --line:#E3E5EE;
+  --teal:#0B7A75; --teal-50:#E3F2F1;
+  --warn:#8A5A00; --warn-50:#FFF4DC;
+  --danger:#B42318; --danger-50:#FDECEA;
+  --radius:12px; --radius-sm:8px;
+  --s1:8px; --s2:16px; --s3:24px; --s4:32px; --s5:40px; --s6:48px; --s8:64px;
+  --shadow:0 1px 2px rgba(23,34,59,.06),0 4px 16px rgba(23,34,59,.06);
+  --font:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--soft);color:var(--navy);font:400 16px/1.5 var(--font)}
+h1,h2,h3,h4{margin:0;font-weight:600;letter-spacing:-.01em;line-height:1.2}
+h1{font-size:clamp(28px,5vw,44px)}
+h2{font-size:clamp(22px,3vw,28px)}
+h3{font-size:18px}
+p{margin:0}
+a{color:var(--indigo)}
+img{display:block;max-width:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--indigo);outline-offset:2px;border-radius:4px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{max-width:1200px;margin:0 auto;padding:0 var(--s2)}
+@media(min-width:768px){.wrap{padding:0 var(--s3)}}
+.muted{color:var(--navy-70)}
+.small{font-size:14px}
+.stack>*+*{margin-top:var(--s2)}
+.row{display:flex;gap:var(--s1);align-items:center}
+.between{justify-content:space-between}
+.wrap-row{flex-wrap:wrap}
+.icon{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- Prototype bar ---------- */
+.protobar{background:var(--navy);color:#fff;font-size:13px}
+.protobar .wrap{display:flex;gap:var(--s2);align-items:center;min-height:40px;overflow-x:auto;white-space:nowrap}
+.protobar a{color:#fff;opacity:.8;text-decoration:none;padding:4px 0}
+.protobar a:hover,.protobar a[aria-current="page"]{opacity:1;text-decoration:underline}
+.protobar .tag{background:rgba(255,255,255,.14);padding:2px 8px;border-radius:999px;font-weight:600}
+
+/* ---------- Buttons / inputs ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 var(--s3);border-radius:var(--radius-sm);border:1px solid transparent;font-weight:600;cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s}
+.btn-primary{background:var(--indigo);color:#fff}
+.btn-primary:hover{background:var(--indigo-600)}
+.btn-secondary{background:#fff;color:var(--navy);border-color:var(--line)}
+.btn-secondary:hover{border-color:var(--navy-50)}
+.btn-ghost{background:transparent;color:var(--indigo);padding:0 var(--s1)}
+.btn-danger{background:#fff;color:var(--danger);border-color:#F0C4BF}
+.btn-block{width:100%}
+.btn-sm{min-height:40px;padding:0 var(--s2);font-size:14px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label,.label{font-weight:500;font-size:14px}
+.input,.select,textarea.input{min-height:48px;padding:0 14px;border:1px solid #C9CDDA;border-radius:var(--radius-sm);background:#fff;width:100%}
+textarea.input{padding:12px 14px;min-height:96px;resize:vertical}
+.input:focus,.select:focus{border-color:var(--indigo);outline:3px solid var(--indigo-100);outline-offset:0}
+.hint{font-size:13px;color:var(--navy-70)}
+.check{display:flex;gap:12px;align-items:flex-start;font-size:15px}
+.check input{width:20px;height:20px;margin-top:2px;accent-color:var(--indigo);flex:none}
+
+/* ---------- Header ---------- */
+header.site{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+.hdr{display:grid;grid-template-columns:auto 1fr auto;gap:var(--s2);align-items:center;min-height:64px}
+.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--indigo)}
+.logo svg{height:30px;width:auto}
+.logo .word{font-weight:700;font-size:22px;letter-spacing:-.02em}
+.city-btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:#fff;cursor:pointer;font-weight:500;font-size:14px}
+.city-btn .icon{width:18px;height:18px;color:var(--teal)}
+.search{position:relative}
+.search .icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--navy-50)}
+.search input{padding-left:44px;border-radius:999px;background:var(--soft);border-color:var(--line)}
+.nav{display:flex;gap:var(--s1);align-items:center}
+.nav a{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 10px;color:var(--navy);text-decoration:none;font-weight:500;font-size:15px;border-radius:var(--radius-sm)}
+.nav a:hover{background:var(--soft)}
+.hdr-search{display:none}
+.hdr-row2{padding-bottom:12px;display:flex;gap:var(--s1)}
+.hdr-row2 .search{flex:1}
+.nav .lbl{display:none}
+@media(min-width:900px){
+  .hdr{grid-template-columns:auto auto 1fr auto}
+  .hdr-search{display:block}
+  .hdr-row2{display:none}
+  .nav .lbl{display:inline}
+}
+.lang{font-size:14px;font-weight:600;border:1px solid var(--line);border-radius:999px;min-height:36px;padding:0 10px;background:#fff}
+
+/* ---------- Cards ---------- */
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.pad{padding:var(--s3)}
+.grid{display:grid;gap:var(--s3)}
+.deals{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.deal{display:flex;flex-direction:column;overflow:hidden;text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s}
+.deal:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(23,34,59,.06),0 12px 28px rgba(23,34,59,.10)}
+.media{aspect-ratio:3/2;background:linear-gradient(135deg,var(--indigo-50),var(--teal-50));position:relative;overflow:hidden}
+.media img{width:100%;height:100%;object-fit:cover}
+.media .chip{position:absolute;left:12px;top:12px}
+.deal .body{padding:var(--s2);display:flex;flex-direction:column;gap:6px;flex:1}
+.meta{font-size:14px;color:var(--navy-70);display:flex;gap:6px;align-items:center}
+.meta .icon{width:16px;height:16px}
+.deal h3{font-size:17px;line-height:1.35}
+.price-row{display:flex;align-items:baseline;gap:8px;margin-top:auto;padding-top:var(--s1)}
+.price{font-size:22px;font-weight:700}
+.ref{font-size:14px;color:var(--navy-70);text-decoration:line-through}
+.restrict{font-size:13px;color:var(--navy-70)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:13px;font-weight:600;background:#fff;color:var(--navy)}
+.chip.teal{background:var(--teal-50);color:var(--teal)}
+.chip.indigo{background:var(--indigo-50);color:var(--indigo)}
+.chip.warn{background:var(--warn-50);color:var(--warn)}
+.chip.danger{background:var(--danger-50);color:var(--danger)}
+.chip.grey{background:#EEF0F5;color:var(--navy-70)}
+.chip .icon{width:14px;height:14px}
+
+/* ---------- Home ---------- */
+.hero{padding:var(--s5) 0 var(--s4)}
+.hero p.lead{font-size:18px;color:var(--navy-70);max-width:560px;margin-top:var(--s2)}
+.hero-search{margin-top:var(--s3);display:grid;gap:var(--s1);max-width:720px}
+@media(min-width:640px){.hero-search{grid-template-columns:200px 1fr auto}}
+.cats{display:flex;gap:var(--s1);overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.cat{display:flex;align-items:center;gap:10px;min-height:56px;padding:0 var(--s2) 0 10px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);text-decoration:none;color:var(--navy);font-weight:500;white-space:nowrap;cursor:pointer}
+.cat .ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--indigo-50);color:var(--indigo)}
+.cat[aria-pressed="true"]{border-color:var(--indigo);background:var(--indigo-50)}
+section{padding:var(--s4) 0}
+.sec-head{display:flex;justify-content:space-between;align-items:end;gap:var(--s2);margin-bottom:var(--s3)}
+.steps{grid-template-columns:1fr}
+@media(min-width:768px){.steps{grid-template-columns:repeat(4,1fr)}}
+.step .n{width:32px;height:32px;border-radius:50%;background:var(--indigo);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px;margin-bottom:12px}
+.merchant-cta{background:var(--navy);color:#fff;border-radius:var(--radius);padding:var(--s4);display:grid;gap:var(--s3)}
+@media(min-width:768px){.merchant-cta{grid-template-columns:1.4fr 1fr;align-items:center;padding:var(--s6)}}
+.merchant-cta ul{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.merchant-cta li{display:flex;gap:10px;align-items:flex-start}
+.merchant-cta li .icon{color:#7FD6CF;margin-top:2px}
+.merchant-cta .btn-primary{background:#fff;color:var(--navy)}
+.merchant-cta .btn-primary:hover{background:var(--indigo-50)}
+footer.site{border-top:1px solid var(--line);background:#fff;margin-top:var(--s6);padding:var(--s5) 0 var(--s4)}
+.foot{display:grid;gap:var(--s3);grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.foot h4{font-size:14px;margin-bottom:12px}
+.foot a{display:block;color:var(--navy-70);text-decoration:none;padding:6px 0;font-size:15px}
+.foot a:hover{color:var(--indigo)}
+.legal{margin-top:var(--s4);padding-top:var(--s3);border-top:1px solid var(--line);font-size:13px;color:var(--navy-70);display:flex;flex-wrap:wrap;gap:var(--s2);justify-content:space-between}
+
+/* ---------- Listing ---------- */
+.filters{display:flex;gap:var(--s1);flex-wrap:wrap;margin-bottom:var(--s3)}
+.empty{text-align:center;padding:var(--s6) var(--s2)}
+
+/* ---------- Deal detail ---------- */
+.crumbs{font-size:14px;padding:var(--s2) 0;color:var(--navy-70);display:flex;gap:6px;flex-wrap:wrap}
+.crumbs a{color:var(--navy-70)}
+.detail{display:grid;gap:var(--s4)}
+@media(min-width:960px){.detail{grid-template-columns:1fr 380px;align-items:start}}
+.gallery{border-radius:var(--radius);overflow:hidden;aspect-ratio:16/9;background:linear-gradient(135deg,var(--indigo-50),var(--teal-50))}
+.gallery img{width:100%;height:100%;object-fit:cover}
+.buybox{position:sticky;top:88px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:10px 16px;font-size:15px}
+.kv dt{color:var(--navy-70)}
+.kv dd{margin:0;font-weight:500}
+ul.ticks{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+ul.ticks li{display:flex;gap:10px}
+ul.ticks .icon{color:var(--teal);margin-top:2px}
+ul.dots{margin:0;padding-left:20px;display:grid;gap:6px}
+.notice{display:flex;gap:12px;padding:var(--s2);border-radius:var(--radius-sm);background:var(--teal-50);color:var(--navy);font-size:15px}
+.notice .icon{color:var(--teal);margin-top:2px}
+.notice.indigo{background:var(--indigo-50)}
+.notice.indigo .icon{color:var(--indigo)}
+.notice.warn{background:var(--warn-50)}
+.notice.warn .icon{color:var(--warn)}
+.merchant{display:flex;gap:var(--s2);align-items:center}
+.avatar{width:48px;height:48px;border-radius:12px;background:var(--indigo-50);color:var(--indigo);display:grid;place-items:center;font-weight:700;flex:none}
+.map{height:160px;border-radius:var(--radius-sm);background:
+  linear-gradient(0deg,rgba(255,255,255,.5),rgba(255,255,255,.5)),
+  repeating-linear-gradient(45deg,#E7EAF3 0 2px,transparent 2px 22px),
+  repeating-linear-gradient(-45deg,#E7EAF3 0 2px,transparent 2px 30px),#F1F3F9;
+  display:grid;place-items:center;color:var(--indigo)}
+.mobile-buy{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px var(--s2);display:flex;gap:var(--s2);align-items:center;justify-content:space-between;z-index:15;box-shadow:0 -4px 16px rgba(23,34,59,.08)}
+@media(min-width:960px){.mobile-buy{display:none}}
+.has-mobile-buy{padding-bottom:96px}
+
+/* ---------- Checkout ---------- */
+.checkout{display:grid;gap:var(--s3)}
+@media(min-width:960px){.checkout{grid-template-columns:1fr 380px;align-items:start}}
+.summary-line{display:flex;justify-content:space-between;gap:var(--s2);font-size:15px;padding:6px 0}
+.summary-line.total{font-weight:700;font-size:18px;border-top:1px solid var(--line);padding-top:12px;margin-top:6px}
+.pay-opts{display:grid;gap:var(--s1)}
+.pay-opt{display:flex;align-items:center;gap:12px;padding:0 var(--s2);min-height:56px;border:1px solid #C9CDDA;border-radius:var(--radius-sm);cursor:pointer;background:#fff}
+.pay-opt:has(input:checked){border-color:var(--indigo);background:var(--indigo-50);box-shadow:inset 0 0 0 1px var(--indigo)}
+.pay-opt input{accent-color:var(--indigo);width:20px;height:20px}
+.pay-opt .brand{margin-left:auto;font-size:12px;font-weight:700;color:var(--navy-70);letter-spacing:.04em}
+.qty{display:inline-flex;align-items:center;border:1px solid #C9CDDA;border-radius:var(--radius-sm)}
+.qty button{width:44px;height:44px;border:0;background:none;cursor:pointer;font-size:20px}
+.qty output{min-width:32px;text-align:center;font-weight:600}
+.stepper{display:flex;gap:var(--s1);font-size:14px;color:var(--navy-70);margin-bottom:var(--s3);flex-wrap:wrap}
+.stepper span{display:flex;gap:6px;align-items:center}
+.stepper b{color:var(--navy)}
+
+/* ---------- Voucher ---------- */
+.voucher{display:grid;gap:var(--s3);border:2px dashed var(--indigo-100)}
+@media(min-width:720px){.voucher{grid-template-columns:auto 1fr}}
+.qr{width:168px;height:168px;padding:8px;background:#fff;border:1px solid var(--line);border-radius:var(--radius-sm)}
+.code{font:600 20px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.06em}
+.success-ic{width:56px;height:56px;border-radius:50%;background:var(--teal-50);color:var(--teal);display:grid;place-items:center}
+.success-ic .icon{width:28px;height:28px}
+
+/* ---------- Tables ---------- */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;font-weight:600;color:var(--navy-70);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.sum td{font-weight:700;border-bottom:0}
+
+/* ---------- Purchases ---------- */
+.purchase{display:grid;grid-template-columns:72px 1fr;gap:var(--s2);padding:var(--s2)}
+@media(min-width:720px){.purchase{grid-template-columns:96px 1fr auto;align-items:center}}
+.purchase .thumb{width:72px;height:72px;border-radius:10px;overflow:hidden;background:var(--indigo-50)}
+@media(min-width:720px){.purchase .thumb{width:96px;height:72px}}
+.purchase .thumb img{width:100%;height:100%;object-fit:cover}
+.purchase .actions{grid-column:1/-1;display:flex;gap:var(--s1);flex-wrap:wrap}
+@media(min-width:720px){.purchase .actions{grid-column:auto;justify-content:flex-end}}
+
+/* ---------- Business portal ---------- */
+.portal{display:grid;min-height:calc(100vh - 40px)}
+@media(min-width:960px){.portal{grid-template-columns:248px 1fr}}
+.side{background:#fff;border-right:1px solid var(--line);padding:var(--s2)}
+.side .logo{padding:8px 8px var(--s2)}
+.side nav{display:flex;gap:4px;overflow-x:auto}
+@media(min-width:960px){.side nav{flex-direction:column}}
+.side nav a{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 12px;border-radius:var(--radius-sm);color:var(--navy);text-decoration:none;font-weight:500;white-space:nowrap}
+.side nav a:hover{background:var(--soft)}
+.side nav a[aria-current="page"]{background:var(--indigo-50);color:var(--indigo)}
+.side .biz{display:none;margin-top:var(--s4);padding:12px;border-radius:var(--radius-sm);background:var(--soft);font-size:14px}
+@media(min-width:960px){.side .biz{display:block}}
+.main{padding:var(--s3) var(--s2) var(--s6)}
+@media(min-width:768px){.main{padding:var(--s4)}}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:var(--s2)}
+.kpi .v{font-size:28px;font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums}
+.form-grid{display:grid;gap:var(--s2)}
+@media(min-width:720px){.form-grid.two{grid-template-columns:1fr 1fr}}
+.split{display:grid;gap:var(--s3)}
+@media(min-width:1100px){.split{grid-template-columns:1fr 380px;align-items:start}}
+.breakdown .summary-line{font-size:14px}
+.breakdown .summary-line.total{font-size:17px}
+.redeem-result{margin-top:var(--s2)}
+
+/* ---------- Dialog ---------- */
+dialog{border:0;border-radius:var(--radius);padding:0;max-width:480px;width:calc(100% - 32px);box-shadow:0 24px 64px rgba(23,34,59,.25);color:var(--navy)}
+dialog::backdrop{background:rgba(23,34,59,.45)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--navy);color:#fff;padding:12px 20px;border-radius:var(--radius-sm);font-weight:500;z-index:50;transition:.25s;display:flex;gap:10px;align-items:center;max-width:calc(100% - 32px)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="protobar" role="navigation" aria-label="Prototype screens">
+  <div class="wrap" id="protobar"></div>
+</div>
+<div id="app"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<dialog id="dlg"></dialog>
+
+<script>
+/* ================= Data (sample content for prototype) ================= */
+const TODAY = new Date(2026, 9, 14); // 14 Oct 2026
+const CITIES = ["Helsinki","Espoo","Vantaa","Kauniainen"];
+const CATS = [
+  {id:"wellness", name:"Wellness & beauty", icon:"spa"},
+  {id:"food", name:"Food & drink", icon:"food"},
+  {id:"activities", name:"Activities", icon:"compass"},
+];
+const IMG = id => `https://images.unsplash.com/photo-${id}?w=900&q=70&auto=format&fit=crop`;
+const DEALS = [
+  {id:"d1", cat:"wellness", city:"Helsinki", merchant:"Näyte Wellness", mInit:"NW", area:"Kallio", address:"Esimerkkikatu 12, 00530 Helsinki",
+   title:"60-minute hot stone massage", price:59, ref:null, vat:25.5, img:"1544161515-4ab6ce6db874",
+   restrict:"Mon–Fri, 10–17 · 1 person",
+   inclusions:["60-minute hot stone massage","Use of relaxation lounge for 30 min","Herbal tea after treatment"],
+   booking:"Book by phone or online at least 24 h ahead. Quote your voucher code when booking.",
+   rules:["Valid Monday–Friday, 10:00–17:00","One voucher per person per visit","Cannot be combined with other offers","Late cancellation (under 24 h) uses the voucher"],
+   business:"Näyte Wellness Oy · Business ID 1234567-8"},
+  {id:"d2", cat:"wellness", city:"Espoo", merchant:"Studio Esimerkki", mInit:"SE", area:"Tapiola", address:"Malliaukio 3, 02100 Espoo",
+   title:"Haircut, wash and blow-dry", price:39, ref:55, refNote:"Lowest price at this salon in the last 30 days: €55.00", vat:25.5, img:"1560066984-138dadb4c035",
+   restrict:"Short and medium hair · New and existing clients",
+   inclusions:["Consultation","Wash with conditioning treatment","Haircut by senior stylist","Blow-dry and styling"],
+   booking:"Book online through the salon's booking page. Select “Vendelia voucher” as payment.",
+   rules:["Short and medium hair only (above shoulders)","Colour services not included","Valid Tuesday–Saturday"],
+   business:"Studio Esimerkki Oy · Business ID 2345678-9"},
+  {id:"d3", cat:"food", city:"Helsinki", merchant:"Bistro Malli", mInit:"BM", area:"Punavuori", address:"Testikatu 8, 00150 Helsinki",
+   title:"Three-course seasonal dinner for two", price:79, ref:null, vat:13.5, img:"1414235077428-338989a2e8c0",
+   restrict:"Sun–Thu · Drinks not included",
+   inclusions:["Starter, main course and dessert for two","Seasonal menu chosen by the chef","Bread and house water"],
+   booking:"Reserve a table by phone. Mention the voucher when booking. Show the voucher code on arrival.",
+   rules:["Valid Sunday–Thursday","Drinks are charged separately","Allergies: tell the restaurant when booking","Not valid on public holidays"],
+   business:"Bistro Malli Oy · Business ID 3456789-0"},
+  {id:"d4", cat:"food", city:"Vantaa", merchant:"Ravintola Kokeilu", mInit:"RK", area:"Tikkurila", address:"Kokeilutie 21, 01300 Vantaa",
+   title:"Weekend brunch for two", price:42, ref:null, vat:13.5, img:"1504674900247-0877df9cc836",
+   restrict:"Sat–Sun, 10–14 · Booking required",
+   inclusions:["Brunch buffet for two","Coffee and tea","Fresh juice"],
+   booking:"Book a brunch slot online. Show the voucher code at the counter.",
+   rules:["Valid Saturday and Sunday, 10:00–14:00","Children under 4 eat free"],
+   business:"Ravintola Kokeilu Oy · Business ID 4567890-1"},
+  {id:"d5", cat:"activities", city:"Espoo", merchant:"Retkeily Esimerkki", mInit:"RE", area:"Nuuksio", address:"Meeting point: Haukkalammentie 31, 02820 Espoo",
+   title:"Guided 3-hour forest hike in Nuuksio", price:35, ref:null, vat:25.5, img:"1551632811-561732d1e306",
+   restrict:"Ages 12+ · Moderate fitness",
+   inclusions:["3-hour guided hike in English or Finnish","Campfire snack and hot drink","Loan of trekking poles"],
+   booking:"Choose a date in the organiser's calendar. Dated tours can be changed until 48 h before.",
+   rules:["Ages 12 and over","Weather-appropriate clothing required","Minimum 3 participants per tour"],
+   business:"Retkeily Esimerkki Oy · Business ID 5678901-2"},
+  {id:"d6", cat:"activities", city:"Kauniainen", merchant:"Liikuntakeskus Demo", mInit:"LD", area:"Keskusta", address:"Demotie 5, 02700 Kauniainen",
+   title:"10-visit gym and group class card", price:69, ref:null, vat:25.5, img:"1534438327276-14e5300c3a48",
+   restrict:"Valid for 10 visits · Personal",
+   inclusions:["10 visits to gym or group classes","Locker and sauna access","Introductory session on first visit"],
+   booking:"Activate the card at reception on your first visit. Group classes are booked in the centre's app.",
+   rules:["Card is personal","Visits must be used within the voucher validity","Ages 16 and over"],
+   business:"Liikuntakeskus Demo Oy · Business ID 6789012-3"},
+  {id:"d7", cat:"wellness", city:"Vantaa", merchant:"Spa Kokeilu", mInit:"SK", area:"Myyrmäki", address:"Kylpyläpolku 2, 01600 Vantaa",
+   title:"Day spa entry with 30-minute facial", price:49, ref:null, vat:25.5, img:"1540555700478-4be289fbecef",
+   restrict:"Any day · 1 person",
+   inclusions:["Day spa entry (pools and saunas)","30-minute hydrating facial","Towel and robe"],
+   booking:"Book the facial by phone. Spa entry needs no booking.",
+   rules:["Facial must be booked in advance","Ages 18 and over"],
+   business:"Spa Kokeilu Oy · Business ID 7890123-4"},
+  {id:"d8", cat:"food", city:"Espoo", merchant:"Kahvila Malli", mInit:"KM", area:"Leppävaara", address:"Mallikuja 4, 02600 Espoo",
+   title:"Afternoon tea for two", price:32, ref:null, vat:13.5, img:"1559339352-11d035aa65de",
+   restrict:"Mon–Sat, 13–17",
+   inclusions:["Selection of sandwiches and pastries for two","Tea or coffee, refills included"],
+   booking:"No booking needed on weekdays. Book Saturdays by phone.",
+   rules:["Valid Monday–Saturday, 13:00–17:00"],
+   business:"Kahvila Malli Oy · Business ID 8901234-5"},
+];
+
+/* ================= Helpers ================= */
+const eur = n => new Intl.NumberFormat("fi-FI",{style:"currency",currency:"EUR"}).format(n);
+const fmtDate = d => d.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});
+const r2 = n => Math.round((n + Number.EPSILON) * 100) / 100;
+function addMonths(d, m){ // calendar months, clamp to month end
+  const t = new Date(d.getFullYear(), d.getMonth()+m, 1);
+  const last = new Date(t.getFullYear(), t.getMonth()+1, 0).getDate();
+  t.setDate(Math.min(d.getDate(), last)); return t;
+}
+function addDays(d,n){const t=new Date(d);t.setDate(t.getDate()+n);return t}
+function split(gross, vatRate, commissionRate=15, commVat=25.5){
+  const net = r2(gross/(1+vatRate/100));
+  const saleVat = r2(gross-net);
+  const comm = r2(net*commissionRate/100);
+  const cVat = r2(comm*commVat/100);
+  return {gross, net, saleVat, comm, cVat, fee:r2(comm+cVat), payout:r2(gross-comm-cVat)};
+}
+const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const deal = id => DEALS.find(d=>d.id===id);
+const cat = id => CATS.find(c=>c.id===id);
+function genCode(){
+  const A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s="";
+  for(let i=0;i<8;i++) s+=A[Math.floor(Math.random()*A.length)];
+  return `VND-${s.slice(0,4)}-${s.slice(4)}`;
+}
+
+/* Icons */
+const P = {
+  search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  pin:'<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+  chev:'<path d="m6 9 6 6 6-6"/>',
+  right:'<path d="m9 6 6 6-6 6"/>',
+  left:'<path d="m15 6-6 6 6 6"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  checkc:'<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  shield:'<path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+  x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  xc:'<circle cx="12" cy="12" r="9"/><path d="m15 9-6 6M9 9l6 6"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  ticket:'<path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z"/><path d="M13 6v12" stroke-dasharray="2 2"/>',
+  store:'<path d="M3 9 4.5 4h15L21 9"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M5 12v8h14v-8"/><path d="M10 20v-5h4v5"/>',
+  help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.7M12 17h.01"/>',
+  spa:'<path d="M12 21c-5 0-8-3-8-8 3 0 6 1.5 8 4 2-2.5 5-4 8-4 0 5-3 8-8 8z"/><path d="M12 17c-2-3-2-8 0-12 2 4 2 9 0 12z"/>',
+  food:'<path d="M5 3v8a2 2 0 0 0 2 2v8M9 3v8a2 2 0 0 1-2 2M7 3v6"/><path d="M17 21V3c-2 1-3 4-3 8h3"/>',
+  compass:'<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/>',
+  grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  scan:'<path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M4 12h16"/>',
+  bank:'<path d="m3 10 9-6 9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18"/>',
+  card:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/>',
+  phone:'<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',
+  mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+  cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  refund:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>',
+  lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  doc:'<path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+  logout:'<path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 17l-5-5 5-5M5 12h11"/>',
+};
+const ic = (n,cls="") => `<svg class="icon ${cls}" viewBox="0 0 24 24" aria-hidden="true">${P[n]}</svg>`;
+
+const LOGO_SYMBOL = `<svg viewBox="0 0 68 48" aria-hidden="true">
+  <path fill="#3B32B3" d="M1.5 1.2h14.6c4.1 0 6.6 1.9 8.6 5.2l13.4 22.4c1.1 1.8 2.9 1.8 3.9 0l3.7-6.5c2.3 3.8 2.6 7.6-.2 11.2l-4.6 5.1C35.4 44 24 46.4 17.6 36.1L1 2.4c-.3-.6 0-1.2.5-1.2z"/>
+  <path fill="#0B7A75" d="M28.6 15.8 33.9 6.6C37 2.5 40.4 1.2 44.5 1.2h14.6c.8 0 1 .7.4 1.2-2.7 2.1-4.2 4.1-5.7 6.8L42 30.7c-1.1 1.9-2.6 1.9-3.7 0z"/>
+</svg>`;
+const logoHTML = (href="#/") => `<a class="logo" href="${href}" aria-label="Vendelia home">${LOGO_SYMBOL}<span class="word">Vendelia</span></a>`;
+
+function photo(d, alt){
+  return `<img src="${IMG(d.img)}" alt="${esc(alt||d.title)}" loading="lazy" onerror="this.remove()">`;
+}
+
+/* ================= State ================= */
+const state = {
+  city: "All cities",
+  q: "",
+  catFilter: null,
+  purchases: [
+    {id:"o-1001", deal:"d3", qty:1, email:"you@example.com", code:"VND-7KQ2-M8XT", bought:addDays(TODAY,-20), status:"redeemed", redeemed:addDays(TODAY,-6)},
+    {id:"o-1002", deal:"d1", qty:1, email:"you@example.com", code:"VND-H4PW-29CN", bought:addDays(TODAY,-5), status:"active"},
+  ],
+  last: null,
+  biz: {
+    merchant:"Näyte Wellness",
+    deals:[
+      {title:"60-minute hot stone massage", price:59, vat:25.5, status:"live", sold:38},
+      {title:"Couples massage, 90 minutes", price:139, vat:25.5, status:"review", sold:0},
+      {title:"Back and neck massage, 30 minutes", price:35, vat:25.5, status:"draft", sold:0},
+    ],
+  },
+};
+
+/* ================= Shell ================= */
+const SCREENS = [
+  ["#/","Home"],["#/deals","Browse"],["#/deal/d1","Deal page"],["#/checkout/d1","Checkout"],
+  ["#/vouchers","My vouchers"],["#/business","Business: overview"],["#/business/new","Business: new deal"],
+  ["#/business/redeem","Business: redeem"],["#/business/payouts","Business: payouts"],
+];
+function renderProtobar(){
+  const h = location.hash || "#/";
+  document.getElementById("protobar").innerHTML =
+    `<span class="tag">Prototype</span><span style="opacity:.7">Sample content · not live</span>` +
+    SCREENS.map(([href,l])=>`<a href="${href}" ${h===href?'aria-current="page"':''}>${l}</a>`).join("");
+}
+
+function header(){
+  return `<header class="site"><div class="wrap">
+    <div class="hdr">
+      ${logoHTML()}
+      <button class="city-btn" data-act="city" aria-haspopup="dialog" aria-label="City: ${esc(state.city)}. Change city">${ic("pin")}<span>${esc(state.city)}</span>${ic("chev")}</button>
+      <form class="search hdr-search" role="search" data-act="search">
+        <label class="sr-only" for="q1">Search deals</label>
+        ${ic("search")}<input class="input" id="q1" name="q" placeholder="Search massage, brunch, hiking…" value="${esc(state.q)}">
+      </form>
+      <nav class="nav" aria-label="Main">
+        <a href="#/vouchers">${ic("ticket")}<span class="lbl">My vouchers</span><span class="sr-only">My vouchers</span></a>
+        <a href="#/business">${ic("store")}<span class="lbl">For businesses</span><span class="sr-only">For businesses</span></a>
+        <select class="lang" aria-label="Language"><option>EN</option><option>FI</option><option>SV</option></select>
+      </nav>
+    </div>
+    <div class="hdr-row2">
+      <form class="search" role="search" data-act="search">
+        <label class="sr-only" for="q2">Search deals</label>
+        ${ic("search")}<input class="input" id="q2" name="q" placeholder="Search deals" value="${esc(state.q)}">
+      </form>
+    </div>
+  </div></header>`;
+}
+
+function footer(){
+  return `<footer class="site"><div class="wrap">
+    <div class="foot">
+      <div>${logoHTML()}<p class="muted small" style="margin-top:12px;max-width:260px">Local offers in Helsinki, Espoo, Vantaa and Kauniainen.</p></div>
+      <div><h4>Customers</h4><a href="#/how">How vouchers work</a><a href="#/vouchers">My vouchers</a><a href="#/vouchers">Cancel a purchase</a></div>
+      <div><h4>Businesses</h4><a href="#/business">Sell on Vendelia</a><a href="#/business">Pricing and payouts</a><a href="#/business">Business terms</a></div>
+      <div><h4>Help</h4><a href="#/">Support centre</a><a href="#/">support@vendelia.fi</a><a href="#/">Refund policy</a></div>
+    </div>
+    <div class="legal">
+      <span>© 2026 Mansio Group Oy · Business ID 3631044-9</span>
+      <span class="row wrap-row" style="gap:16px"><a href="#/" class="muted">Terms of use</a><a href="#/" class="muted">Privacy</a><a href="#/" class="muted">Cookies</a><a href="#/" class="muted">Accessibility</a></span>
+    </div>
+  </div></footer>`;
+}
+
+function dealCard(d){
+  const c = cat(d.cat);
+  return `<a class="card deal" href="#/deal/${d.id}">
+    <div class="media">${photo(d)}<span class="chip">${ic(c.icon)}${c.name}</span></div>
+    <div class="body">
+      <div class="meta"><span>${esc(d.merchant)}</span><span aria-hidden="true">·</span>${ic("pin")}<span>${esc(d.city)}</span></div>
+      <h3>${esc(d.title)}</h3>
+      <p class="restrict">${esc(d.restrict)}</p>
+      <div class="price-row">
+        <span class="price">${eur(d.price)}</span>
+        ${d.ref?`<span class="ref"><span class="sr-only">Reference price </span>${eur(d.ref)}</span><span class="chip teal">−${Math.round((1-d.price/d.ref)*100)}%</span>`:""}
+      </div>
+      <p class="hint">Incl. VAT · Valid 3 months</p>
+    </div>
+  </a>`;
+}
+
+function filtered(){
+  return DEALS.filter(d =>
+    (state.city==="All cities" || d.city===state.city) &&
+    (!state.catFilter || d.cat===state.catFilter) &&
+    (!state.q || (d.title+" "+d.merchant+" "+cat(d.cat).name+" "+d.area).toLowerCase().includes(state.q.toLowerCase())));
+}
+
+/* ================= Screens: customer ================= */
+function Home(){
+  const list = filtered().slice(0,6);
+  return header() + `<main>
+  <div class="wrap">
+    <div class="hero">
+      <h1>Local offers you can trust.</h1>
+      <p class="lead">Clear prices with VAT included, real local businesses, and a 14-day refund on unused vouchers.</p>
+      <form class="hero-search" role="search" data-act="search">
+        <div class="field"><label class="sr-only" for="hc">City</label>
+          <select class="select" id="hc" data-act="city-select">${["All cities",...CITIES].map(c=>`<option ${c===state.city?"selected":""}>${c}</option>`).join("")}</select></div>
+        <div class="search"><label class="sr-only" for="hq">What are you looking for?</label>${ic("search")}<input class="input" id="hq" name="q" placeholder="What are you looking for?" value="${esc(state.q)}"></div>
+        <button class="btn btn-primary" type="submit">Search</button>
+      </form>
+    </div>
+
+    <nav class="cats" aria-label="Categories">
+      ${CATS.map(c=>`<a class="cat" href="#/deals" data-cat="${c.id}"><span class="ic">${ic(c.icon)}</span>${c.name}</a>`).join("")}
+      <a class="cat" href="#/deals" data-cat=""><span class="ic">${ic("grid")}</span>All deals</a>
+    </nav>
+
+    <section aria-labelledby="live">
+      <div class="sec-head"><h2 id="live">Live deals${state.city!=="All cities"?` in ${esc(state.city)}`:""}</h2><a class="btn btn-ghost" href="#/deals" data-cat="">See all ${ic("right")}</a></div>
+      ${list.length?`<div class="grid deals">${list.map(dealCard).join("")}</div>`:emptyState()}
+    </section>
+
+    <section aria-labelledby="how" id="how-sec">
+      <div class="sec-head"><h2 id="how">How it works</h2></div>
+      <div class="grid steps">
+        ${[["Choose a deal","Every deal shows the final price with VAT, what's included and the restrictions."],
+           ["Pay securely","Pay by card or MobilePay. You see every charge before you pay."],
+           ["Get your voucher","Your voucher and its exact expiry date arrive by email and in My vouchers."],
+           ["Book and redeem","Book with the business as described on the deal, then show your code."]]
+          .map((s,i)=>`<div class="card pad step"><div class="n">${i+1}</div><h3>${s[0]}</h3><p class="muted" style="margin-top:6px">${s[1]}</p></div>`).join("")}
+      </div>
+      <div class="notice" style="margin-top:var(--s3)">${ic("refund")}<p><b>14-day refund on unused vouchers.</b> Changed your mind? Cancel an unused voucher in My vouchers within 14 days of purchase. Vouchers are valid for 3 calendar months.</p></div>
+    </section>
+
+    <section aria-labelledby="biz">
+      <div class="merchant-cta">
+        <div>
+          <h2 id="biz">Run a local business?</h2>
+          <p style="opacity:.85;margin-top:12px;max-width:520px">Reach new customers in the Helsinki region. You set the offer; we handle payments, vouchers and support.</p>
+          <div class="row wrap-row" style="margin-top:var(--s3)"><a class="btn btn-primary" href="#/business">List your business</a><a class="btn" style="color:#fff" href="#/business/payouts">See how payouts work</a></div>
+        </div>
+        <ul>
+          <li>${ic("check")}<span><b>15% commission</b> on the VAT-exclusive sale. No sign-up or monthly fee.</span></li>
+          <li>${ic("check")}<span>Every statement line shown: sale, VAT, commission and payout.</span></li>
+          <li>${ic("check")}<span>Redeem vouchers from your phone.</span></li>
+        </ul>
+      </div>
+    </section>
+  </div></main>` + footer();
+}
+
+function emptyState(){
+  return `<div class="card empty"><p style="font-weight:600">No deals match yet.</p><p class="muted" style="margin-top:6px">Try another city or category.</p><button class="btn btn-secondary" style="margin-top:var(--s2)" data-act="reset">Clear filters</button></div>`;
+}
+
+function Browse(){
+  const list = filtered();
+  return header() + `<main class="wrap">
+    <div class="crumbs"><a href="#/">Home</a><span aria-hidden="true">/</span><span>Deals</span></div>
+    <div class="sec-head"><div><h1 style="font-size:clamp(26px,4vw,34px)">${state.catFilter?cat(state.catFilter).name:"All deals"}</h1>
+      <p class="muted" style="margin-top:6px">${list.length} ${list.length===1?"deal":"deals"} · ${esc(state.city)}${state.q?` · “${esc(state.q)}”`:""}</p></div></div>
+    <div class="filters" role="group" aria-label="Filter by city">
+      ${["All cities",...CITIES].map(c=>`<button class="cat" style="min-height:44px" aria-pressed="${c===state.city}" data-city="${c}">${c===state.city?ic("check"):""}${c}</button>`).join("")}
+    </div>
+    <div class="filters" role="group" aria-label="Filter by category">
+      <button class="cat" style="min-height:44px" aria-pressed="${!state.catFilter}" data-catf="">${!state.catFilter?ic("check"):""}All categories</button>
+      ${CATS.map(c=>`<button class="cat" style="min-height:44px" aria-pressed="${state.catFilter===c.id}" data-catf="${c.id}">${state.catFilter===c.id?ic("check"):""}${c.name}</button>`).join("")}
+    </div>
+    ${list.length?`<div class="grid deals">${list.map(dealCard).join("")}</div>`:emptyState()}
+  </main>` + footer();
+}
+
+function Deal(id){
+  const d = deal(id); if(!d) return NotFound();
+  const exp = addMonths(TODAY,3);
+  return `<div class="has-mobile-buy">` + header() + `<main class="wrap">
+    <div class="crumbs"><a href="#/">Home</a><span aria-hidden="true">/</span><a href="#/deals" data-cat="${d.cat}">${cat(d.cat).name}</a><span aria-hidden="true">/</span><span>${esc(d.city)}</span></div>
+    <div class="detail">
+      <div class="stack" style="--gap:24px">
+        <div class="gallery">${photo(d)}</div>
+        <div>
+          <div class="meta">${esc(d.merchant)} · ${ic("pin")} ${esc(d.area)}, ${esc(d.city)}</div>
+          <h1 style="font-size:clamp(26px,4vw,36px);margin-top:8px">${esc(d.title)}</h1>
+        </div>
+
+        <div class="card pad stack"><h2 style="font-size:20px">What's included</h2>
+          <ul class="ticks">${d.inclusions.map(x=>`<li>${ic("check")}<span>${esc(x)}</span></li>`).join("")}</ul></div>
+
+        <div class="card pad stack"><h2 style="font-size:20px">Restrictions</h2>
+          <ul class="dots">${d.rules.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+
+        <div class="card pad stack"><h2 style="font-size:20px">How to book and redeem</h2>
+          <p>${esc(d.booking)}</p>
+          <div class="notice indigo">${ic("cal")}<p>If you buy today, your voucher is valid until <b>${fmtDate(exp)}</b>. The exact date is printed on your voucher.</p></div></div>
+
+        <div class="card pad stack"><h2 style="font-size:20px">Location</h2>
+          <div class="map" role="img" aria-label="Map placeholder for ${esc(d.address)}">${ic("pin")}</div>
+          <p>${esc(d.address)}</p></div>
+
+        <div class="card pad stack"><h2 style="font-size:20px">Refunds and cancellation</h2>
+          <p>You can cancel an <b>unused</b> voucher for a full refund within <b>14 days of purchase</b> in My vouchers or by emailing support@vendelia.fi. We send an acknowledgement and refund to your original payment method. Redeemed vouchers follow the business's terms and your statutory rights.</p></div>
+
+        <div class="card pad"><h2 style="font-size:20px;margin-bottom:var(--s2)">Sold by</h2>
+          <div class="merchant"><div class="avatar">${d.mInit}</div><div><p style="font-weight:600">${esc(d.merchant)}</p><p class="muted small">${esc(d.business)}</p></div></div>
+          <p class="hint" style="margin-top:12px">Vendelia sells this voucher on behalf of the business. The business provides the service.</p></div>
+      </div>
+
+      <aside class="buybox card pad stack" aria-label="Purchase">
+        <div class="row" style="align-items:baseline;gap:12px;flex-wrap:wrap">
+          <span class="price" style="font-size:32px">${eur(d.price)}</span>
+          ${d.ref?`<span class="ref" style="font-size:16px"><span class="sr-only">Reference price </span>${eur(d.ref)}</span><span class="chip teal">−${Math.round((1-d.price/d.ref)*100)}%</span>`:""}
+        </div>
+        ${d.ref?`<p class="hint">${esc(d.refNote)}</p>`:""}
+        <p class="muted small">Final price, VAT ${String(d.vat).replace(".",",")}% included. No booking fee.</p>
+        <a class="btn btn-primary btn-block" href="#/checkout/${d.id}">Buy voucher</a>
+        <ul class="ticks small">
+          <li>${ic("cal")}<span>Valid until ${fmtDate(exp)}</span></li>
+          <li>${ic("refund")}<span>14-day refund if unused</span></li>
+          <li>${ic("lock")}<span>Secure payment by card or MobilePay</span></li>
+        </ul>
+      </aside>
+    </div>
+  </main>
+  <div class="mobile-buy"><div><span class="price">${eur(d.price)}</span><p class="hint">Incl. VAT</p></div><a class="btn btn-primary" href="#/checkout/${d.id}">Buy voucher</a></div>
+  ` + footer() + `</div>`;
+}
+
+function Checkout(id){
+  const d = deal(id); if(!d) return NotFound();
+  const exp = addMonths(TODAY,3);
+  return header() + `<main class="wrap" style="padding-top:var(--s3)">
+    <a class="btn btn-ghost" href="#/deal/${d.id}" style="margin-left:-8px">${ic("left")} Back to deal</a>
+    <h1 style="font-size:clamp(26px,4vw,34px);margin:8px 0 var(--s2)">Checkout</h1>
+    <div class="stepper" aria-label="Checkout steps"><span><b>1. Details</b></span><span aria-hidden="true">›</span><span>2. Payment</span><span aria-hidden="true">›</span><span>3. Voucher</span></div>
+    <form class="checkout" data-act="pay" data-deal="${d.id}" novalidate>
+      <div class="stack">
+        <div class="card pad stack">
+          <h2 style="font-size:20px">Your details</h2>
+          <div class="field"><label for="em">Email address</label><input class="input" id="em" name="email" type="email" autocomplete="email" required value="you@example.com" aria-describedby="em-h"><span class="hint" id="em-h">We send your voucher and receipt here.</span></div>
+          <div class="field"><label for="nm">Name on voucher <span class="muted">(optional)</span></label><input class="input" id="nm" name="name" autocomplete="name"></div>
+        </div>
+        <div class="card pad stack">
+          <h2 style="font-size:20px">Payment method</h2>
+          <fieldset class="pay-opts" style="border:0;padding:0;margin:0"><legend class="sr-only">Payment method</legend>
+            <label class="pay-opt"><input type="radio" name="pm" value="card" checked>${ic("card")}<span>Card</span><span class="brand">VISA · MASTERCARD</span></label>
+            <label class="pay-opt"><input type="radio" name="pm" value="mobilepay">${ic("phone")}<span>MobilePay</span></label>
+            <label class="pay-opt"><input type="radio" name="pm" value="bank">${ic("bank")}<span>Online bank</span><span class="brand">FI BANKS</span></label>
+          </fieldset>
+          <p class="hint">${ic("lock")} Payment details are entered on the payment provider's secure form in the live service.</p>
+        </div>
+        <div class="card pad stack">
+          <label class="check"><input type="checkbox" name="terms" required id="terms"><span>I accept the <a href="#/">terms of use</a> and the business's restrictions for this deal. I understand the voucher is valid until <b>${fmtDate(exp)}</b>.</span></label>
+          <p class="hint" id="terms-err" hidden style="color:var(--danger)">${ic("xc")} Please accept the terms to continue.</p>
+        </div>
+      </div>
+
+      <aside class="card pad stack" aria-label="Order summary">
+        <div class="row" style="gap:12px;align-items:flex-start">
+          <div style="width:72px;height:56px;border-radius:8px;overflow:hidden;flex:none;background:var(--indigo-50)">${photo(d,"")}</div>
+          <div><p style="font-weight:600;line-height:1.35">${esc(d.title)}</p><p class="muted small">${esc(d.merchant)} · ${esc(d.city)}</p></div>
+        </div>
+        <div class="row between"><span class="label">Quantity</span>
+          <div class="qty"><button type="button" data-act="qty" data-d="-1" aria-label="Decrease quantity">−</button><output id="qty" aria-live="polite">1</output><button type="button" data-act="qty" data-d="1" aria-label="Increase quantity">+</button></div></div>
+        <div id="sum"></div>
+        <button class="btn btn-primary btn-block" type="submit" id="paybtn">Pay</button>
+        <ul class="ticks small">
+          <li>${ic("refund")}<span>Cancel unused vouchers within 14 days for a full refund.</span></li>
+          <li>${ic("mail")}<span>Voucher sent by email right after payment.</span></li>
+        </ul>
+      </aside>
+    </form>
+  </main>` + footer();
+}
+function renderSummary(d, qty){
+  const total = r2(d.price*qty);
+  const s = split(total, d.vat);
+  document.getElementById("sum").innerHTML = `
+    <div class="summary-line"><span>${qty} × ${eur(d.price)}</span><span>${eur(total)}</span></div>
+    <div class="summary-line muted"><span>Includes VAT ${String(d.vat).replace(".",",")}%</span><span>${eur(s.saleVat)}</span></div>
+    <div class="summary-line"><span>Booking or service fee</span><span>${eur(0)}</span></div>
+    <div class="summary-line total"><span>Total to pay</span><span>${eur(total)}</span></div>`;
+  document.getElementById("paybtn").textContent = `Pay ${eur(total)}`;
+}
+
+function qrSVG(code){
+  const N=25, cells=[]; let h=0;
+  for(const ch of code) h=(h*31+ch.charCodeAt(0))>>>0;
+  const rnd=()=>{h^=h<<13;h>>>=0;h^=h>>17;h^=h<<5;h>>>=0;return h/4294967296};
+  const finder=(x,y)=>x<7&&y<7||x>=N-7&&y<7||x<7&&y>=N-7;
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){ if(!finder(x,y)&&rnd()>.52) cells.push(`<rect x="${x}" y="${y}" width="1" height="1"/>`); }
+  const f=(x,y)=>`<rect x="${x}" y="${y}" width="7" height="7"/><rect x="${x+1}" y="${y+1}" width="5" height="5" fill="#fff"/><rect x="${x+2}" y="${y+2}" width="3" height="3"/>`;
+  return `<svg class="qr" viewBox="0 0 ${N} ${N}" role="img" aria-label="QR code for voucher ${code} (prototype)" shape-rendering="crispEdges" fill="#17223B">${cells.join("")}${f(0,0)}${f(N-7,0)}${f(0,N-7)}</svg>`;
+}
+
+function Confirmation(){
+  const p = state.last || state.purchases[state.purchases.length-1];
+  const d = deal(p.deal), exp = addMonths(p.bought,3);
+  return header() + `<main class="wrap" style="padding-top:var(--s4);max-width:880px">
+    <div class="stack" style="text-align:center;align-items:center;display:flex;flex-direction:column">
+      <div class="success-ic">${ic("check")}</div>
+      <h1 style="font-size:clamp(26px,4vw,34px)">Payment received. Here's your voucher.</h1>
+      <p class="muted">We've sent it to <b>${esc(p.email)}</b>. You can also find it in My vouchers.</p>
+    </div>
+    <div class="card pad voucher" style="margin-top:var(--s4)">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px">${qrSVG(p.code)}<span class="code">${p.code}</span></div>
+      <div class="stack">
+        <div class="row between wrap-row"><span class="chip teal">${ic("checkc")}Active · not used</span>${logoHTML()}</div>
+        <h2 style="font-size:22px">${esc(d.title)}${p.qty>1?` <span class="muted">× ${p.qty}</span>`:""}</h2>
+        <dl class="kv">
+          <dt>Business</dt><dd>${esc(d.merchant)}</dd>
+          <dt>Address</dt><dd>${esc(d.address)}</dd>
+          <dt>Purchased</dt><dd>${fmtDate(p.bought)}</dd>
+          <dt>Valid until</dt><dd><b>${fmtDate(exp)}</b></dd>
+          <dt>Order</dt><dd>${p.id}</dd>
+        </dl>
+        <div class="notice indigo">${ic("info")}<p><b>Next step:</b> ${esc(d.booking)}</p></div>
+      </div>
+    </div>
+    <div class="row wrap-row" style="justify-content:center;margin-top:var(--s3)">
+      <a class="btn btn-primary" href="#/vouchers">Go to My vouchers</a><a class="btn btn-secondary" href="#/">Keep browsing</a>
+    </div>
+    <p class="hint" style="text-align:center;margin-top:var(--s2)">Changed your mind? Cancel this unused voucher until ${fmtDate(addDays(p.bought,14))} for a full refund.</p>
+  </main>` + footer();
+}
+
+function statusChip(p){
+  const exp = addMonths(p.bought,3);
+  if(p.status==="redeemed") return `<span class="chip grey">${ic("check")}Used ${fmtDate(p.redeemed)}</span>`;
+  if(p.status==="refunded") return `<span class="chip danger">${ic("refund")}Refunded</span>`;
+  if(exp < TODAY) return `<span class="chip grey">${ic("clock")}Expired</span>`;
+  const days = Math.round((exp-TODAY)/864e5);
+  return days<=14 ? `<span class="chip warn">${ic("clock")}Expires in ${days} days</span>` : `<span class="chip teal">${ic("checkc")}Active</span>`;
+}
+
+function Vouchers(){
+  const list = [...state.purchases].reverse();
+  return header() + `<main class="wrap" style="padding-top:var(--s4);max-width:960px">
+    <h1 style="font-size:clamp(26px,4vw,34px)">My vouchers</h1>
+    <p class="muted" style="margin-top:6px">Signed in as you@example.com</p>
+    <div class="stack" style="margin-top:var(--s3)">
+    ${list.map(p=>{
+      const d = deal(p.deal), exp = addMonths(p.bought,3), cancelBy = addDays(p.bought,14);
+      const canCancel = p.status==="active" && TODAY<=cancelBy;
+      return `<article class="card purchase" aria-labelledby="t-${p.id}">
+        <div class="thumb">${photo(d,"")}</div>
+        <div style="min-width:0">
+          <div class="row wrap-row" style="margin-bottom:4px">${statusChip(p)}</div>
+          <h2 id="t-${p.id}" style="font-size:17px">${esc(d.title)}${p.qty>1?` × ${p.qty}`:""}</h2>
+          <p class="muted small">${esc(d.merchant)} · Code <span style="font-family:ui-monospace,monospace">${p.code}</span></p>
+          <p class="small" style="margin-top:4px">Purchased ${fmtDate(p.bought)} · ${p.status==="refunded"?"Cancelled":"Valid until <b>"+fmtDate(exp)+"</b>"}</p>
+          ${canCancel?`<p class="hint">Free cancellation until ${fmtDate(cancelBy)}</p>`:""}
+        </div>
+        <div class="actions">
+          ${p.status==="active"?`<button class="btn btn-secondary btn-sm" data-act="show" data-id="${p.id}">Show voucher</button>`:""}
+          ${canCancel?`<button class="btn btn-danger btn-sm" data-act="cancel" data-id="${p.id}">Cancel and refund</button>`:""}
+          <button class="btn btn-ghost btn-sm" data-act="receipt">${ic("doc")} Receipt</button>
+        </div>
+      </article>`;}).join("")}
+    </div>
+    <div class="notice" style="margin-top:var(--s3)">${ic("help")}<p>Need help with a purchase? Email <a href="#/">support@vendelia.fi</a>. We reply on weekdays within one working day.</p></div>
+  </main>` + footer();
+}
+
+function NotFound(){ return header()+`<main class="wrap empty"><h1>Page not found</h1><a class="btn btn-primary" style="margin-top:16px" href="#/">Go home</a></main>`+footer(); }
+
+/* ================= Screens: business portal ================= */
+function portal(active, inner){
+  const items=[["#/business","Overview","grid"],["#/business/new","Create deal","plus"],["#/business/redeem","Redeem voucher","scan"],["#/business/payouts","Payouts and reports","bank"]];
+  return `<div class="portal">
+    <aside class="side">
+      ${logoHTML("#/business")}
+      <nav aria-label="Business portal">${items.map(([h,l,i])=>`<a href="${h}" ${active===h?'aria-current="page"':''}>${ic(i)}${l}</a>`).join("")}
+        <a href="#/">${ic("logout")}Back to site</a></nav>
+      <div class="biz"><p style="font-weight:600">Näyte Wellness Oy</p><p class="muted">Business ID 1234567-8</p><p class="row" style="margin-top:8px;color:var(--teal);font-weight:600">${ic("checkc")}Payouts verified</p></div>
+    </aside>
+    <main class="main">${inner}</main>
+  </div>`;
+}
+
+function Biz(){
+  const st = state.biz.deals;
+  const chip = s => s==="live"?`<span class="chip teal">${ic("checkc")}Live</span>`:s==="review"?`<span class="chip warn">${ic("clock")}In review</span>`:`<span class="chip grey">${ic("doc")}Draft</span>`;
+  const redeemedCount = state.purchases.filter(p=>p.status==="redeemed").length + 21;
+  return portal("#/business", `
+    <div class="row between wrap-row" style="gap:16px"><div><h1 style="font-size:28px">Overview</h1><p class="muted">October 2026 · sample data</p></div>
+      <a class="btn btn-primary" href="#/business/new">${ic("plus")} Create deal</a></div>
+    <div class="grid kpis" style="margin-top:var(--s3)">
+      <div class="card pad kpi"><p class="muted small">Vouchers sold</p><p class="v">38</p></div>
+      <div class="card pad kpi"><p class="muted small">Redeemed</p><p class="v">${redeemedCount}</p></div>
+      <div class="card pad kpi"><p class="muted small">Gross sales (incl. VAT)</p><p class="v">${eur(38*59)}</p></div>
+      <div class="card pad kpi"><p class="muted small">Next payout</p><p class="v">${eur(split(redeemedCount*59,25.5).payout)}</p><p class="hint">Redeemed vouchers · 21 Oct</p></div>
+    </div>
+    <div class="card" style="margin-top:var(--s3)">
+      <div class="pad row between"><h2 style="font-size:20px">Your deals</h2></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Deal</th><th>Status</th><th class="num">Price</th><th class="num">You receive</th><th class="num">Sold</th></tr></thead>
+        <tbody>${st.map(x=>`<tr><td style="font-weight:500">${esc(x.title)}</td><td>${chip(x.status)}</td><td class="num">${eur(x.price)}</td><td class="num">${eur(split(x.price,x.vat).payout)}</td><td class="num">${x.sold}</td></tr>`).join("")}</tbody>
+      </table></div>
+    </div>`);
+}
+
+function BizNew(){
+  return portal("#/business/new", `
+    <h1 style="font-size:28px">Create deal</h1>
+    <p class="muted" style="margin-top:4px">Deals are checked by Vendelia before going live, usually within one working day.</p>
+    <form class="split" style="margin-top:var(--s3)" data-act="newdeal">
+      <div class="card pad form-grid">
+        <div class="field"><label for="nt">Offer title</label><input class="input" id="nt" name="title" required value="Back and neck massage, 30 minutes"></div>
+        <div class="form-grid two">
+          <div class="field"><label for="nc">Category</label><select class="select" id="nc" name="cat">${CATS.map(c=>`<option value="${c.id}">${c.name}</option>`).join("")}</select></div>
+          <div class="field"><label for="ncity">City</label><select class="select" id="ncity">${CITIES.map(c=>`<option>${c}</option>`).join("")}</select></div>
+        </div>
+        <div class="form-grid two">
+          <div class="field"><label for="np">Customer price incl. VAT (€)</label><input class="input" id="np" name="price" type="number" min="1" step="0.01" value="35.00" inputmode="decimal"></div>
+          <div class="field"><label for="nv">VAT rate for this service</label><select class="select" id="nv" name="vat"><option value="25.5">25,5 % – general</option><option value="13.5">13,5 % – food, restaurants, sports, culture</option><option value="10">10 % – reduced</option></select><span class="hint">Ask your accountant if unsure.</span></div>
+        </div>
+        <div class="field"><label for="nr">Regular price (optional)</label><input class="input" id="nr" type="number" min="0" step="0.01" placeholder="e.g. 45.00" aria-describedby="nr-h"><span class="hint" id="nr-h">Only enter a price you have actually charged recently. It is shown as the reference price.</span></div>
+        <div class="field"><label for="ni">What's included (one per line)</label><textarea class="input" id="ni">30-minute back and neck massage
+Herbal tea after treatment</textarea></div>
+        <div class="field"><label for="nx">Restrictions (one per line)</label><textarea class="input" id="nx">Valid Monday–Friday
+One voucher per person per visit</textarea></div>
+        <div class="field"><label for="nb">Booking instructions</label><textarea class="input" id="nb">Book by phone at least 24 h ahead and quote your voucher code.</textarea></div>
+        <div class="field"><label for="nimg">Photos</label><input class="input" id="nimg" type="file" accept="image/*" style="padding-top:11px"><span class="hint">Use real photos of your premises or service.</span></div>
+        <div class="row wrap-row"><button class="btn btn-primary" type="submit">Submit for review</button><button class="btn btn-secondary" type="button" data-act="toast" data-msg="Draft saved">Save draft</button></div>
+      </div>
+
+      <aside class="card pad stack breakdown" aria-labelledby="bd" style="position:sticky;top:24px">
+        <h2 id="bd" style="font-size:18px">What you receive per voucher</h2>
+        <div id="bdl" aria-live="polite"></div>
+        <p class="hint">Commission is 15% of the VAT-exclusive sale. Commission VAT 25,5% is deductible for VAT-registered businesses. Paid out after redemption.</p>
+      </aside>
+    </form>`);
+}
+function renderBreakdown(){
+  const price = parseFloat(document.getElementById("np").value)||0;
+  const vat = parseFloat(document.getElementById("nv").value);
+  const s = split(price, vat);
+  const L=(a,b,cls="")=>`<div class="summary-line ${cls}"><span>${a}</span><span>${b}</span></div>`;
+  document.getElementById("bdl").innerHTML =
+    L("Customer pays (incl. VAT)", eur(s.gross)) +
+    L(`Sale VAT ${String(vat).replace(".",",")}% (you report)`, eur(s.saleVat),"muted") +
+    L("Commission base (excl. VAT)", eur(s.net),"muted") +
+    L("Commission 15%", "−"+eur(s.comm)) +
+    L("Commission VAT 25,5%", "−"+eur(s.cVat)) +
+    L("Your payout", eur(s.payout),"total") +
+    `<p class="hint" style="margin-top:8px">Total deduction ${eur(s.fee)} = ${(s.gross?s.fee/s.gross*100:0).toFixed(1).replace(".",",")}% of the customer price.</p>`;
+}
+
+function BizRedeem(){
+  const active = state.purchases.filter(p=>p.status==="active" && deal(p.deal).merchant==="Näyte Wellness");
+  return portal("#/business/redeem", `
+    <h1 style="font-size:28px">Redeem voucher</h1>
+    <p class="muted" style="margin-top:4px">Scan the customer's QR code or type the code. Each voucher can be redeemed once.</p>
+    <div class="split" style="margin-top:var(--s3)">
+      <div class="card pad stack">
+        <button class="btn btn-secondary btn-block" style="min-height:120px;flex-direction:column;border-style:dashed" data-act="toast" data-msg="Camera scanning opens here on a phone">${ic("scan")}<span>Scan QR code</span></button>
+        <form data-act="redeem" class="stack">
+          <div class="field"><label for="rc">Or enter voucher code</label><input class="input" id="rc" name="code" autocomplete="off" autocapitalize="characters" placeholder="VND-XXXX-XXXX" style="font-family:ui-monospace,monospace;letter-spacing:.05em;text-transform:uppercase"></div>
+          <button class="btn btn-primary btn-block" type="submit">Check code</button>
+        </form>
+        <div id="rr" class="redeem-result" aria-live="polite"></div>
+      </div>
+      <aside class="card pad stack">
+        <h2 style="font-size:18px">Try it</h2>
+        <p class="muted small">Active sample vouchers for your business:</p>
+        ${active.length?active.map(p=>`<button class="btn btn-ghost btn-sm" style="justify-content:flex-start;font-family:ui-monospace,monospace" data-act="fill" data-code="${p.code}">${p.code}</button>`).join(""):'<p class="small">None. Buy the massage deal in the customer flow to create one.</p>'}
+        <p class="muted small">Used or refunded codes are rejected with the reason shown.</p>
+      </aside>
+    </div>`);
+}
+
+function BizPayouts(){
+  const rows = [
+    {d:"60-minute hot stone massage", n:17, price:59, vat:25.5, ref:1},
+    {d:"Couples massage, 90 minutes", n:4, price:139, vat:25.5, ref:0},
+  ];
+  let T={gross:0,saleVat:0,net:0,comm:0,cVat:0,refund:0,payout:0};
+  const lines = rows.map(r=>{
+    const s = split(r.price*r.n, r.vat), refund = r.ref*r.price, rs = split(refund, r.vat);
+    const payout = r2(s.payout - rs.payout);
+    T.gross+=s.gross;T.saleVat+=s.saleVat;T.net+=s.net;T.comm+=s.comm-rs.comm;T.cVat+=s.cVat-rs.cVat;T.refund+=refund;T.payout+=payout;
+    return `<tr><td>${esc(r.d)}<div class="hint">${r.n} sold · ${r.ref} refunded</div></td><td class="num">${eur(s.gross)}</td><td class="num">${eur(s.saleVat)}</td><td class="num">${eur(s.net)}</td><td class="num">${eur(r2(s.comm-rs.comm))}</td><td class="num">${eur(r2(s.cVat-rs.cVat))}</td><td class="num">${refund?"−"+eur(refund):eur(0)}</td><td class="num"><b>${eur(payout)}</b></td></tr>`;
+  }).join("");
+  Object.keys(T).forEach(k=>T[k]=r2(T[k]));
+  return portal("#/business/payouts", `
+    <div class="row between wrap-row" style="gap:16px"><div><h1 style="font-size:28px">Payouts and reports</h1><p class="muted">Settlement 1–15 Oct 2026 · sample data</p></div>
+      <button class="btn btn-secondary" data-act="toast" data-msg="CSV export starts here">${ic("doc")} Export CSV</button></div>
+    <div class="grid kpis" style="margin-top:var(--s3)">
+      <div class="card pad kpi"><p class="muted small">Payout amount</p><p class="v">${eur(T.payout)}</p></div>
+      <div class="card pad kpi"><p class="muted small">Status</p><p class="v" style="font-size:20px"><span class="chip warn">${ic("clock")}Scheduled 21 Oct</span></p></div>
+      <div class="card pad kpi"><p class="muted small">Paid to</p><p class="v" style="font-size:18px">FI•• •••• •••• 1234</p></div>
+    </div>
+    <div class="card" style="margin-top:var(--s3)"><div class="table-wrap"><table>
+      <thead><tr><th>Deal</th><th class="num">Sales incl. VAT</th><th class="num">Sale VAT</th><th class="num">Commission base</th><th class="num">Commission</th><th class="num">Comm. VAT</th><th class="num">Refunds</th><th class="num">Payout</th></tr></thead>
+      <tbody>${lines}<tr class="sum"><td>Total</td><td class="num">${eur(T.gross)}</td><td class="num">${eur(T.saleVat)}</td><td class="num">${eur(T.net)}</td><td class="num">${eur(T.comm)}</td><td class="num">${eur(T.cVat)}</td><td class="num">${T.refund?"−"+eur(T.refund):eur(0)}</td><td class="num">${eur(T.payout)}</td></tr></tbody>
+    </table></div></div>
+    <div class="notice indigo" style="margin-top:var(--s3)">${ic("info")}<p>Refunds reverse the related commission and commission VAT. A commission invoice for this period is issued with the payout.</p></div>`);
+}
+
+/* ================= Router ================= */
+function route(){
+  const h = location.hash || "#/";
+  const [ , a, b] = h.split("/");
+  let html;
+  if(!a) html = Home();
+  else if(a==="deals") html = Browse();
+  else if(a==="deal") html = Deal(b);
+  else if(a==="checkout") html = Checkout(b);
+  else if(a==="done") html = Confirmation();
+  else if(a==="vouchers") html = Vouchers();
+  else if(a==="how") { location.hash="#/"; setTimeout(()=>document.getElementById("how-sec")?.scrollIntoView(),50); return; }
+  else if(a==="business") html = b==="new"?BizNew():b==="redeem"?BizRedeem():b==="payouts"?BizPayouts():Biz();
+  else html = NotFound();
+  document.getElementById("app").innerHTML = html;
+  renderProtobar();
+  window.scrollTo(0,0);
+  if(a==="checkout"){ window._qty=1; renderSummary(deal(b),1); }
+  if(a==="business" && b==="new") renderBreakdown();
+}
+window.addEventListener("hashchange", route);
+
+/* ================= Interactions ================= */
+function toast(msg){
+  const t=document.getElementById("toast"); t.innerHTML=ic("check")+esc(msg); t.classList.add("show");
+  clearTimeout(window._tt); window._tt=setTimeout(()=>t.classList.remove("show"),2600);
+}
+const dlg = document.getElementById("dlg");
+function openDialog(html){ dlg.innerHTML=html; dlg.showModal(); }
+
+document.addEventListener("click", e=>{
+  const el = e.target.closest("[data-act],[data-cat],[data-city],[data-catf]"); if(!el) return;
+  if(el.dataset.cat!==undefined && el.tagName==="A"){ state.catFilter = el.dataset.cat||null; return; }
+  if(el.dataset.city!==undefined){ state.city=el.dataset.city; route(); return; }
+  if(el.dataset.catf!==undefined){ state.catFilter=el.dataset.catf||null; route(); return; }
+  const act = el.dataset.act;
+  if(act==="city"){
+    openDialog(`<div class="pad stack"><div class="row between"><h2 style="font-size:20px">Choose your city</h2><button class="btn btn-ghost" data-act="close" aria-label="Close">${ic("x")}</button></div>
+      <div class="stack" role="group" aria-label="Cities">${["All cities",...CITIES].map(c=>`<button class="pay-opt" style="width:100%" data-act="pickcity" data-v="${c}">${ic("pin")}<span>${c}</span>${c===state.city?`<span class="brand" style="color:var(--indigo)">SELECTED</span>`:""}</button>`).join("")}</div></div>`);
+  }
+  if(act==="pickcity"){ state.city=el.dataset.v; dlg.close(); route(); toast(`Showing deals in ${state.city}`); }
+  if(act==="close"){ dlg.close(); }
+  if(act==="reset"){ state.city="All cities"; state.q=""; state.catFilter=null; route(); }
+  if(act==="qty"){
+    const id=location.hash.split("/")[2]; window._qty=Math.max(1,Math.min(5,(window._qty||1)+Number(el.dataset.d)));
+    document.getElementById("qty").textContent=window._qty; renderSummary(deal(id),window._qty);
+  }
+  if(act==="toast") toast(el.dataset.msg);
+  if(act==="receipt") toast("Receipt PDF opens here");
+  if(act==="show"){ state.last=state.purchases.find(p=>p.id===el.dataset.id); location.hash="#/done"; }
+  if(act==="cancel"){
+    const p=state.purchases.find(x=>x.id===el.dataset.id), d=deal(p.deal);
+    openDialog(`<div class="pad stack"><h2 style="font-size:20px">Cancel this voucher?</h2>
+      <p>${esc(d.title)} · <span style="font-family:ui-monospace,monospace">${p.code}</span></p>
+      <p class="muted">The voucher stops working immediately. ${eur(d.price*p.qty)} is refunded to your original payment method, usually within 5 working days. We'll email you a confirmation.</p>
+      <div class="row wrap-row" style="justify-content:flex-end"><button class="btn btn-secondary" data-act="close">Keep voucher</button><button class="btn btn-primary" data-act="confirmcancel" data-id="${p.id}">Cancel and refund</button></div></div>`);
+  }
+  if(act==="confirmcancel"){ const p=state.purchases.find(x=>x.id===el.dataset.id); p.status="refunded"; dlg.close(); route(); toast("Cancelled. Refund confirmation sent by email."); }
+  if(act==="fill"){ document.getElementById("rc").value=el.dataset.code; document.getElementById("rc").focus(); }
+  if(act==="doredeem"){
+    const p=state.purchases.find(x=>x.code===el.dataset.code); p.status="redeemed"; p.redeemed=TODAY;
+    document.getElementById("rr").innerHTML=`<div class="notice">${ic("checkc")}<p><b>Redeemed.</b> ${p.code} is now marked as used. ${eur(split(deal(p.deal).price*p.qty,deal(p.deal).vat).payout)} added to your next payout.</p></div>`;
+  }
+});
+
+document.addEventListener("change", e=>{
+  if(e.target.dataset.act==="city-select"){ state.city=e.target.value; route(); }
+  if(e.target.id==="nv") renderBreakdown();
+});
+document.addEventListener("input", e=>{ if(e.target.id==="np") renderBreakdown(); });
+
+document.addEventListener("submit", e=>{
+  const f=e.target, act=f.dataset.act; if(!act) return; e.preventDefault();
+  if(act==="search"){ state.q=f.q.value.trim(); state.catFilter=null; location.hash="#/deals"; if(location.hash==="#/deals") route(); }
+  if(act==="pay"){
+    const terms=f.terms.checked, email=f.email.value.trim();
+    document.getElementById("terms-err").hidden=terms;
+    if(!terms){ f.terms.focus(); return; }
+    if(!/^\S+@\S+\.\S+$/.test(email)){ f.email.focus(); f.email.setAttribute("aria-invalid","true"); return; }
+    const p={id:"o-"+(1000+state.purchases.length+1), deal:f.dataset.deal, qty:window._qty||1, email, code:genCode(), bought:TODAY, status:"active"};
+    state.purchases.push(p); state.last=p; location.hash="#/done";
+  }
+  if(act==="redeem"){
+    const code=f.code.value.trim().toUpperCase(), out=document.getElementById("rr");
+    const p=state.purchases.find(x=>x.code===code);
+    if(!p){ out.innerHTML=`<div class="notice warn">${ic("xc")}<p><b>Code not found.</b> Check the code and try again.</p></div>`; return; }
+    const d=deal(p.deal);
+    if(p.status==="redeemed"){ out.innerHTML=`<div class="notice warn">${ic("xc")}<p><b>Already used</b> on ${fmtDate(p.redeemed)}. Do not provide the service again.</p></div>`; return; }
+    if(p.status==="refunded"){ out.innerHTML=`<div class="notice warn">${ic("xc")}<p><b>Refunded voucher.</b> The customer cancelled this purchase. It is no longer valid.</p></div>`; return; }
+    out.innerHTML=`<div class="card pad stack" style="box-shadow:none"><span class="chip teal" style="align-self:flex-start">${ic("checkc")}Valid · not used</span>
+      <p style="font-weight:600">${esc(d.title)}${p.qty>1?` × ${p.qty}`:""}</p><p class="muted small">Valid until ${fmtDate(addMonths(p.bought,3))}</p>
+      <button class="btn btn-primary" data-act="doredeem" data-code="${p.code}">Mark as redeemed</button></div>`;
+  }
+  if(act==="newdeal"){
+    const price=parseFloat(document.getElementById("np").value)||0, vat=parseFloat(document.getElementById("nv").value);
+    state.biz.deals.push({title:f.title.value||"Untitled deal", price, vat, status:"review", sold:0});
+    location.hash="#/business"; setTimeout(()=>toast("Submitted. We'll review it within one working day."),60);
+  }
+});
+
+route();
+</script>
+</body>
+</html>
