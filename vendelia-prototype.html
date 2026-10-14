@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="fi">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vendelia Prototype</title>
+<title>Vendelia Prototyyppi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -43,19 +43,20 @@ button,input,select,textarea{font:inherit;color:inherit}
 .between{justify-content:space-between}
 .wrap-row{flex-wrap:wrap}
 .icon{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 
 /* ---------- Prototype bar ---------- */
 .protobar{background:var(--navy);color:#fff;font-size:13px}
 .protobar .wrap{display:flex;gap:var(--s2);align-items:center;min-height:40px;overflow-x:auto;white-space:nowrap}
-.protobar a{color:#fff;opacity:.8;text-decoration:none;padding:4px 0}
-.protobar a:hover,.protobar a[aria-current="page"]{opacity:1;text-decoration:underline}
+.protobar a,.protobar button{color:#fff;opacity:.8;text-decoration:none;padding:4px 0;background:none;border:0;cursor:pointer;font-size:13px}
+.protobar a:hover,.protobar a[aria-current="page"],.protobar button:hover{opacity:1;text-decoration:underline}
 .protobar .tag{background:rgba(255,255,255,.14);padding:2px 8px;border-radius:999px;font-weight:600}
 
 /* ---------- Buttons / inputs ---------- */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 var(--s3);border-radius:var(--radius-sm);border:1px solid transparent;font-weight:600;cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 var(--s3);border-radius:var(--radius-sm);border:1px solid transparent;font-weight:600;cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s;text-align:center}
 .btn-primary{background:var(--indigo);color:#fff}
 .btn-primary:hover{background:var(--indigo-600)}
-.btn-secondary{background:#fff;color:var(--navy);border-color:var(--line)}
+.btn-secondary{background:#fff;color:var(--navy);border-color:#C9CDDA}
 .btn-secondary:hover{border-color:var(--navy-50)}
 .btn-ghost{background:transparent;color:var(--indigo);padding:0 var(--s1)}
 .btn-danger{background:#fff;color:var(--danger);border-color:#F0C4BF}
@@ -64,36 +65,42 @@ button,input,select,textarea{font:inherit;color:inherit}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 .field{display:flex;flex-direction:column;gap:6px}
 .field label,.label{font-weight:500;font-size:14px}
+.req{color:var(--danger)}
 .input,.select,textarea.input{min-height:48px;padding:0 14px;border:1px solid #C9CDDA;border-radius:var(--radius-sm);background:#fff;width:100%}
 textarea.input{padding:12px 14px;min-height:96px;resize:vertical}
 .input:focus,.select:focus{border-color:var(--indigo);outline:3px solid var(--indigo-100);outline-offset:0}
+.input[aria-invalid="true"]{border-color:var(--danger);box-shadow:inset 0 0 0 1px var(--danger)}
+.err-msg{font-size:13px;color:var(--danger);display:flex;gap:6px;align-items:center}
+.err-msg .icon{width:16px;height:16px}
 .hint{font-size:13px;color:var(--navy-70)}
-.check{display:flex;gap:12px;align-items:flex-start;font-size:15px}
+.check{display:flex;gap:12px;align-items:flex-start;font-size:15px;cursor:pointer}
 .check input{width:20px;height:20px;margin-top:2px;accent-color:var(--indigo);flex:none}
 
 /* ---------- Header ---------- */
 header.site{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
-.hdr{display:grid;grid-template-columns:auto 1fr auto;gap:var(--s2);align-items:center;min-height:64px}
-.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--indigo)}
-.logo svg{height:30px;width:auto}
-.logo .word{font-weight:700;font-size:22px;letter-spacing:-.02em}
-.city-btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:#fff;cursor:pointer;font-weight:500;font-size:14px}
+.hdr{display:grid;grid-template-columns:auto 1fr auto;gap:var(--s2);align-items:center;min-height:68px}
+.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--navy);min-height:44px}
+.logo svg{height:34px;width:auto}
+.logo .sub{font-weight:600;font-size:15px}
+.city-btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:#fff;cursor:pointer;font-weight:500;font-size:14px;justify-self:start}
 .city-btn .icon{width:18px;height:18px;color:var(--teal)}
 .search{position:relative}
 .search .icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--navy-50)}
 .search input{padding-left:44px;border-radius:999px;background:var(--soft);border-color:var(--line)}
-.nav{display:flex;gap:var(--s1);align-items:center}
-.nav a{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 10px;color:var(--navy);text-decoration:none;font-weight:500;font-size:15px;border-radius:var(--radius-sm)}
-.nav a:hover{background:var(--soft)}
+.nav{display:flex;gap:4px;align-items:center}
+.nav a,.nav .navbtn{position:relative;display:inline-flex;align-items:center;gap:6px;min-height:44px;min-width:44px;justify-content:center;padding:0 10px;color:var(--navy);text-decoration:none;font-weight:500;font-size:15px;border-radius:var(--radius-sm);background:none;border:0;cursor:pointer}
+.nav a:hover,.nav .navbtn:hover{background:var(--soft)}
+.badge{position:absolute;top:4px;right:2px;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--indigo);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;line-height:1}
 .hdr-search{display:none}
 .hdr-row2{padding-bottom:12px;display:flex;gap:var(--s1)}
 .hdr-row2 .search{flex:1}
 .nav .lbl{display:none}
-@media(min-width:900px){
+@media(min-width:960px){
   .hdr{grid-template-columns:auto auto 1fr auto}
   .hdr-search{display:block}
   .hdr-row2{display:none}
   .nav .lbl{display:inline}
+  .nav .navbtn.cart .badge{position:static;margin-left:2px}
 }
 .lang{font-size:14px;font-weight:600;border:1px solid var(--line);border-radius:999px;min-height:36px;padding:0 10px;background:#fff}
 
@@ -102,17 +109,20 @@ header.site{background:#fff;border-bottom:1px solid var(--line);position:sticky;
 .pad{padding:var(--s3)}
 .grid{display:grid;gap:var(--s3)}
 .deals{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
-.deal{display:flex;flex-direction:column;overflow:hidden;text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s}
+.deal{display:flex;flex-direction:column;overflow:hidden;transition:transform .15s,box-shadow .15s}
 .deal:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(23,34,59,.06),0 12px 28px rgba(23,34,59,.10)}
-.media{aspect-ratio:3/2;background:linear-gradient(135deg,var(--indigo-50),var(--teal-50));position:relative;overflow:hidden}
+.media{display:block;aspect-ratio:3/2;background:linear-gradient(135deg,var(--indigo-50),var(--teal-50));position:relative;overflow:hidden}
 .media img{width:100%;height:100%;object-fit:cover}
 .media .chip{position:absolute;left:12px;top:12px}
 .deal .body{padding:var(--s2);display:flex;flex-direction:column;gap:6px;flex:1}
-.meta{font-size:14px;color:var(--navy-70);display:flex;gap:6px;align-items:center}
+.deal h3 a{color:inherit;text-decoration:none}
+.deal h3 a:hover{text-decoration:underline}
+.meta{font-size:14px;color:var(--navy-70);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .meta .icon{width:16px;height:16px}
 .deal h3{font-size:17px;line-height:1.35}
-.price-row{display:flex;align-items:baseline;gap:8px;margin-top:auto;padding-top:var(--s1)}
-.price{font-size:22px;font-weight:700}
+.price-row{display:flex;align-items:baseline;gap:8px;margin-top:auto;padding-top:var(--s1);flex-wrap:wrap}
+.price{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.from{font-size:14px;font-weight:500;color:var(--navy-70)}
 .ref{font-size:14px;color:var(--navy-70);text-decoration:line-through}
 .restrict{font-size:13px;color:var(--navy-70)}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:13px;font-weight:600;background:#fff;color:var(--navy)}
@@ -125,9 +135,14 @@ header.site{background:#fff;border-bottom:1px solid var(--line);position:sticky;
 
 /* ---------- Home ---------- */
 .hero{padding:var(--s5) 0 var(--s4)}
-.hero p.lead{font-size:18px;color:var(--navy-70);max-width:560px;margin-top:var(--s2)}
-.hero-search{margin-top:var(--s3);display:grid;gap:var(--s1);max-width:720px}
-@media(min-width:640px){.hero-search{grid-template-columns:200px 1fr auto}}
+.hero p.lead{font-size:18px;color:var(--navy-70);max-width:600px;margin-top:var(--s2)}
+.hero-search{margin-top:var(--s3);display:grid;gap:var(--s1);max-width:760px}
+@media(min-width:640px){.hero-search{grid-template-columns:220px 1fr auto}}
+.cities{display:flex;gap:var(--s2);overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none}
+.city{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;cursor:pointer;min-width:76px;font-size:14px;font-weight:500;color:var(--navy);padding:0}
+.city .c{width:64px;height:64px;border-radius:50%;border:2px solid var(--indigo);display:grid;place-items:center;font-weight:700;color:var(--indigo);background:#fff;letter-spacing:.02em;transition:background .15s}
+.city:hover .c{background:var(--indigo-50)}
+.city[aria-pressed="true"] .c{background:var(--indigo);color:#fff}
 .cats{display:flex;gap:var(--s1);overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
 .cat{display:flex;align-items:center;gap:10px;min-height:56px;padding:0 var(--s2) 0 10px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);text-decoration:none;color:var(--navy);font-weight:500;white-space:nowrap;cursor:pointer}
 .cat .ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--indigo-50);color:var(--indigo)}
@@ -150,19 +165,21 @@ footer.site{border-top:1px solid var(--line);background:#fff;margin-top:var(--s6
 .foot a{display:block;color:var(--navy-70);text-decoration:none;padding:6px 0;font-size:15px}
 .foot a:hover{color:var(--indigo)}
 .legal{margin-top:var(--s4);padding-top:var(--s3);border-top:1px solid var(--line);font-size:13px;color:var(--navy-70);display:flex;flex-wrap:wrap;gap:var(--s2);justify-content:space-between}
+.paylogos{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.paylogos span{font-size:12px;font-weight:700;color:var(--navy-70);border:1px solid var(--line);border-radius:6px;padding:4px 8px}
 
 /* ---------- Listing ---------- */
-.filters{display:flex;gap:var(--s1);flex-wrap:wrap;margin-bottom:var(--s3)}
+.filters{display:flex;gap:var(--s1);flex-wrap:wrap;margin-bottom:var(--s2)}
 .empty{text-align:center;padding:var(--s6) var(--s2)}
 
 /* ---------- Deal detail ---------- */
 .crumbs{font-size:14px;padding:var(--s2) 0;color:var(--navy-70);display:flex;gap:6px;flex-wrap:wrap}
 .crumbs a{color:var(--navy-70)}
 .detail{display:grid;gap:var(--s4)}
-@media(min-width:960px){.detail{grid-template-columns:1fr 380px;align-items:start}}
+@media(min-width:960px){.detail{grid-template-columns:1fr 400px;align-items:start}}
 .gallery{border-radius:var(--radius);overflow:hidden;aspect-ratio:16/9;background:linear-gradient(135deg,var(--indigo-50),var(--teal-50))}
 .gallery img{width:100%;height:100%;object-fit:cover}
-.buybox{position:sticky;top:88px}
+.buybox{position:sticky;top:96px}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:10px 16px;font-size:15px}
 .kv dt{color:var(--navy-70)}
 .kv dd{margin:0;font-weight:500}
@@ -170,12 +187,15 @@ ul.ticks{list-style:none;padding:0;margin:0;display:grid;gap:10px}
 ul.ticks li{display:flex;gap:10px}
 ul.ticks .icon{color:var(--teal);margin-top:2px}
 ul.dots{margin:0;padding-left:20px;display:grid;gap:6px}
+ol.nums{margin:0;padding-left:22px;display:grid;gap:8px}
 .notice{display:flex;gap:12px;padding:var(--s2);border-radius:var(--radius-sm);background:var(--teal-50);color:var(--navy);font-size:15px}
 .notice .icon{color:var(--teal);margin-top:2px}
 .notice.indigo{background:var(--indigo-50)}
 .notice.indigo .icon{color:var(--indigo)}
 .notice.warn{background:var(--warn-50)}
 .notice.warn .icon{color:var(--warn)}
+.notice.danger{background:var(--danger-50)}
+.notice.danger .icon{color:var(--danger)}
 .merchant{display:flex;gap:var(--s2);align-items:center}
 .avatar{width:48px;height:48px;border-radius:12px;background:var(--indigo-50);color:var(--indigo);display:grid;place-items:center;font-weight:700;flex:none}
 .map{height:160px;border-radius:var(--radius-sm);background:
@@ -183,32 +203,71 @@ ul.dots{margin:0;padding-left:20px;display:grid;gap:6px}
   repeating-linear-gradient(45deg,#E7EAF3 0 2px,transparent 2px 22px),
   repeating-linear-gradient(-45deg,#E7EAF3 0 2px,transparent 2px 30px),#F1F3F9;
   display:grid;place-items:center;color:var(--indigo)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto;position:sticky;top:68px;background:var(--soft);z-index:5}
+@media(min-width:960px){.tabs{top:68px}}
+.tabs a{padding:12px 14px;min-height:44px;color:var(--navy-70);text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;border-bottom:3px solid transparent}
+.tabs a:hover{color:var(--navy);border-bottom-color:var(--indigo-100)}
+.opt{display:flex;align-items:center;gap:12px;padding:0 var(--s2);min-height:56px;border:1px solid #C9CDDA;border-radius:var(--radius-sm);cursor:pointer;background:#fff}
+.opt:has(input:checked){border-color:var(--indigo);background:var(--indigo-50);box-shadow:inset 0 0 0 1px var(--indigo)}
+.opt input{accent-color:var(--indigo);width:20px;height:20px;flex:none}
+.opt .p{margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums}
 .mobile-buy{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px var(--s2);display:flex;gap:var(--s2);align-items:center;justify-content:space-between;z-index:15;box-shadow:0 -4px 16px rgba(23,34,59,.08)}
 @media(min-width:960px){.mobile-buy{display:none}}
 .has-mobile-buy{padding-bottom:96px}
+@media(min-width:960px){.has-mobile-buy{padding-bottom:0}}
 
-/* ---------- Checkout ---------- */
+/* ---------- Cart / checkout ---------- */
 .checkout{display:grid;gap:var(--s3)}
-@media(min-width:960px){.checkout{grid-template-columns:1fr 380px;align-items:start}}
-.summary-line{display:flex;justify-content:space-between;gap:var(--s2);font-size:15px;padding:6px 0}
+@media(min-width:960px){.checkout{grid-template-columns:1fr 400px;align-items:start}}
+.checkout aside{position:sticky;top:96px}
+.summary-line{display:flex;justify-content:space-between;gap:var(--s2);font-size:15px;padding:6px 0;font-variant-numeric:tabular-nums}
 .summary-line.total{font-weight:700;font-size:18px;border-top:1px solid var(--line);padding-top:12px;margin-top:6px}
 .pay-opts{display:grid;gap:var(--s1)}
-.pay-opt{display:flex;align-items:center;gap:12px;padding:0 var(--s2);min-height:56px;border:1px solid #C9CDDA;border-radius:var(--radius-sm);cursor:pointer;background:#fff}
+.pay-opt{display:flex;align-items:center;gap:12px;padding:12px var(--s2);min-height:56px;border:1px solid #C9CDDA;border-radius:var(--radius-sm);cursor:pointer;background:#fff;width:100%;text-align:left}
 .pay-opt:has(input:checked){border-color:var(--indigo);background:var(--indigo-50);box-shadow:inset 0 0 0 1px var(--indigo)}
-.pay-opt input{accent-color:var(--indigo);width:20px;height:20px}
+.pay-opt input{accent-color:var(--indigo);width:20px;height:20px;flex:none}
 .pay-opt .brand{margin-left:auto;font-size:12px;font-weight:700;color:var(--navy-70);letter-spacing:.04em}
-.qty{display:inline-flex;align-items:center;border:1px solid #C9CDDA;border-radius:var(--radius-sm)}
-.qty button{width:44px;height:44px;border:0;background:none;cursor:pointer;font-size:20px}
+.pay-opt .d{display:block;font-size:13px;color:var(--navy-70);font-weight:400}
+.banks{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:8px;margin-top:4px}
+.bank{position:relative;min-height:52px;border:1px solid #C9CDDA;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-weight:600;cursor:pointer;background:#fff;text-align:center;padding:4px 8px;font-size:14px}
+.bank input{position:absolute;opacity:0;pointer-events:none}
+.bank:has(input:checked){border-color:var(--indigo);background:var(--indigo-50);box-shadow:inset 0 0 0 1px var(--indigo);color:var(--indigo)}
+.bank:has(input:focus-visible){outline:3px solid var(--indigo);outline-offset:2px}
+.qty{display:inline-flex;align-items:center;border:1px solid #C9CDDA;border-radius:var(--radius-sm);background:#fff}
+.qty button{width:44px;height:44px;border:0;background:none;cursor:pointer;font-size:20px;line-height:1}
+.qty button:disabled{opacity:.35;cursor:not-allowed}
 .qty output{min-width:32px;text-align:center;font-weight:600}
-.stepper{display:flex;gap:var(--s1);font-size:14px;color:var(--navy-70);margin-bottom:var(--s3);flex-wrap:wrap}
+.stepper{display:flex;gap:var(--s1);font-size:14px;color:var(--navy-70);margin-bottom:var(--s3);flex-wrap:wrap;align-items:center}
 .stepper span{display:flex;gap:6px;align-items:center}
-.stepper b{color:var(--navy)}
+.stepper .n{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;border:1px solid #C9CDDA;font-size:12px;font-weight:700}
+.stepper .on{color:var(--navy);font-weight:600}
+.stepper .on .n{background:var(--indigo);border-color:var(--indigo);color:#fff}
+.stepper .done .n{background:var(--teal);border-color:var(--teal);color:#fff}
+.line{display:grid;grid-template-columns:80px 1fr;gap:var(--s2);padding:var(--s2) 0;border-bottom:1px solid var(--line)}
+.line:last-child{border-bottom:0}
+.line .thumb{width:80px;height:64px;border-radius:10px;overflow:hidden;background:var(--indigo-50)}
+.line .thumb img{width:100%;height:100%;object-fit:cover}
+.line h3{font-size:16px;line-height:1.35}
+.line h3 a{color:inherit;text-decoration:none}
+.line h3 a:hover{text-decoration:underline}
+.line .ctrl{display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:8px;flex-wrap:wrap}
+.line .lt{font-weight:700;font-variant-numeric:tabular-nums}
+.mini-line{display:flex;gap:12px;align-items:flex-start;padding:8px 0;font-size:14px}
+.mini-line .thumb{width:56px;height:44px;border-radius:8px;overflow:hidden;flex:none;background:var(--indigo-50)}
+.mini-line .thumb img{width:100%;height:100%;object-fit:cover}
+.mini-line .t{flex:1;min-width:0}
+.mini-line .t b{display:block;font-weight:600;line-height:1.3}
+.err-sum{border:2px solid var(--danger);background:var(--danger-50);border-radius:var(--radius-sm);padding:var(--s2)}
+.err-sum ul{margin:8px 0 0;padding-left:20px}
+.err-sum a{color:var(--danger);font-weight:500}
+fieldset{border:0;padding:0;margin:0;min-width:0}
+legend{padding:0}
 
 /* ---------- Voucher ---------- */
 .voucher{display:grid;gap:var(--s3);border:2px dashed var(--indigo-100)}
 @media(min-width:720px){.voucher{grid-template-columns:auto 1fr}}
-.qr{width:168px;height:168px;padding:8px;background:#fff;border:1px solid var(--line);border-radius:var(--radius-sm)}
-.code{font:600 20px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.06em}
+.qr{width:152px;height:152px;padding:8px;background:#fff;border:1px solid var(--line);border-radius:var(--radius-sm)}
+.code{font:600 18px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.06em}
 .success-ic{width:56px;height:56px;border-radius:50%;background:var(--teal-50);color:var(--teal);display:grid;place-items:center}
 .success-ic .icon{width:28px;height:28px}
 
@@ -231,9 +290,9 @@ tr.sum td{font-weight:700;border-bottom:0}
 
 /* ---------- Business portal ---------- */
 .portal{display:grid;min-height:calc(100vh - 40px)}
-@media(min-width:960px){.portal{grid-template-columns:248px 1fr}}
+@media(min-width:960px){.portal{grid-template-columns:260px 1fr}}
 .side{background:#fff;border-right:1px solid var(--line);padding:var(--s2)}
-.side .logo{padding:8px 8px var(--s2)}
+.side .logo{padding:4px 8px var(--s2)}
 .side nav{display:flex;gap:4px;overflow-x:auto}
 @media(min-width:960px){.side nav{flex-direction:column}}
 .side nav a{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 12px;border-radius:var(--radius-sm);color:var(--navy);text-decoration:none;font-weight:500;white-space:nowrap}
@@ -248,103 +307,130 @@ tr.sum td{font-weight:700;border-bottom:0}
 .form-grid{display:grid;gap:var(--s2)}
 @media(min-width:720px){.form-grid.two{grid-template-columns:1fr 1fr}}
 .split{display:grid;gap:var(--s3)}
-@media(min-width:1100px){.split{grid-template-columns:1fr 380px;align-items:start}}
+@media(min-width:1100px){.split{grid-template-columns:1fr 400px;align-items:start}}
 .breakdown .summary-line{font-size:14px}
 .breakdown .summary-line.total{font-size:17px}
 .redeem-result{margin-top:var(--s2)}
 
-/* ---------- Dialog ---------- */
+/* ---------- Dialogs / drawer ---------- */
 dialog{border:0;border-radius:var(--radius);padding:0;max-width:480px;width:calc(100% - 32px);box-shadow:0 24px 64px rgba(23,34,59,.25);color:var(--navy)}
 dialog::backdrop{background:rgba(23,34,59,.45)}
-.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--navy);color:#fff;padding:12px 20px;border-radius:var(--radius-sm);font-weight:500;z-index:50;transition:.25s;display:flex;gap:10px;align-items:center;max-width:calc(100% - 32px)}
+dialog.drawer{margin:0 0 0 auto;height:100dvh;max-height:100dvh;width:min(440px,100%);max-width:100%;border-radius:0;flex-direction:column}
+dialog.drawer[open]{display:flex}
+.drawer-head{display:flex;justify-content:space-between;align-items:center;padding:var(--s2) var(--s3);border-bottom:1px solid var(--line)}
+.drawer-body{flex:1;overflow:auto;padding:0 var(--s3)}
+.drawer-foot{border-top:1px solid var(--line);padding:var(--s2) var(--s3) var(--s3);display:grid;gap:var(--s1)}
+.spin{width:44px;height:44px;border:4px solid var(--indigo-100);border-top-color:var(--indigo);border-radius:50%;animation:sp .9s linear infinite;margin:0 auto}
+@keyframes sp{to{transform:rotate(360deg)}}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--navy);color:#fff;padding:12px 20px;border-radius:var(--radius-sm);font-weight:500;z-index:50;transition:.25s;display:flex;gap:10px;align-items:center;max-width:calc(100% - 32px);pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation-duration:3s!important}}
 </style>
 </head>
 <body>
 
-<div class="protobar" role="navigation" aria-label="Prototype screens">
+<div class="protobar" role="navigation" aria-label="Prototyypin näkymät">
   <div class="wrap" id="protobar"></div>
 </div>
 <div id="app"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
 <dialog id="dlg"></dialog>
+<dialog id="drawer" class="drawer" aria-labelledby="drawer-title"></dialog>
 
 <script>
-/* ================= Data (sample content for prototype) ================= */
-const TODAY = new Date(2026, 9, 14); // 14 Oct 2026
-const CITIES = ["Helsinki","Espoo","Vantaa","Kauniainen"];
-const CATS = [
-  {id:"wellness", name:"Wellness & beauty", icon:"spa"},
-  {id:"food", name:"Food & drink", icon:"food"},
-  {id:"activities", name:"Activities", icon:"compass"},
+/* ================= Data (esimerkkisisältö) ================= */
+const TODAY = new Date(2026, 9, 14); // 14.10.2026
+const CITIES = [
+  {name:"Helsinki", abbr:"HKI"},
+  {name:"Espoo", abbr:"ESP"},
+  {name:"Vantaa", abbr:"VAN"},
+  {name:"Kauniainen", abbr:"KAU"},
 ];
+const ALL = "Kaikki kaupungit";
+const CATS = [
+  {id:"wellness", name:"Hyvinvointi ja kauneus", icon:"spa"},
+  {id:"food", name:"Ruoka ja juoma", icon:"food"},
+  {id:"activities", name:"Tekeminen", icon:"compass"},
+];
+const BANKS = ["OP","Nordea","Danske Bank","S-Pankki","Aktia","POP Pankki","Säästöpankki","Oma Säästöpankki","Handelsbanken","Ålandsbanken"];
 const IMG = id => `https://images.unsplash.com/photo-${id}?w=900&q=70&auto=format&fit=crop`;
 const DEALS = [
-  {id:"d1", cat:"wellness", city:"Helsinki", merchant:"Näyte Wellness", mInit:"NW", area:"Kallio", address:"Esimerkkikatu 12, 00530 Helsinki",
-   title:"60-minute hot stone massage", price:59, ref:null, vat:25.5, img:"1544161515-4ab6ce6db874",
-   restrict:"Mon–Fri, 10–17 · 1 person",
-   inclusions:["60-minute hot stone massage","Use of relaxation lounge for 30 min","Herbal tea after treatment"],
-   booking:"Book by phone or online at least 24 h ahead. Quote your voucher code when booking.",
-   rules:["Valid Monday–Friday, 10:00–17:00","One voucher per person per visit","Cannot be combined with other offers","Late cancellation (under 24 h) uses the voucher"],
-   business:"Näyte Wellness Oy · Business ID 1234567-8"},
-  {id:"d2", cat:"wellness", city:"Espoo", merchant:"Studio Esimerkki", mInit:"SE", area:"Tapiola", address:"Malliaukio 3, 02100 Espoo",
-   title:"Haircut, wash and blow-dry", price:39, ref:55, refNote:"Lowest price at this salon in the last 30 days: €55.00", vat:25.5, img:"1560066984-138dadb4c035",
-   restrict:"Short and medium hair · New and existing clients",
-   inclusions:["Consultation","Wash with conditioning treatment","Haircut by senior stylist","Blow-dry and styling"],
-   booking:"Book online through the salon's booking page. Select “Vendelia voucher” as payment.",
-   rules:["Short and medium hair only (above shoulders)","Colour services not included","Valid Tuesday–Saturday"],
-   business:"Studio Esimerkki Oy · Business ID 2345678-9"},
-  {id:"d3", cat:"food", city:"Helsinki", merchant:"Bistro Malli", mInit:"BM", area:"Punavuori", address:"Testikatu 8, 00150 Helsinki",
-   title:"Three-course seasonal dinner for two", price:79, ref:null, vat:13.5, img:"1414235077428-338989a2e8c0",
-   restrict:"Sun–Thu · Drinks not included",
-   inclusions:["Starter, main course and dessert for two","Seasonal menu chosen by the chef","Bread and house water"],
-   booking:"Reserve a table by phone. Mention the voucher when booking. Show the voucher code on arrival.",
-   rules:["Valid Sunday–Thursday","Drinks are charged separately","Allergies: tell the restaurant when booking","Not valid on public holidays"],
-   business:"Bistro Malli Oy · Business ID 3456789-0"},
-  {id:"d4", cat:"food", city:"Vantaa", merchant:"Ravintola Kokeilu", mInit:"RK", area:"Tikkurila", address:"Kokeilutie 21, 01300 Vantaa",
-   title:"Weekend brunch for two", price:42, ref:null, vat:13.5, img:"1504674900247-0877df9cc836",
-   restrict:"Sat–Sun, 10–14 · Booking required",
-   inclusions:["Brunch buffet for two","Coffee and tea","Fresh juice"],
-   booking:"Book a brunch slot online. Show the voucher code at the counter.",
-   rules:["Valid Saturday and Sunday, 10:00–14:00","Children under 4 eat free"],
-   business:"Ravintola Kokeilu Oy · Business ID 4567890-1"},
-  {id:"d5", cat:"activities", city:"Espoo", merchant:"Retkeily Esimerkki", mInit:"RE", area:"Nuuksio", address:"Meeting point: Haukkalammentie 31, 02820 Espoo",
-   title:"Guided 3-hour forest hike in Nuuksio", price:35, ref:null, vat:25.5, img:"1551632811-561732d1e306",
-   restrict:"Ages 12+ · Moderate fitness",
-   inclusions:["3-hour guided hike in English or Finnish","Campfire snack and hot drink","Loan of trekking poles"],
-   booking:"Choose a date in the organiser's calendar. Dated tours can be changed until 48 h before.",
-   rules:["Ages 12 and over","Weather-appropriate clothing required","Minimum 3 participants per tour"],
-   business:"Retkeily Esimerkki Oy · Business ID 5678901-2"},
-  {id:"d6", cat:"activities", city:"Kauniainen", merchant:"Liikuntakeskus Demo", mInit:"LD", area:"Keskusta", address:"Demotie 5, 02700 Kauniainen",
-   title:"10-visit gym and group class card", price:69, ref:null, vat:25.5, img:"1534438327276-14e5300c3a48",
-   restrict:"Valid for 10 visits · Personal",
-   inclusions:["10 visits to gym or group classes","Locker and sauna access","Introductory session on first visit"],
-   booking:"Activate the card at reception on your first visit. Group classes are booked in the centre's app.",
-   rules:["Card is personal","Visits must be used within the voucher validity","Ages 16 and over"],
-   business:"Liikuntakeskus Demo Oy · Business ID 6789012-3"},
-  {id:"d7", cat:"wellness", city:"Vantaa", merchant:"Spa Kokeilu", mInit:"SK", area:"Myyrmäki", address:"Kylpyläpolku 2, 01600 Vantaa",
-   title:"Day spa entry with 30-minute facial", price:49, ref:null, vat:25.5, img:"1540555700478-4be289fbecef",
-   restrict:"Any day · 1 person",
-   inclusions:["Day spa entry (pools and saunas)","30-minute hydrating facial","Towel and robe"],
-   booking:"Book the facial by phone. Spa entry needs no booking.",
-   rules:["Facial must be booked in advance","Ages 18 and over"],
-   business:"Spa Kokeilu Oy · Business ID 7890123-4"},
-  {id:"d8", cat:"food", city:"Espoo", merchant:"Kahvila Malli", mInit:"KM", area:"Leppävaara", address:"Mallikuja 4, 02600 Espoo",
-   title:"Afternoon tea for two", price:32, ref:null, vat:13.5, img:"1559339352-11d035aa65de",
-   restrict:"Mon–Sat, 13–17",
-   inclusions:["Selection of sandwiches and pastries for two","Tea or coffee, refills included"],
-   booking:"No booking needed on weekdays. Book Saturdays by phone.",
-   rules:["Valid Monday–Saturday, 13:00–17:00"],
-   business:"Kahvila Malli Oy · Business ID 8901234-5"},
+  {id:"d1", cat:"wellness", city:"Helsinki", merchant:"Näyte Wellness", mInit:"NW", area:"Kallio", address:"Esimerkkikatu 12, 00530 Helsinki", phone:"09 123 4567",
+   title:"Kuumakivihieronta 60 tai 90 min", vat:25.5, img:"1544161515-4ab6ce6db874",
+   options:[{id:"60",label:"60 min",price:59},{id:"90",label:"90 min",price:79}],
+   restrict:"ma–pe klo 10–17 · 1 henkilö",
+   desc:"Rauhoittava kuumakivihieronta, jossa lämpimät kivet rentouttavat lihaksia ja hieroja käsittelee jännittyneet kohdat. Hoito sopii erityisesti niska-hartiaseudun ja selän jumeihin.",
+   inclusions:["Kuumakivihieronta valitun keston mukaan","Rentoutumistila 30 min käytössäsi","Yrttitee hoidon jälkeen"],
+   how:["Saat lahjakortin sähköpostiisi heti maksun jälkeen.","Varaa aika puhelimitse tai verkossa vähintään 24 h etukäteen ja mainitse lahjakortin koodi.","Näytä lahjakortti puhelimesta tai paperilla paikan päällä."],
+   rules:["Voimassa ma–pe klo 10–17","Yksi lahjakortti per henkilö per käynti","Ei voi yhdistää muihin etuihin","Alle 24 h ennen peruttu aika katsotaan käytetyksi"],
+   business:"Näyte Wellness Oy · Y-tunnus 1234567-8"},
+  {id:"d2", cat:"wellness", city:"Espoo", merchant:"Studio Esimerkki", mInit:"SE", area:"Tapiola", address:"Malliaukio 3, 02100 Espoo", phone:"09 234 5678",
+   title:"Hiustenleikkaus, pesu ja föönaus", price:39, ref:55, refNote:"Alin hinta tässä liikkeessä viimeisen 30 päivän aikana: 55,00 €", vat:25.5, img:"1560066984-138dadb4c035",
+   restrict:"Lyhyet ja puolipitkät hiukset",
+   desc:"Kokeneen kampaajan tekemä leikkaus, joka alkaa konsultaatiolla ja päättyy viimeisteltyyn föönaukseen.",
+   inclusions:["Konsultaatio","Pesu ja hoitoaine","Leikkaus kokeneelta kampaajalta","Föönaus ja muotoilu"],
+   how:["Saat lahjakortin sähköpostiisi heti maksun jälkeen.","Varaa aika liikkeen ajanvarauksesta ja valitse maksutavaksi ”Vendelia-lahjakortti”.","Näytä koodi kassalla."],
+   rules:["Vain lyhyet ja puolipitkät hiukset (olkapäiden yläpuolelle)","Ei sisällä värjäystä","Voimassa ti–la"],
+   business:"Studio Esimerkki Oy · Y-tunnus 2345678-9"},
+  {id:"d3", cat:"food", city:"Helsinki", merchant:"Bistro Malli", mInit:"BM", area:"Punavuori", address:"Testikatu 8, 00150 Helsinki", phone:"09 345 6789",
+   title:"Kolmen ruokalajin kausimenu", vat:13.5, img:"1414235077428-338989a2e8c0",
+   options:[{id:"2",label:"Kahdelle",price:79},{id:"4",label:"Neljälle",price:152}],
+   restrict:"su–to · juomat eivät sisälly",
+   desc:"Keittiömestarin kausimenu kotimaisista raaka-aineista rennossa punavuorelaisessa bistrossa.",
+   inclusions:["Alkuruoka, pääruoka ja jälkiruoka","Keittiömestarin kausimenu","Leipä ja talon vesi"],
+   how:["Saat lahjakortin sähköpostiisi heti maksun jälkeen.","Varaa pöytä puhelimitse ja mainitse Vendelia-lahjakortti.","Näytä koodi saapuessasi."],
+   rules:["Voimassa sunnuntaista torstaihin","Juomat veloitetaan erikseen","Kerro allergioista varauksen yhteydessä","Ei voimassa juhlapyhinä"],
+   business:"Bistro Malli Oy · Y-tunnus 3456789-0"},
+  {id:"d4", cat:"food", city:"Vantaa", merchant:"Ravintola Kokeilu", mInit:"RK", area:"Tikkurila", address:"Kokeilutie 21, 01300 Vantaa", phone:"09 456 7890",
+   title:"Viikonloppubrunssi kahdelle", price:42, vat:13.5, img:"1504674900247-0877df9cc836",
+   restrict:"la–su klo 10–14 · varaus vaaditaan",
+   desc:"Runsas brunssibuffet viikonloppuaamuun: lämpimiä ruokia, leivonnaisia ja tuoreita hedelmiä.",
+   inclusions:["Brunssibuffet kahdelle","Kahvi ja tee","Tuorepuristettu mehu"],
+   how:["Saat lahjakortin sähköpostiisi heti maksun jälkeen.","Varaa brunssiaika ravintolan verkkosivuilta.","Näytä koodi kassalla."],
+   rules:["Voimassa lauantaisin ja sunnuntaisin klo 10–14","Alle 4-vuotiaat syövät ilmaiseksi"],
+   business:"Ravintola Kokeilu Oy · Y-tunnus 4567890-1"},
+  {id:"d5", cat:"activities", city:"Espoo", merchant:"Retkeily Esimerkki", mInit:"RE", area:"Nuuksio", address:"Kokoontuminen: Haukkalammentie 31, 02820 Espoo", phone:"040 123 4567",
+   title:"Opastettu 3 tunnin metsäretki Nuuksiossa", vat:25.5, img:"1551632811-561732d1e306",
+   options:[{id:"1",label:"1 henkilö",price:35},{id:"2",label:"2 henkilöä",price:65}],
+   restrict:"Yli 12-vuotiaille · kohtalainen kunto",
+   desc:"Kokenut opas vie Nuuksion polulle, kertoo luonnosta ja sytyttää nuotion matkan puolivälissä.",
+   inclusions:["3 tunnin opastettu retki suomeksi tai englanniksi","Nuotioeväs ja kuuma juoma","Vaellussauvat lainaan"],
+   how:["Saat lahjakortin sähköpostiisi heti maksun jälkeen.","Valitse retkipäivä järjestäjän kalenterista. Päivättyä retkeä voi vaihtaa 48 h ennen.","Näytä koodi oppaalle kokoontumispaikalla."],
+   rules:["Yli 12-vuotiaille","Säänmukainen vaatetus","Vähintään 3 osallistujaa retkellä"],
+   business:"Retkeily Esimerkki Oy · Y-tunnus 5678901-2"},
+  {id:"d6", cat:"activities", city:"Kauniainen", merchant:"Liikuntakeskus Demo", mInit:"LD", area:"Keskusta", address:"Demotie 5, 02700 Kauniainen", phone:"09 567 8901",
+   title:"10 kerran kuntosali- ja ryhmäliikuntakortti", price:69, vat:13.5, img:"1534438327276-14e5300c3a48",
+   restrict:"10 käyntikertaa · henkilökohtainen",
+   desc:"Kymmenen käyntiä kuntosalille tai ohjatuille ryhmäliikuntatunneille, sauna ja pukukaappi mukaan lukien.",
+   inclusions:["10 käyntiä kuntosalille tai ryhmäliikuntaan","Pukukaappi ja sauna","Opastus ensimmäisellä käynnillä"],
+   how:["Saat lahjakortin sähköpostiisi heti maksun jälkeen.","Aktivoi kortti vastaanotossa ensimmäisellä käynnillä.","Varaa ryhmäliikuntatunnit keskuksen sovelluksessa."],
+   rules:["Kortti on henkilökohtainen","Käyntikerrat käytettävä lahjakortin voimassaoloaikana","Yli 16-vuotiaille"],
+   business:"Liikuntakeskus Demo Oy · Y-tunnus 6789012-3"},
+  {id:"d7", cat:"wellness", city:"Vantaa", merchant:"Spa Kokeilu", mInit:"SK", area:"Myyrmäki", address:"Kylpyläpolku 2, 01600 Vantaa", phone:"09 678 9012",
+   title:"Kylpyläpäivä ja 30 min kasvohoito", price:49, vat:25.5, img:"1540555700478-4be289fbecef",
+   restrict:"Joka päivä · 1 henkilö",
+   desc:"Rentouttava päivä altailla ja saunoissa sekä kosteuttava kasvohoito.",
+   inclusions:["Kylpyläsisäänpääsy (altaat ja saunat)","30 minuutin kosteuttava kasvohoito","Pyyhe ja kylpytakki"],
+   how:["Saat lahjakortin sähköpostiisi heti maksun jälkeen.","Varaa kasvohoito puhelimitse. Kylpyläkäynti ei vaadi varausta.","Näytä koodi vastaanotossa."],
+   rules:["Kasvohoito varattava etukäteen","Yli 18-vuotiaille"],
+   business:"Spa Kokeilu Oy · Y-tunnus 7890123-4"},
+  {id:"d8", cat:"food", city:"Espoo", merchant:"Kahvila Malli", mInit:"KM", area:"Leppävaara", address:"Mallikuja 4, 02600 Espoo", phone:"09 789 0123",
+   title:"Iltapäivätee kahdelle", price:32, vat:13.5, img:"1559339352-11d035aa65de",
+   restrict:"ma–la klo 13–17",
+   desc:"Klassinen iltapäivätee voileipineen ja leivonnaisineen tunnelmallisessa kahvilassa.",
+   inclusions:["Valikoima voileipiä ja leivonnaisia kahdelle","Tee tai kahvi, santsikupit"],
+   how:["Saat lahjakortin sähköpostiisi heti maksun jälkeen.","Arkisin ei tarvitse varata. Lauantait varataan puhelimitse.","Näytä koodi tiskillä."],
+   rules:["Voimassa ma–la klo 13–17"],
+   business:"Kahvila Malli Oy · Y-tunnus 8901234-5"},
 ];
 
 /* ================= Helpers ================= */
 const eur = n => new Intl.NumberFormat("fi-FI",{style:"currency",currency:"EUR"}).format(n);
-const fmtDate = d => d.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});
+const pct = v => String(v).replace(".",",")+" %";
+const fmtDate = d => new Date(d).toLocaleDateString("fi-FI");
 const r2 = n => Math.round((n + Number.EPSILON) * 100) / 100;
-function addMonths(d, m){ // calendar months, clamp to month end
+function addMonths(d, m){ // kalenterikuukaudet, rajataan kuun loppuun
+  d = new Date(d);
   const t = new Date(d.getFullYear(), d.getMonth()+m, 1);
   const last = new Date(t.getFullYear(), t.getMonth()+1, 0).getDate();
   t.setDate(Math.min(d.getDate(), last)); return t;
@@ -357,14 +443,19 @@ function split(gross, vatRate, commissionRate=15, commVat=25.5){
   const cVat = r2(comm*commVat/100);
   return {gross, net, saleVat, comm, cVat, fee:r2(comm+cVat), payout:r2(gross-comm-cVat)};
 }
-const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const deal = id => DEALS.find(d=>d.id===id);
 const cat = id => CATS.find(c=>c.id===id);
+const opts = d => d.options || [{id:"std", label:"", price:d.price}];
+const optOf = (d,id) => opts(d).find(o=>o.id===id) || opts(d)[0];
+const minPrice = d => Math.min(...opts(d).map(o=>o.price));
+const itemTitle = (d,o) => o.label ? `${d.title.replace(/ \d+ tai \d+ min$/,"")} – ${o.label}` : d.title;
 function genCode(){
   const A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s="";
   for(let i=0;i<8;i++) s+=A[Math.floor(Math.random()*A.length)];
   return `VND-${s.slice(0,4)}-${s.slice(4)}`;
 }
+const plural = (n, one, many) => `${n} ${n===1?one:many}`;
 
 /* Icons */
 const P = {
@@ -376,11 +467,9 @@ const P = {
   check:'<path d="M20 6 9 17l-5-5"/>',
   checkc:'<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',
   clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
-  shield:'<path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/>',
   info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
   x:'<path d="M18 6 6 18M6 6l12 12"/>',
   xc:'<circle cx="12" cy="12" r="9"/><path d="m15 9-6 6M9 9l6 6"/>',
-  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
   ticket:'<path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z"/><path d="M13 6v12" stroke-dasharray="2 2"/>',
   store:'<path d="M3 9 4.5 4h15L21 9"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M5 12v8h14v-8"/><path d="M10 20v-5h4v5"/>',
   help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.7M12 17h.01"/>',
@@ -399,71 +488,109 @@ const P = {
   lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
   doc:'<path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
   logout:'<path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 17l-5-5 5-5M5 12h11"/>',
+  cart:'<circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.7 12.4a1 1 0 0 0 1 .8h9.6a1 1 0 0 0 1-.8L21 7H6"/>',
+  trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13M9 7V4h6v3"/>',
+  gift:'<rect x="3" y="8" width="18" height="5" rx="1"/><path d="M5 13v8h14v-8M12 8v13M12 8c-1.5-3-5-4-5-1.5S10 8 12 8zm0 0c1.5-3 5-4 5-1.5S14 8 12 8z"/>',
 };
 const ic = (n,cls="") => `<svg class="icon ${cls}" viewBox="0 0 24 24" aria-hidden="true">${P[n]}</svg>`;
 
+/* V-symboli (vain symboli, ei sanamerkkiä) */
 const LOGO_SYMBOL = `<svg viewBox="0 0 68 48" aria-hidden="true">
   <path fill="#3B32B3" d="M1.5 1.2h14.6c4.1 0 6.6 1.9 8.6 5.2l13.4 22.4c1.1 1.8 2.9 1.8 3.9 0l3.7-6.5c2.3 3.8 2.6 7.6-.2 11.2l-4.6 5.1C35.4 44 24 46.4 17.6 36.1L1 2.4c-.3-.6 0-1.2.5-1.2z"/>
   <path fill="#0B7A75" d="M28.6 15.8 33.9 6.6C37 2.5 40.4 1.2 44.5 1.2h14.6c.8 0 1 .7.4 1.2-2.7 2.1-4.2 4.1-5.7 6.8L42 30.7c-1.1 1.9-2.6 1.9-3.7 0z"/>
 </svg>`;
-const logoHTML = (href="#/") => `<a class="logo" href="${href}" aria-label="Vendelia home">${LOGO_SYMBOL}<span class="word">Vendelia</span></a>`;
+const logoHTML = (href="#/", sub="") => `<a class="logo" href="${href}" aria-label="Vendelia${sub?" "+sub:""} – etusivu">${LOGO_SYMBOL}${sub?`<span class="sub">${sub}</span>`:""}</a>`;
 
 function photo(d, alt){
-  return `<img src="${IMG(d.img)}" alt="${esc(alt||d.title)}" loading="lazy" onerror="this.remove()">`;
+  return `<img src="${IMG(d.img)}" alt="${esc(alt??d.title)}" loading="lazy" onerror="this.remove()">`;
 }
 
-/* ================= State ================= */
-const state = {
-  city: "All cities",
-  q: "",
-  catFilter: null,
-  purchases: [
-    {id:"o-1001", deal:"d3", qty:1, email:"you@example.com", code:"VND-7KQ2-M8XT", bought:addDays(TODAY,-20), status:"redeemed", redeemed:addDays(TODAY,-6)},
-    {id:"o-1002", deal:"d1", qty:1, email:"you@example.com", code:"VND-H4PW-29CN", bought:addDays(TODAY,-5), status:"active"},
-  ],
-  last: null,
-  biz: {
-    merchant:"Näyte Wellness",
-    deals:[
-      {title:"60-minute hot stone massage", price:59, vat:25.5, status:"live", sold:38},
-      {title:"Couples massage, 90 minutes", price:139, vat:25.5, status:"review", sold:0},
-      {title:"Back and neck massage, 30 minutes", price:35, vat:25.5, status:"draft", sold:0},
+/* ================= State (säilyy selaimessa) ================= */
+const KEY = "vendelia-proto-v2";
+function seed(){
+  return {
+    cart: [],
+    vouchers: [
+      {code:"VND-7KQ2-M8XT", deal:"d3", opt:"2", price:79, order:"VD-204118", email:"sinä@esimerkki.fi", bought:+addDays(TODAY,-20), status:"redeemed", redeemed:+addDays(TODAY,-6)},
+      {code:"VND-H4PW-29CN", deal:"d1", opt:"60", price:59, order:"VD-204377", email:"sinä@esimerkki.fi", bought:+addDays(TODAY,-5), status:"active"},
     ],
-  },
-};
+    bizDeals: [
+      {title:"Kuumakivihieronta 60 min", price:59, vat:25.5, status:"live", sold:38},
+      {title:"Parihieronta 90 min", price:139, vat:25.5, status:"review", sold:0},
+      {title:"Selkä- ja niskahieronta 30 min", price:35, vat:25.5, status:"draft", sold:0},
+    ],
+  };
+}
+let S;
+try { S = JSON.parse(localStorage.getItem(KEY)) || seed(); } catch { S = seed(); }
+const ui = {city:ALL, q:"", catFilter:null, lastOrder:null, qty:1, opt:null, checkoutErrors:null};
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} updateBadge(); }
+
+/* ================= Cart ================= */
+const cartKey = (d,o) => `${d}:${o}`;
+function cartLines(){
+  return S.cart.map(c=>{ const d=deal(c.deal), o=optOf(d,c.opt); return {...c, key:cartKey(c.deal,c.opt), d, o, unit:o.price, total:r2(o.price*c.qty)}; });
+}
+function cartTotals(){
+  const lines = cartLines(); const vat = {};
+  let total = 0, count = 0;
+  for(const l of lines){ total+=l.total; count+=l.qty; vat[l.d.vat] = r2((vat[l.d.vat]||0) + r2(l.total - l.total/(1+l.d.vat/100))); }
+  return {lines, total:r2(total), count, vat};
+}
+function addToCart(dealId, optId, qty){
+  const ex = S.cart.find(c=>c.deal===dealId && c.opt===optId);
+  if(ex) ex.qty = Math.min(10, ex.qty+qty); else S.cart.push({deal:dealId, opt:optId, qty:Math.min(10,qty)});
+  save(); openDrawer(true);
+}
+function setQty(key, delta){
+  const c = S.cart.find(c=>cartKey(c.deal,c.opt)===key); if(!c) return;
+  c.qty = Math.max(1, Math.min(10, c.qty+delta)); save();
+}
+function removeLine(key){ S.cart = S.cart.filter(c=>cartKey(c.deal,c.opt)!==key); save(); }
+function updateBadge(){
+  const n = S.cart.reduce((a,c)=>a+c.qty,0);
+  document.querySelectorAll("[data-cart-count]").forEach(el=>{ el.textContent=n; el.hidden=!n; });
+  document.querySelectorAll("[data-act=drawer]").forEach(el=>el.setAttribute("aria-label",`Ostoskori, ${plural(n,"tuote","tuotetta")}`));
+}
+function vatLines(vat){
+  return Object.keys(vat).sort((a,b)=>b-a).map(r=>`<div class="summary-line muted"><span>Sisältää ALV ${pct(r)}</span><span>${eur(vat[r])}</span></div>`).join("");
+}
 
 /* ================= Shell ================= */
 const SCREENS = [
-  ["#/","Home"],["#/deals","Browse"],["#/deal/d1","Deal page"],["#/checkout/d1","Checkout"],
-  ["#/vouchers","My vouchers"],["#/business","Business: overview"],["#/business/new","Business: new deal"],
-  ["#/business/redeem","Business: redeem"],["#/business/payouts","Business: payouts"],
+  ["#/","Etusivu"],["#/tarjoukset","Selaa"],["#/tarjous/d1","Diilisivu"],["#/ostoskori","Ostoskori"],["#/kassa","Kassa"],
+  ["#/omat","Omat lahjakortit"],["#/yritys","Yritys: yleiskatsaus"],["#/yritys/uusi","Yritys: uusi diili"],
+  ["#/yritys/lunasta","Yritys: lunastus"],["#/yritys/tilitykset","Yritys: tilitykset"],
 ];
 function renderProtobar(){
   const h = location.hash || "#/";
   document.getElementById("protobar").innerHTML =
-    `<span class="tag">Prototype</span><span style="opacity:.7">Sample content · not live</span>` +
-    SCREENS.map(([href,l])=>`<a href="${href}" ${h===href?'aria-current="page"':''}>${l}</a>`).join("");
+    `<span class="tag">Prototyyppi</span><span style="opacity:.7">Esimerkkisisältö · ei käytössä</span>` +
+    SCREENS.map(([href,l])=>`<a href="${href}" ${h===href?'aria-current="page"':''}>${l}</a>`).join("") +
+    `<button data-act="reset">Nollaa demo</button>`;
 }
 
 function header(){
+  const n = S.cart.reduce((a,c)=>a+c.qty,0);
   return `<header class="site"><div class="wrap">
     <div class="hdr">
       ${logoHTML()}
-      <button class="city-btn" data-act="city" aria-haspopup="dialog" aria-label="City: ${esc(state.city)}. Change city">${ic("pin")}<span>${esc(state.city)}</span>${ic("chev")}</button>
+      <button class="city-btn" data-act="city" aria-haspopup="dialog" aria-label="Kaupunki: ${esc(ui.city)}. Vaihda kaupunkia">${ic("pin")}<span>${esc(ui.city)}</span>${ic("chev")}</button>
       <form class="search hdr-search" role="search" data-act="search">
-        <label class="sr-only" for="q1">Search deals</label>
-        ${ic("search")}<input class="input" id="q1" name="q" placeholder="Search massage, brunch, hiking…" value="${esc(state.q)}">
+        <label class="sr-only" for="q1">Hae diilejä</label>
+        ${ic("search")}<input class="input" id="q1" name="q" placeholder="Hae diilejä, esim. hieronta, brunssi…" value="${esc(ui.q)}">
       </form>
-      <nav class="nav" aria-label="Main">
-        <a href="#/vouchers">${ic("ticket")}<span class="lbl">My vouchers</span><span class="sr-only">My vouchers</span></a>
-        <a href="#/business">${ic("store")}<span class="lbl">For businesses</span><span class="sr-only">For businesses</span></a>
-        <select class="lang" aria-label="Language"><option>EN</option><option>FI</option><option>SV</option></select>
+      <nav class="nav" aria-label="Päävalikko">
+        <a href="#/omat" title="Omat lahjakortit">${ic("ticket")}<span class="lbl">Omat lahjakortit</span></a>
+        <a href="#/yritys" title="Yrityksille">${ic("store")}<span class="lbl">Yrityksille</span></a>
+        <button class="navbtn cart" data-act="drawer" aria-haspopup="dialog" aria-label="Ostoskori, ${plural(n,"tuote","tuotetta")}">${ic("cart")}<span class="lbl">Ostoskori</span><span class="badge" data-cart-count ${n?"":"hidden"}>${n}</span></button>
+        <select class="lang" aria-label="Kieli"><option>FI</option><option>SV</option><option>EN</option></select>
       </nav>
     </div>
     <div class="hdr-row2">
       <form class="search" role="search" data-act="search">
-        <label class="sr-only" for="q2">Search deals</label>
-        ${ic("search")}<input class="input" id="q2" name="q" placeholder="Search deals" value="${esc(state.q)}">
+        <label class="sr-only" for="q2">Hae diilejä</label>
+        ${ic("search")}<input class="input" id="q2" name="q" placeholder="Hae diilejä" value="${esc(ui.q)}">
       </form>
     </div>
   </div></header>`;
@@ -472,91 +599,101 @@ function header(){
 function footer(){
   return `<footer class="site"><div class="wrap">
     <div class="foot">
-      <div>${logoHTML()}<p class="muted small" style="margin-top:12px;max-width:260px">Local offers in Helsinki, Espoo, Vantaa and Kauniainen.</p></div>
-      <div><h4>Customers</h4><a href="#/how">How vouchers work</a><a href="#/vouchers">My vouchers</a><a href="#/vouchers">Cancel a purchase</a></div>
-      <div><h4>Businesses</h4><a href="#/business">Sell on Vendelia</a><a href="#/business">Pricing and payouts</a><a href="#/business">Business terms</a></div>
-      <div><h4>Help</h4><a href="#/">Support centre</a><a href="#/">support@vendelia.fi</a><a href="#/">Refund policy</a></div>
+      <div>${logoHTML()}<p class="muted small" style="margin-top:12px;max-width:260px">Paikallisia elämyksiä ja palveluita Helsingissä, Espoossa, Vantaalla ja Kauniaisissa.</p>
+        <div class="paylogos" aria-label="Maksutavat"><span>Verkkopankki</span><span>MobilePay</span><span>Visa</span><span>Mastercard</span></div></div>
+      <div><h4>Asiakkaille</h4><a href="#/" data-act="how">Näin lahjakortit toimivat</a><a href="#/omat">Omat lahjakortit</a><a href="#/omat">Peru ostos</a></div>
+      <div><h4>Yrityksille</h4><a href="#/yritys">Myy Vendeliassa</a><a href="#/yritys/tilitykset">Hinnoittelu ja tilitykset</a><a href="#/yritys">Myyjän ehdot</a></div>
+      <div><h4>Apua</h4><a href="#/">Asiakaspalvelu</a><a href="#/">tuki@vendelia.fi</a><a href="#/">Palautusehdot</a></div>
     </div>
     <div class="legal">
-      <span>© 2026 Mansio Group Oy · Business ID 3631044-9</span>
-      <span class="row wrap-row" style="gap:16px"><a href="#/" class="muted">Terms of use</a><a href="#/" class="muted">Privacy</a><a href="#/" class="muted">Cookies</a><a href="#/" class="muted">Accessibility</a></span>
+      <span>© 2026 Mansio Group Oy · Y-tunnus 3631044-9</span>
+      <span class="row wrap-row" style="gap:16px"><a href="#/" class="muted">Käyttöehdot</a><a href="#/" class="muted">Tietosuoja</a><a href="#/" class="muted">Evästeet</a><a href="#/" class="muted">Saavutettavuus</a></span>
     </div>
   </div></footer>`;
 }
 
 function dealCard(d){
-  const c = cat(d.cat);
-  return `<a class="card deal" href="#/deal/${d.id}">
-    <div class="media">${photo(d)}<span class="chip">${ic(c.icon)}${c.name}</span></div>
+  const c = cat(d.cat), multi = opts(d).length>1;
+  return `<article class="card deal">
+    <a class="media" href="#/tarjous/${d.id}" tabindex="-1" aria-hidden="true">${photo(d,"")}<span class="chip">${ic(c.icon)}${c.name}</span></a>
     <div class="body">
-      <div class="meta"><span>${esc(d.merchant)}</span><span aria-hidden="true">·</span>${ic("pin")}<span>${esc(d.city)}</span></div>
-      <h3>${esc(d.title)}</h3>
+      <div class="meta"><span>${esc(d.merchant)}</span><span aria-hidden="true">·</span>${ic("pin")}<span>${esc(d.city)}, ${esc(d.area)}</span></div>
+      <h3><a href="#/tarjous/${d.id}">${esc(d.title)}</a></h3>
       <p class="restrict">${esc(d.restrict)}</p>
       <div class="price-row">
-        <span class="price">${eur(d.price)}</span>
-        ${d.ref?`<span class="ref"><span class="sr-only">Reference price </span>${eur(d.ref)}</span><span class="chip teal">−${Math.round((1-d.price/d.ref)*100)}%</span>`:""}
+        ${multi?`<span class="from">alk.</span>`:""}<span class="price">${eur(minPrice(d))}</span>
+        ${d.ref?`<span class="ref"><span class="sr-only">Vertailuhinta </span>${eur(d.ref)}</span><span class="chip teal">−${Math.round((1-d.price/d.ref)*100)} %</span>`:""}
       </div>
-      <p class="hint">Incl. VAT · Valid 3 months</p>
+      <p class="hint">Sis. ALV · voimassa 3 kk</p>
+      ${multi
+        ? `<a class="btn btn-secondary btn-sm" href="#/tarjous/${d.id}" style="margin-top:8px">Valitse vaihtoehto</a>`
+        : `<button class="btn btn-secondary btn-sm" data-act="add" data-deal="${d.id}" data-opt="std" style="margin-top:8px">${ic("cart")}Lisää ostoskoriin</button>`}
     </div>
-  </a>`;
+  </article>`;
 }
 
 function filtered(){
   return DEALS.filter(d =>
-    (state.city==="All cities" || d.city===state.city) &&
-    (!state.catFilter || d.cat===state.catFilter) &&
-    (!state.q || (d.title+" "+d.merchant+" "+cat(d.cat).name+" "+d.area).toLowerCase().includes(state.q.toLowerCase())));
+    (ui.city===ALL || d.city===ui.city) &&
+    (!ui.catFilter || d.cat===ui.catFilter) &&
+    (!ui.q || (d.title+" "+d.merchant+" "+cat(d.cat).name+" "+d.area+" "+d.city).toLowerCase().includes(ui.q.toLowerCase())));
+}
+function cityRow(){
+  return `<div class="cities" role="group" aria-label="Valitse kaupunki">
+    ${CITIES.map(c=>`<button class="city" data-city="${c.name}" data-go="1" aria-pressed="${ui.city===c.name}"><span class="c" aria-hidden="true">${c.abbr}</span>${c.name}</button>`).join("")}
+  </div>`;
 }
 
-/* ================= Screens: customer ================= */
+/* ================= Näkymät: asiakas ================= */
 function Home(){
   const list = filtered().slice(0,6);
   return header() + `<main>
   <div class="wrap">
     <div class="hero">
-      <h1>Local offers you can trust.</h1>
-      <p class="lead">Clear prices with VAT included, real local businesses, and a 14-day refund on unused vouchers.</p>
+      <h1>Paikallisia elämyksiä reiluun hintaan.</h1>
+      <p class="lead">Selkeät hinnat sisältäen ALV:n, aidot paikalliset yritykset ja 14 päivän palautusoikeus käyttämättömille lahjakorteille.</p>
       <form class="hero-search" role="search" data-act="search">
-        <div class="field"><label class="sr-only" for="hc">City</label>
-          <select class="select" id="hc" data-act="city-select">${["All cities",...CITIES].map(c=>`<option ${c===state.city?"selected":""}>${c}</option>`).join("")}</select></div>
-        <div class="search"><label class="sr-only" for="hq">What are you looking for?</label>${ic("search")}<input class="input" id="hq" name="q" placeholder="What are you looking for?" value="${esc(state.q)}"></div>
-        <button class="btn btn-primary" type="submit">Search</button>
+        <div class="field"><label class="sr-only" for="hc">Kaupunki</label>
+          <select class="select" id="hc" data-act="city-select">${[ALL,...CITIES.map(c=>c.name)].map(c=>`<option ${c===ui.city?"selected":""}>${c}</option>`).join("")}</select></div>
+        <div class="search"><label class="sr-only" for="hq">Mitä etsit?</label>${ic("search")}<input class="input" id="hq" name="q" placeholder="Mitä etsit?" value="${esc(ui.q)}"></div>
+        <button class="btn btn-primary" type="submit">Hae</button>
       </form>
     </div>
 
-    <nav class="cats" aria-label="Categories">
-      ${CATS.map(c=>`<a class="cat" href="#/deals" data-cat="${c.id}"><span class="ic">${ic(c.icon)}</span>${c.name}</a>`).join("")}
-      <a class="cat" href="#/deals" data-cat=""><span class="ic">${ic("grid")}</span>All deals</a>
+    ${cityRow()}
+    <nav class="cats" aria-label="Kategoriat" style="margin-top:var(--s2)">
+      ${CATS.map(c=>`<a class="cat" href="#/tarjoukset" data-cat="${c.id}"><span class="ic">${ic(c.icon)}</span>${c.name}</a>`).join("")}
+      <a class="cat" href="#/tarjoukset" data-cat=""><span class="ic">${ic("grid")}</span>Kaikki diilit</a>
     </nav>
 
     <section aria-labelledby="live">
-      <div class="sec-head"><h2 id="live">Live deals${state.city!=="All cities"?` in ${esc(state.city)}`:""}</h2><a class="btn btn-ghost" href="#/deals" data-cat="">See all ${ic("right")}</a></div>
+      <div class="sec-head"><h2 id="live">Ajankohtaiset diilit${ui.city!==ALL?` · ${esc(ui.city)}`:""}</h2><a class="btn btn-ghost" href="#/tarjoukset" data-cat="">Näytä kaikki ${ic("right")}</a></div>
       ${list.length?`<div class="grid deals">${list.map(dealCard).join("")}</div>`:emptyState()}
     </section>
 
     <section aria-labelledby="how" id="how-sec">
-      <div class="sec-head"><h2 id="how">How it works</h2></div>
+      <div class="sec-head"><h2 id="how">Näin se toimii</h2></div>
       <div class="grid steps">
-        ${[["Choose a deal","Every deal shows the final price with VAT, what's included and the restrictions."],
-           ["Pay securely","Pay by card or MobilePay. You see every charge before you pay."],
-           ["Get your voucher","Your voucher and its exact expiry date arrive by email and in My vouchers."],
-           ["Book and redeem","Book with the business as described on the deal, then show your code."]]
+        ${[["Valitse diili","Jokaisessa diilissä näet lopullisen hinnan sisältäen ALV:n, mitä hintaan sisältyy ja käyttöehdot."],
+           ["Maksa turvallisesti","Maksa verkkopankilla, MobilePaylla tai kortilla. Näet kaikki kulut ennen maksamista."],
+           ["Saat lahjakortin","Lahjakortti ja sen tarkka viimeinen voimassaolopäivä tulevat sähköpostiisi ja Omiin lahjakortteihin."],
+           ["Varaa ja lunasta","Varaa aika yrityksestä diilin ohjeiden mukaan ja näytä koodi paikan päällä."]]
           .map((s,i)=>`<div class="card pad step"><div class="n">${i+1}</div><h3>${s[0]}</h3><p class="muted" style="margin-top:6px">${s[1]}</p></div>`).join("")}
       </div>
-      <div class="notice" style="margin-top:var(--s3)">${ic("refund")}<p><b>14-day refund on unused vouchers.</b> Changed your mind? Cancel an unused voucher in My vouchers within 14 days of purchase. Vouchers are valid for 3 calendar months.</p></div>
+      <div class="notice" style="margin-top:var(--s3)">${ic("refund")}<p><b>14 päivän palautusoikeus.</b> Muuttuivatko suunnitelmat? Peru käyttämätön lahjakortti Omissa lahjakorteissa 14 päivän kuluessa ostosta. Lahjakortit ovat voimassa 3 kalenterikuukautta.</p></div>
     </section>
 
     <section aria-labelledby="biz">
       <div class="merchant-cta">
         <div>
-          <h2 id="biz">Run a local business?</h2>
-          <p style="opacity:.85;margin-top:12px;max-width:520px">Reach new customers in the Helsinki region. You set the offer; we handle payments, vouchers and support.</p>
-          <div class="row wrap-row" style="margin-top:var(--s3)"><a class="btn btn-primary" href="#/business">List your business</a><a class="btn" style="color:#fff" href="#/business/payouts">See how payouts work</a></div>
+          <h2 id="biz">Onko sinulla paikallinen yritys?</h2>
+          <p style="opacity:.85;margin-top:12px;max-width:520px">Tavoita uusia asiakkaita pääkaupunkiseudulla. Sinä päätät tarjouksesta – me hoidamme maksut, lahjakortit ja asiakastuen.</p>
+          <div class="row wrap-row" style="margin-top:var(--s3)"><a class="btn btn-primary" href="#/yritys">Liity myyjäksi</a><a class="btn" style="color:#fff" href="#/yritys/tilitykset">Näin tilitykset toimivat</a></div>
         </div>
         <ul>
-          <li>${ic("check")}<span><b>15% commission</b> on the VAT-exclusive sale. No sign-up or monthly fee.</span></li>
-          <li>${ic("check")}<span>Every statement line shown: sale, VAT, commission and payout.</span></li>
-          <li>${ic("check")}<span>Redeem vouchers from your phone.</span></li>
+          <li>${ic("check")}<span><b>15 % provisio</b> arvonlisäverottomasta myynnistä. Ei liittymis- eikä kuukausimaksuja.</span></li>
+          <li>${ic("check")}<span>Jokainen tilitysrivi näkyvissä: myynti, ALV, provisio ja tilitys.</span></li>
+          <li>${ic("check")}<span>Lunasta lahjakortit puhelimella.</span></li>
         </ul>
       </div>
     </section>
@@ -564,21 +701,21 @@ function Home(){
 }
 
 function emptyState(){
-  return `<div class="card empty"><p style="font-weight:600">No deals match yet.</p><p class="muted" style="margin-top:6px">Try another city or category.</p><button class="btn btn-secondary" style="margin-top:var(--s2)" data-act="reset">Clear filters</button></div>`;
+  return `<div class="card empty"><p style="font-weight:600">Hakuehdoilla ei löytynyt diilejä.</p><p class="muted" style="margin-top:6px">Kokeile toista kaupunkia tai kategoriaa.</p><button class="btn btn-secondary" style="margin-top:var(--s2)" data-act="clear">Tyhjennä suodattimet</button></div>`;
 }
 
 function Browse(){
   const list = filtered();
   return header() + `<main class="wrap">
-    <div class="crumbs"><a href="#/">Home</a><span aria-hidden="true">/</span><span>Deals</span></div>
-    <div class="sec-head"><div><h1 style="font-size:clamp(26px,4vw,34px)">${state.catFilter?cat(state.catFilter).name:"All deals"}</h1>
-      <p class="muted" style="margin-top:6px">${list.length} ${list.length===1?"deal":"deals"} · ${esc(state.city)}${state.q?` · “${esc(state.q)}”`:""}</p></div></div>
-    <div class="filters" role="group" aria-label="Filter by city">
-      ${["All cities",...CITIES].map(c=>`<button class="cat" style="min-height:44px" aria-pressed="${c===state.city}" data-city="${c}">${c===state.city?ic("check"):""}${c}</button>`).join("")}
+    <div class="crumbs"><a href="#/">Etusivu</a><span aria-hidden="true">›</span><span>Diilit</span></div>
+    <div class="sec-head"><div><h1 style="font-size:clamp(26px,4vw,34px)">${ui.catFilter?cat(ui.catFilter).name:"Kaikki diilit"}</h1>
+      <p class="muted" style="margin-top:6px">${plural(list.length,"diili","diiliä")} · ${esc(ui.city)}${ui.q?` · ”${esc(ui.q)}”`:""}</p></div></div>
+    <div class="filters" role="group" aria-label="Suodata kaupungin mukaan">
+      ${[ALL,...CITIES.map(c=>c.name)].map(c=>`<button class="cat" style="min-height:44px" aria-pressed="${c===ui.city}" data-city="${c}">${c===ui.city?ic("check"):""}${c}</button>`).join("")}
     </div>
-    <div class="filters" role="group" aria-label="Filter by category">
-      <button class="cat" style="min-height:44px" aria-pressed="${!state.catFilter}" data-catf="">${!state.catFilter?ic("check"):""}All categories</button>
-      ${CATS.map(c=>`<button class="cat" style="min-height:44px" aria-pressed="${state.catFilter===c.id}" data-catf="${c.id}">${state.catFilter===c.id?ic("check"):""}${c.name}</button>`).join("")}
+    <div class="filters" role="group" aria-label="Suodata kategorian mukaan" style="margin-bottom:var(--s3)">
+      <button class="cat" style="min-height:44px" aria-pressed="${!ui.catFilter}" data-catf="">${!ui.catFilter?ic("check"):""}Kaikki kategoriat</button>
+      ${CATS.map(c=>`<button class="cat" style="min-height:44px" aria-pressed="${ui.catFilter===c.id}" data-catf="${c.id}">${ui.catFilter===c.id?ic("check"):""}${c.name}</button>`).join("")}
     </div>
     ${list.length?`<div class="grid deals">${list.map(dealCard).join("")}</div>`:emptyState()}
   </main>` + footer();
@@ -586,114 +723,190 @@ function Browse(){
 
 function Deal(id){
   const d = deal(id); if(!d) return NotFound();
-  const exp = addMonths(TODAY,3);
+  const exp = addMonths(TODAY,3), o = optOf(d, ui.opt), multi = opts(d).length>1;
   return `<div class="has-mobile-buy">` + header() + `<main class="wrap">
-    <div class="crumbs"><a href="#/">Home</a><span aria-hidden="true">/</span><a href="#/deals" data-cat="${d.cat}">${cat(d.cat).name}</a><span aria-hidden="true">/</span><span>${esc(d.city)}</span></div>
+    <div class="crumbs"><a href="#/">Etusivu</a><span aria-hidden="true">›</span><a href="#/tarjoukset" data-cat="${d.cat}">${cat(d.cat).name}</a><span aria-hidden="true">›</span><span>${esc(d.city)}</span></div>
     <div class="detail">
-      <div class="stack" style="--gap:24px">
+      <div class="stack">
         <div class="gallery">${photo(d)}</div>
         <div>
           <div class="meta">${esc(d.merchant)} · ${ic("pin")} ${esc(d.area)}, ${esc(d.city)}</div>
           <h1 style="font-size:clamp(26px,4vw,36px);margin-top:8px">${esc(d.title)}</h1>
+          <p class="muted" style="margin-top:12px;font-size:17px">${esc(d.desc)}</p>
         </div>
+        <nav class="tabs" aria-label="Diilin osiot"><a href="#s-sis" data-jump>Kuvaus</a><a href="#s-ehdot" data-jump>Ehdot</a><a href="#s-nain" data-jump>Näin hyödynnät</a><a href="#s-sijainti" data-jump>Sijainti</a><a href="#s-myyja" data-jump>Diiliä myy</a></nav>
 
-        <div class="card pad stack"><h2 style="font-size:20px">What's included</h2>
+        <div class="card pad stack" id="s-sis"><h2 style="font-size:20px">Mitä hintaan sisältyy</h2>
           <ul class="ticks">${d.inclusions.map(x=>`<li>${ic("check")}<span>${esc(x)}</span></li>`).join("")}</ul></div>
 
-        <div class="card pad stack"><h2 style="font-size:20px">Restrictions</h2>
-          <ul class="dots">${d.rules.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+        <div class="card pad stack" id="s-ehdot"><h2 style="font-size:20px">Ehdot</h2>
+          <ul class="dots"><li>Lahjakortti on voimassa 3 kalenterikuukautta ostopäivästä</li>${d.rules.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
 
-        <div class="card pad stack"><h2 style="font-size:20px">How to book and redeem</h2>
-          <p>${esc(d.booking)}</p>
-          <div class="notice indigo">${ic("cal")}<p>If you buy today, your voucher is valid until <b>${fmtDate(exp)}</b>. The exact date is printed on your voucher.</p></div></div>
+        <div class="card pad stack" id="s-nain"><h2 style="font-size:20px">Näin hyödynnät tarjouksen</h2>
+          <ol class="nums">${d.how.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>
+          <div class="notice indigo">${ic("cal")}<p>Jos ostat tänään, lahjakortti on voimassa <b>${fmtDate(exp)}</b> asti. Tarkka päivämäärä näkyy lahjakortissa.</p></div></div>
 
-        <div class="card pad stack"><h2 style="font-size:20px">Location</h2>
-          <div class="map" role="img" aria-label="Map placeholder for ${esc(d.address)}">${ic("pin")}</div>
+        <div class="card pad stack" id="s-sijainti"><h2 style="font-size:20px">Sijainti</h2>
+          <div class="map" role="img" aria-label="Karttapaikka: ${esc(d.address)}">${ic("pin")}</div>
           <p>${esc(d.address)}</p></div>
 
-        <div class="card pad stack"><h2 style="font-size:20px">Refunds and cancellation</h2>
-          <p>You can cancel an <b>unused</b> voucher for a full refund within <b>14 days of purchase</b> in My vouchers or by emailing support@vendelia.fi. We send an acknowledgement and refund to your original payment method. Redeemed vouchers follow the business's terms and your statutory rights.</p></div>
+        <div class="card pad stack"><h2 style="font-size:20px">Peruutus ja palautus</h2>
+          <p>Voit perua <b>käyttämättömän</b> lahjakortin ja saada rahat takaisin <b>14 päivän kuluessa ostosta</b> Omissa lahjakorteissa tai sähköpostitse osoitteeseen tuki@vendelia.fi. Lähetämme vahvistuksen ja palautamme rahat alkuperäiselle maksutavalle. Käytettyihin lahjakortteihin sovelletaan yrityksen ehtoja ja lakisääteisiä oikeuksiasi.</p></div>
 
-        <div class="card pad"><h2 style="font-size:20px;margin-bottom:var(--s2)">Sold by</h2>
-          <div class="merchant"><div class="avatar">${d.mInit}</div><div><p style="font-weight:600">${esc(d.merchant)}</p><p class="muted small">${esc(d.business)}</p></div></div>
-          <p class="hint" style="margin-top:12px">Vendelia sells this voucher on behalf of the business. The business provides the service.</p></div>
+        <div class="card pad" id="s-myyja"><h2 style="font-size:20px;margin-bottom:var(--s2)">Diiliä myy</h2>
+          <div class="merchant"><div class="avatar">${d.mInit}</div><div><p style="font-weight:600">${esc(d.merchant)}</p><p class="muted small">${esc(d.business)}</p><p class="muted small">${esc(d.address)} · puh. ${esc(d.phone)}</p></div></div>
+          <p class="hint" style="margin-top:12px">Vendelia myy lahjakortin yrityksen puolesta. Palvelun tuottaa yritys.</p></div>
       </div>
 
-      <aside class="buybox card pad stack" aria-label="Purchase">
+      <aside class="buybox card pad stack" aria-label="Osta">
+        ${multi?`<fieldset class="stack" style="--x:0"><legend class="label" style="margin-bottom:8px">Valitse vaihtoehto</legend>
+          ${opts(d).map(x=>`<label class="opt"><input type="radio" name="opt" value="${x.id}" ${x.id===o.id?"checked":""} data-act="opt">${esc(x.label)}<span class="p">${eur(x.price)}</span></label>`).join("")}</fieldset>`:""}
         <div class="row" style="align-items:baseline;gap:12px;flex-wrap:wrap">
-          <span class="price" style="font-size:32px">${eur(d.price)}</span>
-          ${d.ref?`<span class="ref" style="font-size:16px"><span class="sr-only">Reference price </span>${eur(d.ref)}</span><span class="chip teal">−${Math.round((1-d.price/d.ref)*100)}%</span>`:""}
+          <span class="price" style="font-size:32px" id="bprice">${eur(o.price)}</span>
+          ${d.ref?`<span class="ref" style="font-size:16px"><span class="sr-only">Vertailuhinta </span>${eur(d.ref)}</span><span class="chip teal">−${Math.round((1-d.price/d.ref)*100)} %</span>`:""}
         </div>
         ${d.ref?`<p class="hint">${esc(d.refNote)}</p>`:""}
-        <p class="muted small">Final price, VAT ${String(d.vat).replace(".",",")}% included. No booking fee.</p>
-        <a class="btn btn-primary btn-block" href="#/checkout/${d.id}">Buy voucher</a>
+        <p class="muted small">Lopullinen hinta, sis. ALV ${pct(d.vat)}. Ei palvelu- eikä toimitusmaksuja.</p>
+        <div class="row between"><span class="label" id="ql">Määrä</span>
+          <div class="qty" role="group" aria-labelledby="ql"><button type="button" data-act="dq" data-d="-1" aria-label="Vähennä määrää" ${ui.qty<=1?"disabled":""}>−</button><output id="dqty" aria-live="polite">${ui.qty}</output><button type="button" data-act="dq" data-d="1" aria-label="Lisää määrää" ${ui.qty>=10?"disabled":""}>+</button></div></div>
+        <button class="btn btn-primary btn-block" data-act="addsel" data-deal="${d.id}">${ic("cart")}Lisää ostoskoriin</button>
         <ul class="ticks small">
-          <li>${ic("cal")}<span>Valid until ${fmtDate(exp)}</span></li>
-          <li>${ic("refund")}<span>14-day refund if unused</span></li>
-          <li>${ic("lock")}<span>Secure payment by card or MobilePay</span></li>
+          <li>${ic("cal")}<span>Voimassa ${fmtDate(exp)} asti</span></li>
+          <li>${ic("refund")}<span>14 päivän palautusoikeus käyttämättömälle</span></li>
+          <li>${ic("gift")}<span>Voit ostaa lahjaksi – valitse kassalla</span></li>
+          <li>${ic("lock")}<span>Turvallinen maksu: verkkopankki, MobilePay, kortti</span></li>
         </ul>
       </aside>
     </div>
   </main>
-  <div class="mobile-buy"><div><span class="price">${eur(d.price)}</span><p class="hint">Incl. VAT</p></div><a class="btn btn-primary" href="#/checkout/${d.id}">Buy voucher</a></div>
+  <div class="mobile-buy"><div><span class="price" id="mprice">${eur(o.price)}</span><p class="hint">Sis. ALV</p></div><button class="btn btn-primary" data-act="addsel" data-deal="${d.id}">${ic("cart")}Lisää ostoskoriin</button></div>
   ` + footer() + `</div>`;
 }
 
-function Checkout(id){
-  const d = deal(id); if(!d) return NotFound();
+function stepper(n){
+  const st=["Ostoskori","Tiedot ja maksu","Valmis"];
+  return `<ol class="stepper" aria-label="Ostoksen vaiheet" style="list-style:none;padding:0">${st.map((s,i)=>`<li><span class="${i+1===n?"on":i+1<n?"done":""}" ${i+1===n?'aria-current="step"':""}><span class="n">${i+1<n?"✓":i+1}</span>${s}</span></li>${i<2?'<li aria-hidden="true">›</li>':""}`).join("")}</ol>`;
+}
+
+function Cart(){
+  const t = cartTotals();
+  if(!t.lines.length) return header() + `<main class="wrap" style="padding-top:var(--s4)">
+    <h1 style="font-size:clamp(26px,4vw,34px)">Ostoskori</h1>
+    <div class="card empty" style="margin-top:var(--s3)">${ic("cart")}<p style="font-weight:600;margin-top:8px">Ostoskorisi on tyhjä.</p><p class="muted" style="margin-top:6px">Löydä paikallisia elämyksiä ja palveluita.</p><a class="btn btn-primary" style="margin-top:var(--s2)" href="#/tarjoukset" data-cat="">Selaa diilejä</a></div>
+  </main>` + footer();
   const exp = addMonths(TODAY,3);
-  return header() + `<main class="wrap" style="padding-top:var(--s3)">
-    <a class="btn btn-ghost" href="#/deal/${d.id}" style="margin-left:-8px">${ic("left")} Back to deal</a>
-    <h1 style="font-size:clamp(26px,4vw,34px);margin:8px 0 var(--s2)">Checkout</h1>
-    <div class="stepper" aria-label="Checkout steps"><span><b>1. Details</b></span><span aria-hidden="true">›</span><span>2. Payment</span><span aria-hidden="true">›</span><span>3. Voucher</span></div>
-    <form class="checkout" data-act="pay" data-deal="${d.id}" novalidate>
+  return header() + `<main class="wrap" style="padding-top:var(--s4)">
+    <h1 style="font-size:clamp(26px,4vw,34px);margin-bottom:var(--s2)">Ostoskori</h1>
+    ${stepper(1)}
+    <div class="checkout">
+      <div class="card pad">
+        <h2 class="sr-only">Tuotteet</h2>
+        ${t.lines.map(l=>`<div class="line">
+          <div class="thumb">${photo(l.d,"")}</div>
+          <div>
+            <h3><a href="#/tarjous/${l.d.id}">${esc(itemTitle(l.d,l.o))}</a></h3>
+            <p class="muted small">${esc(l.d.merchant)} · ${esc(l.d.city)} · ${eur(l.unit)} / kpl</p>
+            <p class="hint">Voimassa ${fmtDate(exp)} asti · ALV ${pct(l.d.vat)}</p>
+            <div class="ctrl">
+              <div class="qty" role="group" aria-label="Määrä: ${esc(itemTitle(l.d,l.o))}"><button data-act="cq" data-k="${l.key}" data-d="-1" aria-label="Vähennä" ${l.qty<=1?"disabled":""}>−</button><output>${l.qty}</output><button data-act="cq" data-k="${l.key}" data-d="1" aria-label="Lisää" ${l.qty>=10?"disabled":""}>+</button></div>
+              <span class="lt">${eur(l.total)}</span>
+              <button class="btn btn-ghost btn-sm" data-act="rm" data-k="${l.key}">${ic("trash")}Poista</button>
+            </div>
+          </div>
+        </div>`).join("")}
+        <p class="hint" style="margin-top:var(--s2)">Jokaisesta kappaleesta tulee oma lahjakortti ja oma koodi.</p>
+      </div>
+      <aside class="card pad stack" aria-label="Yhteenveto">
+        <h2 style="font-size:20px">Yhteenveto</h2>
+        <div>
+          <div class="summary-line"><span>Tuotteet (${t.count} kpl)</span><span>${eur(t.total)}</span></div>
+          ${vatLines(t.vat)}
+          <div class="summary-line"><span>Palvelumaksu</span><span>${eur(0)}</span></div>
+          <div class="summary-line total"><span>Yhteensä</span><span>${eur(t.total)}</span></div>
+        </div>
+        <a class="btn btn-primary btn-block" href="#/kassa">Siirry kassalle ${ic("right")}</a>
+        <a class="btn btn-ghost btn-block" href="#/tarjoukset" data-cat="">Jatka ostoksia</a>
+        <ul class="ticks small">
+          <li>${ic("refund")}<span>Käyttämättömät lahjakortit voi perua 14 päivän kuluessa.</span></li>
+          <li>${ic("mail")}<span>Lahjakortit lähetetään sähköpostiin heti maksun jälkeen.</span></li>
+        </ul>
+      </aside>
+    </div>
+  </main>` + footer();
+}
+
+function Checkout(){
+  const t = cartTotals();
+  if(!t.lines.length){ location.hash="#/ostoskori"; return ""; }
+  const exp = addMonths(TODAY,3), e = ui.checkoutErrors||{}, v = ui.form||{};
+  const err = k => e[k]?`<span class="err-msg" id="${k}-err">${ic("xc")}${e[k]}</span>`:"";
+  const inv = k => e[k]?`aria-invalid="true" aria-describedby="${k}-err"`:"";
+  const errList = Object.entries(e);
+  return header() + `<main class="wrap" style="padding-top:var(--s4)">
+    <a class="btn btn-ghost" href="#/ostoskori" style="margin-left:-8px">${ic("left")} Takaisin ostoskoriin</a>
+    <h1 style="font-size:clamp(26px,4vw,34px);margin:8px 0 var(--s2)">Kassa</h1>
+    ${stepper(2)}
+    <form class="checkout" data-act="pay" novalidate>
       <div class="stack">
-        <div class="card pad stack">
-          <h2 style="font-size:20px">Your details</h2>
-          <div class="field"><label for="em">Email address</label><input class="input" id="em" name="email" type="email" autocomplete="email" required value="you@example.com" aria-describedby="em-h"><span class="hint" id="em-h">We send your voucher and receipt here.</span></div>
-          <div class="field"><label for="nm">Name on voucher <span class="muted">(optional)</span></label><input class="input" id="nm" name="name" autocomplete="name"></div>
-        </div>
-        <div class="card pad stack">
-          <h2 style="font-size:20px">Payment method</h2>
-          <fieldset class="pay-opts" style="border:0;padding:0;margin:0"><legend class="sr-only">Payment method</legend>
-            <label class="pay-opt"><input type="radio" name="pm" value="card" checked>${ic("card")}<span>Card</span><span class="brand">VISA · MASTERCARD</span></label>
-            <label class="pay-opt"><input type="radio" name="pm" value="mobilepay">${ic("phone")}<span>MobilePay</span></label>
-            <label class="pay-opt"><input type="radio" name="pm" value="bank">${ic("bank")}<span>Online bank</span><span class="brand">FI BANKS</span></label>
-          </fieldset>
-          <p class="hint">${ic("lock")} Payment details are entered on the payment provider's secure form in the live service.</p>
-        </div>
-        <div class="card pad stack">
-          <label class="check"><input type="checkbox" name="terms" required id="terms"><span>I accept the <a href="#/">terms of use</a> and the business's restrictions for this deal. I understand the voucher is valid until <b>${fmtDate(exp)}</b>.</span></label>
-          <p class="hint" id="terms-err" hidden style="color:var(--danger)">${ic("xc")} Please accept the terms to continue.</p>
-        </div>
+        ${errList.length?`<div class="err-sum" role="alert" tabindex="-1" id="errsum"><b>Tarkista seuraavat kohdat:</b><ul>${errList.map(([k,m])=>`<li><a href="#${k}" data-focus="${k}">${m}</a></li>`).join("")}</ul></div>`:""}
+        <fieldset class="card pad stack">
+          <legend class="sr-only">Yhteystiedot</legend>
+          <h2 style="font-size:20px" aria-hidden="true">Yhteystiedot</h2>
+          <div class="field"><label for="email">Sähköposti <span class="req" aria-hidden="true">*</span></label><input class="input" id="email" name="email" type="email" autocomplete="email" required value="${esc(v.email??"sinä@esimerkki.fi")}" ${inv("email")}>${err("email")}<span class="hint">Lähetämme lahjakortit ja kuitin tähän osoitteeseen.</span></div>
+          <div class="form-grid two">
+            <div class="field"><label for="fn">Etunimi <span class="req" aria-hidden="true">*</span></label><input class="input" id="fn" name="fn" autocomplete="given-name" required value="${esc(v.fn??"")}" ${inv("fn")}>${err("fn")}</div>
+            <div class="field"><label for="ln">Sukunimi <span class="req" aria-hidden="true">*</span></label><input class="input" id="ln" name="ln" autocomplete="family-name" required value="${esc(v.ln??"")}" ${inv("ln")}>${err("ln")}</div>
+          </div>
+          <div class="field"><label for="tel">Puhelin <span class="muted">(valinnainen)</span></label><input class="input" id="tel" name="tel" type="tel" autocomplete="tel" value="${esc(v.tel??"")}"><span class="hint">Käytetään vain, jos tilauksessasi on ongelma.</span></div>
+        </fieldset>
+
+        <fieldset class="card pad stack">
+          <legend class="sr-only">Lahjaksi</legend>
+          <label class="check"><input type="checkbox" name="gift" id="gift" data-act="gift" ${v.gift?"checked":""}><span><b>Ostan lahjaksi</b><br><span class="muted small">Lahjakorttiin tulostetaan saajan nimi ja tervehdys. Hintaa ei näytetä.</span></span></label>
+          <div id="giftf" class="stack" ${v.gift?"":"hidden"}>
+            <div class="field"><label for="gname">Saajan nimi <span class="req" aria-hidden="true">*</span></label><input class="input" id="gname" name="gname" value="${esc(v.gname??"")}" ${inv("gname")}>${err("gname")}</div>
+            <div class="field"><label for="gmsg">Tervehdys <span class="muted">(valinnainen, enintään 200 merkkiä)</span></label><textarea class="input" id="gmsg" name="gmsg" maxlength="200">${esc(v.gmsg??"")}</textarea></div>
+          </div>
+        </fieldset>
+
+        <fieldset class="card pad stack">
+          <legend class="sr-only">Maksutapa</legend>
+          <h2 style="font-size:20px" aria-hidden="true">Maksutapa</h2>
+          <div class="pay-opts" role="radiogroup" aria-label="Maksutapa">
+            <label class="pay-opt"><input type="radio" name="pm" value="bank" data-act="pm" ${(v.pm??"bank")==="bank"?"checked":""}>${ic("bank")}<span>Verkkopankki<span class="d">Kaikki suomalaiset pankit</span></span></label>
+            <div id="banks" ${(v.pm??"bank")==="bank"?"":"hidden"}>
+              <p class="label" id="bank-l" style="margin:4px 0">Valitse pankkisi</p>
+              <div class="banks" role="radiogroup" aria-labelledby="bank-l">${BANKS.map((b,i)=>`<label class="bank"><input type="radio" name="bank" value="${b}" ${v.bank===b?"checked":""} ${i===0?'id="bank"':""}>${b}</label>`).join("")}</div>
+              ${err("bank")}
+            </div>
+            <label class="pay-opt"><input type="radio" name="pm" value="mobilepay" data-act="pm" ${v.pm==="mobilepay"?"checked":""}>${ic("phone")}<span>MobilePay<span class="d">Vahvista maksu sovelluksessa</span></span></label>
+            <label class="pay-opt"><input type="radio" name="pm" value="card" data-act="pm" ${v.pm==="card"?"checked":""}>${ic("card")}<span>Kortti<span class="d">Kortin tiedot syötetään maksupalvelun suojatulla sivulla</span></span><span class="brand">VISA · MC</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="card pad stack">
+          <legend class="sr-only">Hyväksyntä</legend>
+          <label class="check"><input type="checkbox" name="terms" id="terms" ${v.terms?"checked":""} ${inv("terms")}><span>Hyväksyn <a href="#/">käyttöehdot</a> ja ostamieni diilien ehdot. Ymmärrän, että lahjakortit ovat voimassa <b>${fmtDate(exp)}</b> asti. <span class="req" aria-hidden="true">*</span></span></label>
+          ${err("terms")}
+          <label class="check"><input type="checkbox" name="news" ${v.news?"checked":""}><span>Haluan Vendelian uutiskirjeen <span class="muted">(valinnainen)</span></span></label>
+          <p class="hint">Luemme <a href="#/">tietosuojaselosteen</a> mukaisesti vain tilauksen käsittelyyn tarvittavat tiedot.</p>
+        </fieldset>
       </div>
 
-      <aside class="card pad stack" aria-label="Order summary">
-        <div class="row" style="gap:12px;align-items:flex-start">
-          <div style="width:72px;height:56px;border-radius:8px;overflow:hidden;flex:none;background:var(--indigo-50)">${photo(d,"")}</div>
-          <div><p style="font-weight:600;line-height:1.35">${esc(d.title)}</p><p class="muted small">${esc(d.merchant)} · ${esc(d.city)}</p></div>
+      <aside class="card pad stack" aria-label="Tilauksen yhteenveto">
+        <h2 style="font-size:20px">Tilauksesi</h2>
+        <div>${t.lines.map(l=>`<div class="mini-line"><div class="thumb">${photo(l.d,"")}</div><div class="t"><b>${esc(itemTitle(l.d,l.o))}</b><span class="muted">${l.qty} × ${eur(l.unit)} · ${esc(l.d.merchant)}</span></div><span style="font-weight:600">${eur(l.total)}</span></div>`).join("")}</div>
+        <div>
+          <div class="summary-line"><span>Välisumma</span><span>${eur(t.total)}</span></div>
+          ${vatLines(t.vat)}
+          <div class="summary-line"><span>Palvelumaksu</span><span>${eur(0)}</span></div>
+          <div class="summary-line total"><span>Maksettava yhteensä</span><span>${eur(t.total)}</span></div>
         </div>
-        <div class="row between"><span class="label">Quantity</span>
-          <div class="qty"><button type="button" data-act="qty" data-d="-1" aria-label="Decrease quantity">−</button><output id="qty" aria-live="polite">1</output><button type="button" data-act="qty" data-d="1" aria-label="Increase quantity">+</button></div></div>
-        <div id="sum"></div>
-        <button class="btn btn-primary btn-block" type="submit" id="paybtn">Pay</button>
-        <ul class="ticks small">
-          <li>${ic("refund")}<span>Cancel unused vouchers within 14 days for a full refund.</span></li>
-          <li>${ic("mail")}<span>Voucher sent by email right after payment.</span></li>
-        </ul>
+        <button class="btn btn-primary btn-block" type="submit">${ic("lock")}Siirry maksamaan · ${eur(t.total)}</button>
+        <p class="hint" style="text-align:center">Siirryt maksupalveluun. Veloitus tehdään vasta, kun hyväksyt maksun.</p>
       </aside>
     </form>
   </main>` + footer();
-}
-function renderSummary(d, qty){
-  const total = r2(d.price*qty);
-  const s = split(total, d.vat);
-  document.getElementById("sum").innerHTML = `
-    <div class="summary-line"><span>${qty} × ${eur(d.price)}</span><span>${eur(total)}</span></div>
-    <div class="summary-line muted"><span>Includes VAT ${String(d.vat).replace(".",",")}%</span><span>${eur(s.saleVat)}</span></div>
-    <div class="summary-line"><span>Booking or service fee</span><span>${eur(0)}</span></div>
-    <div class="summary-line total"><span>Total to pay</span><span>${eur(total)}</span></div>`;
-  document.getElementById("paybtn").textContent = `Pay ${eur(total)}`;
 }
 
 function qrSVG(code){
@@ -703,145 +916,172 @@ function qrSVG(code){
   const finder=(x,y)=>x<7&&y<7||x>=N-7&&y<7||x<7&&y>=N-7;
   for(let y=0;y<N;y++)for(let x=0;x<N;x++){ if(!finder(x,y)&&rnd()>.52) cells.push(`<rect x="${x}" y="${y}" width="1" height="1"/>`); }
   const f=(x,y)=>`<rect x="${x}" y="${y}" width="7" height="7"/><rect x="${x+1}" y="${y+1}" width="5" height="5" fill="#fff"/><rect x="${x+2}" y="${y+2}" width="3" height="3"/>`;
-  return `<svg class="qr" viewBox="0 0 ${N} ${N}" role="img" aria-label="QR code for voucher ${code} (prototype)" shape-rendering="crispEdges" fill="#17223B">${cells.join("")}${f(0,0)}${f(N-7,0)}${f(0,N-7)}</svg>`;
+  return `<svg class="qr" viewBox="0 0 ${N} ${N}" role="img" aria-label="QR-koodi lahjakortille ${code} (prototyyppi)" shape-rendering="crispEdges" fill="#17223B">${cells.join("")}${f(0,0)}${f(N-7,0)}${f(0,N-7)}</svg>`;
+}
+
+function voucherCard(v){
+  const d = deal(v.deal), o = optOf(d, v.opt);
+  return `<div class="card pad voucher">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px">${qrSVG(v.code)}<span class="code">${v.code}</span></div>
+    <div class="stack">
+      <div class="row between wrap-row"><span class="chip teal">${ic("checkc")}Voimassa · käyttämätön</span>${LOGO_SYMBOL.replace("<svg",'<svg style="height:28px;width:auto"')}</div>
+      <h2 style="font-size:20px">${esc(itemTitle(d,o))}</h2>
+      ${v.gift?`<p class="chip indigo" style="align-self:flex-start">${ic("gift")}Lahja: ${esc(v.gift)}</p>`:""}
+      <dl class="kv">
+        <dt>Yritys</dt><dd>${esc(d.merchant)}</dd>
+        <dt>Osoite</dt><dd>${esc(d.address)}</dd>
+        <dt>Ostettu</dt><dd>${fmtDate(v.bought)}</dd>
+        <dt>Voimassa</dt><dd><b>${fmtDate(addMonths(v.bought,3))}</b> asti</dd>
+        <dt>Tilaus</dt><dd>${v.order}</dd>
+      </dl>
+      <div class="notice indigo">${ic("info")}<p><b>Seuraava vaihe:</b> ${esc(d.how[1])}</p></div>
+    </div>
+  </div>`;
 }
 
 function Confirmation(){
-  const p = state.last || state.purchases[state.purchases.length-1];
-  const d = deal(p.deal), exp = addMonths(p.bought,3);
-  return header() + `<main class="wrap" style="padding-top:var(--s4);max-width:880px">
-    <div class="stack" style="text-align:center;align-items:center;display:flex;flex-direction:column">
+  const lo = ui.lastOrder;
+  const list = lo ? S.vouchers.filter(v=>lo.codes.includes(v.code)) : S.vouchers.filter(v=>v.status==="active").slice(-1);
+  if(!list.length){ location.hash="#/omat"; return ""; }
+  const email = list[0].email, n = list.length;
+  return header() + `<main class="wrap" style="padding-top:var(--s4);max-width:900px">
+    ${lo?stepper(3):""}
+    <div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:var(--s2)">
       <div class="success-ic">${ic("check")}</div>
-      <h1 style="font-size:clamp(26px,4vw,34px)">Payment received. Here's your voucher.</h1>
-      <p class="muted">We've sent it to <b>${esc(p.email)}</b>. You can also find it in My vouchers.</p>
+      <h1 style="font-size:clamp(26px,4vw,34px)">${lo?"Kiitos! Maksu vastaanotettu.":"Lahjakorttisi"}</h1>
+      ${lo?`<p class="muted">Lähetimme ${plural(n,"lahjakortin","lahjakorttia")} osoitteeseen <b>${esc(email)}</b>. Tilausnumero <b>${lo.id}</b> · yhteensä ${eur(lo.total)}.</p>`:""}
     </div>
-    <div class="card pad voucher" style="margin-top:var(--s4)">
-      <div style="display:flex;flex-direction:column;align-items:center;gap:8px">${qrSVG(p.code)}<span class="code">${p.code}</span></div>
-      <div class="stack">
-        <div class="row between wrap-row"><span class="chip teal">${ic("checkc")}Active · not used</span>${logoHTML()}</div>
-        <h2 style="font-size:22px">${esc(d.title)}${p.qty>1?` <span class="muted">× ${p.qty}</span>`:""}</h2>
-        <dl class="kv">
-          <dt>Business</dt><dd>${esc(d.merchant)}</dd>
-          <dt>Address</dt><dd>${esc(d.address)}</dd>
-          <dt>Purchased</dt><dd>${fmtDate(p.bought)}</dd>
-          <dt>Valid until</dt><dd><b>${fmtDate(exp)}</b></dd>
-          <dt>Order</dt><dd>${p.id}</dd>
-        </dl>
-        <div class="notice indigo">${ic("info")}<p><b>Next step:</b> ${esc(d.booking)}</p></div>
-      </div>
-    </div>
+    <div class="stack" style="margin-top:var(--s4)">${list.map(voucherCard).join("")}</div>
     <div class="row wrap-row" style="justify-content:center;margin-top:var(--s3)">
-      <a class="btn btn-primary" href="#/vouchers">Go to My vouchers</a><a class="btn btn-secondary" href="#/">Keep browsing</a>
+      <a class="btn btn-primary" href="#/omat">Omat lahjakortit</a><a class="btn btn-secondary" href="#/">Jatka selaamista</a>
     </div>
-    <p class="hint" style="text-align:center;margin-top:var(--s2)">Changed your mind? Cancel this unused voucher until ${fmtDate(addDays(p.bought,14))} for a full refund.</p>
+    <p class="hint" style="text-align:center;margin-top:var(--s2)">Muuttuivatko suunnitelmat? Voit perua käyttämättömät lahjakortit ${fmtDate(addDays(list[0].bought,14))} asti ja saada rahat takaisin.</p>
   </main>` + footer();
 }
 
-function statusChip(p){
-  const exp = addMonths(p.bought,3);
-  if(p.status==="redeemed") return `<span class="chip grey">${ic("check")}Used ${fmtDate(p.redeemed)}</span>`;
-  if(p.status==="refunded") return `<span class="chip danger">${ic("refund")}Refunded</span>`;
-  if(exp < TODAY) return `<span class="chip grey">${ic("clock")}Expired</span>`;
+function statusChip(v){
+  const exp = addMonths(v.bought,3);
+  if(v.status==="redeemed") return `<span class="chip grey">${ic("check")}Käytetty ${fmtDate(v.redeemed)}</span>`;
+  if(v.status==="refunded") return `<span class="chip danger">${ic("refund")}Hyvitetty</span>`;
+  if(exp < TODAY) return `<span class="chip grey">${ic("clock")}Vanhentunut</span>`;
   const days = Math.round((exp-TODAY)/864e5);
-  return days<=14 ? `<span class="chip warn">${ic("clock")}Expires in ${days} days</span>` : `<span class="chip teal">${ic("checkc")}Active</span>`;
+  return days<=14 ? `<span class="chip warn">${ic("clock")}Vanhenee ${days} päivän kuluttua</span>` : `<span class="chip teal">${ic("checkc")}Voimassa</span>`;
 }
 
 function Vouchers(){
-  const list = [...state.purchases].reverse();
+  const list = [...S.vouchers].reverse();
   return header() + `<main class="wrap" style="padding-top:var(--s4);max-width:960px">
-    <h1 style="font-size:clamp(26px,4vw,34px)">My vouchers</h1>
-    <p class="muted" style="margin-top:6px">Signed in as you@example.com</p>
+    <h1 style="font-size:clamp(26px,4vw,34px)">Omat lahjakortit</h1>
+    <p class="muted" style="margin-top:6px">Kirjautuneena: sinä@esimerkki.fi</p>
     <div class="stack" style="margin-top:var(--s3)">
-    ${list.map(p=>{
-      const d = deal(p.deal), exp = addMonths(p.bought,3), cancelBy = addDays(p.bought,14);
-      const canCancel = p.status==="active" && TODAY<=cancelBy;
-      return `<article class="card purchase" aria-labelledby="t-${p.id}">
+    ${list.length?list.map(v=>{
+      const d = deal(v.deal), o = optOf(d,v.opt), exp = addMonths(v.bought,3), cancelBy = addDays(v.bought,14);
+      const canCancel = v.status==="active" && TODAY<=cancelBy;
+      return `<article class="card purchase" aria-labelledby="t-${v.code}">
         <div class="thumb">${photo(d,"")}</div>
         <div style="min-width:0">
-          <div class="row wrap-row" style="margin-bottom:4px">${statusChip(p)}</div>
-          <h2 id="t-${p.id}" style="font-size:17px">${esc(d.title)}${p.qty>1?` × ${p.qty}`:""}</h2>
-          <p class="muted small">${esc(d.merchant)} · Code <span style="font-family:ui-monospace,monospace">${p.code}</span></p>
-          <p class="small" style="margin-top:4px">Purchased ${fmtDate(p.bought)} · ${p.status==="refunded"?"Cancelled":"Valid until <b>"+fmtDate(exp)+"</b>"}</p>
-          ${canCancel?`<p class="hint">Free cancellation until ${fmtDate(cancelBy)}</p>`:""}
+          <div class="row wrap-row" style="margin-bottom:4px">${statusChip(v)}${v.gift?`<span class="chip indigo">${ic("gift")}Lahja</span>`:""}</div>
+          <h2 id="t-${v.code}" style="font-size:17px">${esc(itemTitle(d,o))}</h2>
+          <p class="muted small">${esc(d.merchant)} · Koodi <span class="mono">${v.code}</span> · ${eur(v.price)}</p>
+          <p class="small" style="margin-top:4px">Ostettu ${fmtDate(v.bought)} · ${v.status==="refunded"?"Peruttu":"Voimassa <b>"+fmtDate(exp)+"</b> asti"}</p>
+          ${canCancel?`<p class="hint">Maksuton peruutus ${fmtDate(cancelBy)} asti</p>`:""}
         </div>
         <div class="actions">
-          ${p.status==="active"?`<button class="btn btn-secondary btn-sm" data-act="show" data-id="${p.id}">Show voucher</button>`:""}
-          ${canCancel?`<button class="btn btn-danger btn-sm" data-act="cancel" data-id="${p.id}">Cancel and refund</button>`:""}
-          <button class="btn btn-ghost btn-sm" data-act="receipt">${ic("doc")} Receipt</button>
+          ${v.status==="active"?`<button class="btn btn-secondary btn-sm" data-act="show" data-code="${v.code}">Näytä lahjakortti</button>`:""}
+          ${canCancel?`<button class="btn btn-danger btn-sm" data-act="cancel" data-code="${v.code}">Peru ja hyvitä</button>`:""}
+          <button class="btn btn-ghost btn-sm" data-act="toast" data-msg="Kuitti (PDF) avautuu tästä">${ic("doc")} Kuitti</button>
         </div>
-      </article>`;}).join("")}
+      </article>`;}).join(""):`<div class="card empty"><p style="font-weight:600">Sinulla ei ole vielä lahjakortteja.</p></div>`}
     </div>
-    <div class="notice" style="margin-top:var(--s3)">${ic("help")}<p>Need help with a purchase? Email <a href="#/">support@vendelia.fi</a>. We reply on weekdays within one working day.</p></div>
+    <div class="notice" style="margin-top:var(--s3)">${ic("help")}<p>Tarvitsetko apua ostoksen kanssa? Lähetä sähköpostia osoitteeseen <a href="#/">tuki@vendelia.fi</a>. Vastaamme arkisin yhden työpäivän kuluessa.</p></div>
   </main>` + footer();
 }
 
-function NotFound(){ return header()+`<main class="wrap empty"><h1>Page not found</h1><a class="btn btn-primary" style="margin-top:16px" href="#/">Go home</a></main>`+footer(); }
+function NotFound(){ return header()+`<main class="wrap empty"><h1>Sivua ei löytynyt</h1><a class="btn btn-primary" style="margin-top:16px" href="#/">Etusivulle</a></main>`+footer(); }
 
-/* ================= Screens: business portal ================= */
+/* ================= Drawer ================= */
+const drawer = document.getElementById("drawer");
+function drawerHTML(added){
+  const t = cartTotals();
+  return `<div class="drawer-head"><h2 id="drawer-title" style="font-size:20px">${added?`<span class="row" style="color:var(--teal)">${ic("checkc")}Lisätty ostoskoriin</span>`:"Ostoskori"}</h2><button class="btn btn-ghost" data-act="dclose" aria-label="Sulje ostoskori">${ic("x")}</button></div>
+  <div class="drawer-body">${t.lines.length?t.lines.map(l=>`<div class="line">
+      <div class="thumb">${photo(l.d,"")}</div>
+      <div><h3>${esc(itemTitle(l.d,l.o))}</h3><p class="muted small">${esc(l.d.merchant)} · ${eur(l.unit)} / kpl</p>
+        <div class="ctrl"><div class="qty" role="group" aria-label="Määrä"><button data-act="cq" data-k="${l.key}" data-d="-1" aria-label="Vähennä" ${l.qty<=1?"disabled":""}>−</button><output>${l.qty}</output><button data-act="cq" data-k="${l.key}" data-d="1" aria-label="Lisää" ${l.qty>=10?"disabled":""}>+</button></div>
+        <span class="lt">${eur(l.total)}</span><button class="btn btn-ghost btn-sm" data-act="rm" data-k="${l.key}" aria-label="Poista ${esc(itemTitle(l.d,l.o))}">${ic("trash")}</button></div></div>
+    </div>`).join(""):`<div class="empty"><p style="font-weight:600">Ostoskorisi on tyhjä.</p></div>`}</div>
+  ${t.lines.length?`<div class="drawer-foot">
+    <div class="summary-line total" style="border:0;margin:0;padding:0 0 8px"><span>Yhteensä <span class="muted small" style="font-weight:400">sis. ALV</span></span><span>${eur(t.total)}</span></div>
+    <a class="btn btn-primary btn-block" href="#/kassa" data-act="dclose">Siirry kassalle</a>
+    <a class="btn btn-secondary btn-block" href="#/ostoskori" data-act="dclose">Näytä ostoskori</a>
+  </div>`:`<div class="drawer-foot"><a class="btn btn-primary btn-block" href="#/tarjoukset" data-cat="" data-act="dclose">Selaa diilejä</a></div>`}`;
+}
+function openDrawer(added){ drawer.innerHTML = drawerHTML(added); if(!drawer.open) drawer.showModal(); }
+
+/* ================= Näkymät: yritysportaali ================= */
 function portal(active, inner){
-  const items=[["#/business","Overview","grid"],["#/business/new","Create deal","plus"],["#/business/redeem","Redeem voucher","scan"],["#/business/payouts","Payouts and reports","bank"]];
+  const items=[["#/yritys","Yleiskatsaus","grid"],["#/yritys/uusi","Luo diili","plus"],["#/yritys/lunasta","Lunasta lahjakortti","scan"],["#/yritys/tilitykset","Tilitykset ja raportit","bank"]];
   return `<div class="portal">
     <aside class="side">
-      ${logoHTML("#/business")}
-      <nav aria-label="Business portal">${items.map(([h,l,i])=>`<a href="${h}" ${active===h?'aria-current="page"':''}>${ic(i)}${l}</a>`).join("")}
-        <a href="#/">${ic("logout")}Back to site</a></nav>
-      <div class="biz"><p style="font-weight:600">Näyte Wellness Oy</p><p class="muted">Business ID 1234567-8</p><p class="row" style="margin-top:8px;color:var(--teal);font-weight:600">${ic("checkc")}Payouts verified</p></div>
+      ${logoHTML("#/yritys","Yritysportaali")}
+      <nav aria-label="Yritysportaali">${items.map(([h,l,i])=>`<a href="${h}" ${active===h?'aria-current="page"':''}>${ic(i)}${l}</a>`).join("")}
+        <a href="#/">${ic("logout")}Takaisin sivustolle</a></nav>
+      <div class="biz"><p style="font-weight:600">Näyte Wellness Oy</p><p class="muted">Y-tunnus 1234567-8</p><p class="row" style="margin-top:8px;color:var(--teal);font-weight:600">${ic("checkc")}Tilitystiedot vahvistettu</p></div>
     </aside>
     <main class="main">${inner}</main>
   </div>`;
 }
 
 function Biz(){
-  const st = state.biz.deals;
-  const chip = s => s==="live"?`<span class="chip teal">${ic("checkc")}Live</span>`:s==="review"?`<span class="chip warn">${ic("clock")}In review</span>`:`<span class="chip grey">${ic("doc")}Draft</span>`;
-  const redeemedCount = state.purchases.filter(p=>p.status==="redeemed").length + 21;
-  return portal("#/business", `
-    <div class="row between wrap-row" style="gap:16px"><div><h1 style="font-size:28px">Overview</h1><p class="muted">October 2026 · sample data</p></div>
-      <a class="btn btn-primary" href="#/business/new">${ic("plus")} Create deal</a></div>
+  const chip = s => s==="live"?`<span class="chip teal">${ic("checkc")}Myynnissä</span>`:s==="review"?`<span class="chip warn">${ic("clock")}Tarkastettavana</span>`:`<span class="chip grey">${ic("doc")}Luonnos</span>`;
+  const mine = S.vouchers.filter(v=>deal(v.deal).merchant==="Näyte Wellness");
+  const redeemed = 21 + mine.filter(v=>v.status==="redeemed").length;
+  return portal("#/yritys", `
+    <div class="row between wrap-row" style="gap:16px"><div><h1 style="font-size:28px">Yleiskatsaus</h1><p class="muted">Lokakuu 2026 · esimerkkidata</p></div>
+      <a class="btn btn-primary" href="#/yritys/uusi">${ic("plus")} Luo diili</a></div>
     <div class="grid kpis" style="margin-top:var(--s3)">
-      <div class="card pad kpi"><p class="muted small">Vouchers sold</p><p class="v">38</p></div>
-      <div class="card pad kpi"><p class="muted small">Redeemed</p><p class="v">${redeemedCount}</p></div>
-      <div class="card pad kpi"><p class="muted small">Gross sales (incl. VAT)</p><p class="v">${eur(38*59)}</p></div>
-      <div class="card pad kpi"><p class="muted small">Next payout</p><p class="v">${eur(split(redeemedCount*59,25.5).payout)}</p><p class="hint">Redeemed vouchers · 21 Oct</p></div>
+      <div class="card pad kpi"><p class="muted small">Myydyt lahjakortit</p><p class="v">${38+mine.length-1}</p></div>
+      <div class="card pad kpi"><p class="muted small">Lunastetut</p><p class="v">${redeemed}</p></div>
+      <div class="card pad kpi"><p class="muted small">Bruttomyynti (sis. ALV)</p><p class="v">${eur(38*59)}</p></div>
+      <div class="card pad kpi"><p class="muted small">Seuraava tilitys</p><p class="v">${eur(split(redeemed*59,25.5).payout)}</p><p class="hint">Lunastetut lahjakortit · 21.10.</p></div>
     </div>
     <div class="card" style="margin-top:var(--s3)">
-      <div class="pad row between"><h2 style="font-size:20px">Your deals</h2></div>
+      <div class="pad"><h2 style="font-size:20px">Diilisi</h2></div>
       <div class="table-wrap"><table>
-        <thead><tr><th>Deal</th><th>Status</th><th class="num">Price</th><th class="num">You receive</th><th class="num">Sold</th></tr></thead>
-        <tbody>${st.map(x=>`<tr><td style="font-weight:500">${esc(x.title)}</td><td>${chip(x.status)}</td><td class="num">${eur(x.price)}</td><td class="num">${eur(split(x.price,x.vat).payout)}</td><td class="num">${x.sold}</td></tr>`).join("")}</tbody>
+        <thead><tr><th>Diili</th><th>Tila</th><th class="num">Hinta</th><th class="num">Sinulle tilitetään</th><th class="num">Myyty</th></tr></thead>
+        <tbody>${S.bizDeals.map(x=>`<tr><td style="font-weight:500">${esc(x.title)}</td><td>${chip(x.status)}</td><td class="num">${eur(x.price)}</td><td class="num">${eur(split(x.price,x.vat).payout)}</td><td class="num">${x.sold}</td></tr>`).join("")}</tbody>
       </table></div>
     </div>`);
 }
 
 function BizNew(){
-  return portal("#/business/new", `
-    <h1 style="font-size:28px">Create deal</h1>
-    <p class="muted" style="margin-top:4px">Deals are checked by Vendelia before going live, usually within one working day.</p>
+  return portal("#/yritys/uusi", `
+    <h1 style="font-size:28px">Luo diili</h1>
+    <p class="muted" style="margin-top:4px">Vendelia tarkistaa diilit ennen julkaisua, yleensä yhden arkipäivän kuluessa.</p>
     <form class="split" style="margin-top:var(--s3)" data-act="newdeal">
       <div class="card pad form-grid">
-        <div class="field"><label for="nt">Offer title</label><input class="input" id="nt" name="title" required value="Back and neck massage, 30 minutes"></div>
+        <div class="field"><label for="nt">Tarjouksen otsikko</label><input class="input" id="nt" name="title" required value="Selkä- ja niskahieronta 30 min"></div>
         <div class="form-grid two">
-          <div class="field"><label for="nc">Category</label><select class="select" id="nc" name="cat">${CATS.map(c=>`<option value="${c.id}">${c.name}</option>`).join("")}</select></div>
-          <div class="field"><label for="ncity">City</label><select class="select" id="ncity">${CITIES.map(c=>`<option>${c}</option>`).join("")}</select></div>
+          <div class="field"><label for="nc">Kategoria</label><select class="select" id="nc" name="cat">${CATS.map(c=>`<option value="${c.id}">${c.name}</option>`).join("")}</select></div>
+          <div class="field"><label for="ncity">Kaupunki</label><select class="select" id="ncity">${CITIES.map(c=>`<option>${c.name}</option>`).join("")}</select></div>
         </div>
         <div class="form-grid two">
-          <div class="field"><label for="np">Customer price incl. VAT (€)</label><input class="input" id="np" name="price" type="number" min="1" step="0.01" value="35.00" inputmode="decimal"></div>
-          <div class="field"><label for="nv">VAT rate for this service</label><select class="select" id="nv" name="vat"><option value="25.5">25,5 % – general</option><option value="13.5">13,5 % – food, restaurants, sports, culture</option><option value="10">10 % – reduced</option></select><span class="hint">Ask your accountant if unsure.</span></div>
+          <div class="field"><label for="np">Asiakashinta sis. ALV (€)</label><input class="input" id="np" name="price" type="number" min="1" step="0.01" value="35.00" inputmode="decimal"></div>
+          <div class="field"><label for="nv">Palvelun ALV-kanta</label><select class="select" id="nv" name="vat"><option value="25.5">25,5 % – yleinen</option><option value="13.5">13,5 % – ruoka, ravintolat, liikunta, kulttuuri</option><option value="10">10 % – alennettu</option></select><span class="hint">Tarkista kirjanpitäjältäsi, jos olet epävarma.</span></div>
         </div>
-        <div class="field"><label for="nr">Regular price (optional)</label><input class="input" id="nr" type="number" min="0" step="0.01" placeholder="e.g. 45.00" aria-describedby="nr-h"><span class="hint" id="nr-h">Only enter a price you have actually charged recently. It is shown as the reference price.</span></div>
-        <div class="field"><label for="ni">What's included (one per line)</label><textarea class="input" id="ni">30-minute back and neck massage
-Herbal tea after treatment</textarea></div>
-        <div class="field"><label for="nx">Restrictions (one per line)</label><textarea class="input" id="nx">Valid Monday–Friday
-One voucher per person per visit</textarea></div>
-        <div class="field"><label for="nb">Booking instructions</label><textarea class="input" id="nb">Book by phone at least 24 h ahead and quote your voucher code.</textarea></div>
-        <div class="field"><label for="nimg">Photos</label><input class="input" id="nimg" type="file" accept="image/*" style="padding-top:11px"><span class="hint">Use real photos of your premises or service.</span></div>
-        <div class="row wrap-row"><button class="btn btn-primary" type="submit">Submit for review</button><button class="btn btn-secondary" type="button" data-act="toast" data-msg="Draft saved">Save draft</button></div>
+        <div class="field"><label for="nr">Normaalihinta (valinnainen)</label><input class="input" id="nr" type="number" min="0" step="0.01" placeholder="esim. 45,00" aria-describedby="nr-h"><span class="hint" id="nr-h">Syötä vain hinta, jolla olet todella myynyt palvelua viime aikoina. Se näytetään vertailuhintana.</span></div>
+        <div class="field"><label for="ni">Mitä hintaan sisältyy (yksi per rivi)</label><textarea class="input" id="ni">30 minuutin selkä- ja niskahieronta
+Yrttitee hoidon jälkeen</textarea></div>
+        <div class="field"><label for="nx">Ehdot (yksi per rivi)</label><textarea class="input" id="nx">Voimassa ma–pe
+Yksi lahjakortti per henkilö per käynti</textarea></div>
+        <div class="field"><label for="nb">Ajanvarausohjeet</label><textarea class="input" id="nb">Varaa aika puhelimitse vähintään 24 h etukäteen ja mainitse lahjakortin koodi.</textarea></div>
+        <div class="field"><label for="nimg">Kuvat</label><input class="input" id="nimg" type="file" accept="image/*" style="padding-top:11px"><span class="hint">Käytä aitoja kuvia tiloistasi tai palvelustasi.</span></div>
+        <div class="row wrap-row"><button class="btn btn-primary" type="submit">Lähetä tarkastettavaksi</button><button class="btn btn-secondary" type="button" data-act="toast" data-msg="Luonnos tallennettu">Tallenna luonnos</button></div>
       </div>
-
       <aside class="card pad stack breakdown" aria-labelledby="bd" style="position:sticky;top:24px">
-        <h2 id="bd" style="font-size:18px">What you receive per voucher</h2>
+        <h2 id="bd" style="font-size:18px">Mitä saat lahjakorttia kohden</h2>
         <div id="bdl" aria-live="polite"></div>
-        <p class="hint">Commission is 15% of the VAT-exclusive sale. Commission VAT 25,5% is deductible for VAT-registered businesses. Paid out after redemption.</p>
+        <p class="hint">Provisio on 15 % arvonlisäverottomasta myynnistä. Provision ALV 25,5 % on vähennettävissä ALV-rekisteröidyille yrityksille. Tilitetään lunastuksen jälkeen.</p>
       </aside>
     </form>`);
 }
@@ -851,87 +1091,91 @@ function renderBreakdown(){
   const s = split(price, vat);
   const L=(a,b,cls="")=>`<div class="summary-line ${cls}"><span>${a}</span><span>${b}</span></div>`;
   document.getElementById("bdl").innerHTML =
-    L("Customer pays (incl. VAT)", eur(s.gross)) +
-    L(`Sale VAT ${String(vat).replace(".",",")}% (you report)`, eur(s.saleVat),"muted") +
-    L("Commission base (excl. VAT)", eur(s.net),"muted") +
-    L("Commission 15%", "−"+eur(s.comm)) +
-    L("Commission VAT 25,5%", "−"+eur(s.cVat)) +
-    L("Your payout", eur(s.payout),"total") +
-    `<p class="hint" style="margin-top:8px">Total deduction ${eur(s.fee)} = ${(s.gross?s.fee/s.gross*100:0).toFixed(1).replace(".",",")}% of the customer price.</p>`;
+    L("Asiakas maksaa (sis. ALV)", eur(s.gross)) +
+    L(`Myynnin ALV ${pct(vat)} (ilmoitat itse)`, eur(s.saleVat),"muted") +
+    L("Provisiopohja (ALV 0 %)", eur(s.net),"muted") +
+    L("Provisio 15 %", "−"+eur(s.comm)) +
+    L("Provision ALV 25,5 %", "−"+eur(s.cVat)) +
+    L("Tilityksesi", eur(s.payout),"total") +
+    `<p class="hint" style="margin-top:8px">Vähennykset yhteensä ${eur(s.fee)} = ${(s.gross?s.fee/s.gross*100:0).toFixed(1).replace(".",",")} % asiakashinnasta.</p>`;
 }
 
 function BizRedeem(){
-  const active = state.purchases.filter(p=>p.status==="active" && deal(p.deal).merchant==="Näyte Wellness");
-  return portal("#/business/redeem", `
-    <h1 style="font-size:28px">Redeem voucher</h1>
-    <p class="muted" style="margin-top:4px">Scan the customer's QR code or type the code. Each voucher can be redeemed once.</p>
+  const active = S.vouchers.filter(v=>v.status==="active" && deal(v.deal).merchant==="Näyte Wellness");
+  return portal("#/yritys/lunasta", `
+    <h1 style="font-size:28px">Lunasta lahjakortti</h1>
+    <p class="muted" style="margin-top:4px">Skannaa asiakkaan QR-koodi tai kirjoita koodi. Kukin lahjakortti voidaan lunastaa vain kerran.</p>
     <div class="split" style="margin-top:var(--s3)">
       <div class="card pad stack">
-        <button class="btn btn-secondary btn-block" style="min-height:120px;flex-direction:column;border-style:dashed" data-act="toast" data-msg="Camera scanning opens here on a phone">${ic("scan")}<span>Scan QR code</span></button>
+        <button class="btn btn-secondary btn-block" style="min-height:120px;flex-direction:column;border-style:dashed" data-act="toast" data-msg="Kamera avautuu tästä puhelimella">${ic("scan")}<span>Skannaa QR-koodi</span></button>
         <form data-act="redeem" class="stack">
-          <div class="field"><label for="rc">Or enter voucher code</label><input class="input" id="rc" name="code" autocomplete="off" autocapitalize="characters" placeholder="VND-XXXX-XXXX" style="font-family:ui-monospace,monospace;letter-spacing:.05em;text-transform:uppercase"></div>
-          <button class="btn btn-primary btn-block" type="submit">Check code</button>
+          <div class="field"><label for="rc">Tai syötä lahjakortin koodi</label><input class="input mono" id="rc" name="code" autocomplete="off" autocapitalize="characters" placeholder="VND-XXXX-XXXX" style="letter-spacing:.05em;text-transform:uppercase"></div>
+          <button class="btn btn-primary btn-block" type="submit">Tarkista koodi</button>
         </form>
         <div id="rr" class="redeem-result" aria-live="polite"></div>
       </div>
       <aside class="card pad stack">
-        <h2 style="font-size:18px">Try it</h2>
-        <p class="muted small">Active sample vouchers for your business:</p>
-        ${active.length?active.map(p=>`<button class="btn btn-ghost btn-sm" style="justify-content:flex-start;font-family:ui-monospace,monospace" data-act="fill" data-code="${p.code}">${p.code}</button>`).join(""):'<p class="small">None. Buy the massage deal in the customer flow to create one.</p>'}
-        <p class="muted small">Used or refunded codes are rejected with the reason shown.</p>
+        <h2 style="font-size:18px">Kokeile</h2>
+        <p class="muted small">Yrityksesi voimassa olevat esimerkkilahjakortit:</p>
+        ${active.length?active.map(v=>`<button class="btn btn-ghost btn-sm mono" style="justify-content:flex-start" data-act="fill" data-code="${v.code}">${v.code}</button>`).join(""):'<p class="small">Ei yhtään. Osta kuumakivihieronta asiakaspuolella, niin saat koodin.</p>'}
+        <p class="muted small">Käytetyt, hyvitetyt ja muiden yritysten koodit hylätään, ja syy näytetään.</p>
       </aside>
     </div>`);
 }
 
 function BizPayouts(){
   const rows = [
-    {d:"60-minute hot stone massage", n:17, price:59, vat:25.5, ref:1},
-    {d:"Couples massage, 90 minutes", n:4, price:139, vat:25.5, ref:0},
+    {d:"Kuumakivihieronta 60 min", n:17, price:59, vat:25.5, ref:1},
+    {d:"Parihieronta 90 min", n:4, price:139, vat:25.5, ref:0},
   ];
   let T={gross:0,saleVat:0,net:0,comm:0,cVat:0,refund:0,payout:0};
   const lines = rows.map(r=>{
     const s = split(r.price*r.n, r.vat), refund = r.ref*r.price, rs = split(refund, r.vat);
     const payout = r2(s.payout - rs.payout);
     T.gross+=s.gross;T.saleVat+=s.saleVat;T.net+=s.net;T.comm+=s.comm-rs.comm;T.cVat+=s.cVat-rs.cVat;T.refund+=refund;T.payout+=payout;
-    return `<tr><td>${esc(r.d)}<div class="hint">${r.n} sold · ${r.ref} refunded</div></td><td class="num">${eur(s.gross)}</td><td class="num">${eur(s.saleVat)}</td><td class="num">${eur(s.net)}</td><td class="num">${eur(r2(s.comm-rs.comm))}</td><td class="num">${eur(r2(s.cVat-rs.cVat))}</td><td class="num">${refund?"−"+eur(refund):eur(0)}</td><td class="num"><b>${eur(payout)}</b></td></tr>`;
+    return `<tr><td>${esc(r.d)}<div class="hint">${r.n} myyty · ${r.ref} hyvitetty</div></td><td class="num">${eur(s.gross)}</td><td class="num">${eur(s.saleVat)}</td><td class="num">${eur(s.net)}</td><td class="num">${eur(r2(s.comm-rs.comm))}</td><td class="num">${eur(r2(s.cVat-rs.cVat))}</td><td class="num">${refund?"−"+eur(refund):eur(0)}</td><td class="num"><b>${eur(payout)}</b></td></tr>`;
   }).join("");
   Object.keys(T).forEach(k=>T[k]=r2(T[k]));
-  return portal("#/business/payouts", `
-    <div class="row between wrap-row" style="gap:16px"><div><h1 style="font-size:28px">Payouts and reports</h1><p class="muted">Settlement 1–15 Oct 2026 · sample data</p></div>
-      <button class="btn btn-secondary" data-act="toast" data-msg="CSV export starts here">${ic("doc")} Export CSV</button></div>
+  return portal("#/yritys/tilitykset", `
+    <div class="row between wrap-row" style="gap:16px"><div><h1 style="font-size:28px">Tilitykset ja raportit</h1><p class="muted">Tilityskausi 1.–15.10.2026 · esimerkkidata</p></div>
+      <button class="btn btn-secondary" data-act="toast" data-msg="CSV-vienti alkaa tästä">${ic("doc")} Vie CSV</button></div>
     <div class="grid kpis" style="margin-top:var(--s3)">
-      <div class="card pad kpi"><p class="muted small">Payout amount</p><p class="v">${eur(T.payout)}</p></div>
-      <div class="card pad kpi"><p class="muted small">Status</p><p class="v" style="font-size:20px"><span class="chip warn">${ic("clock")}Scheduled 21 Oct</span></p></div>
-      <div class="card pad kpi"><p class="muted small">Paid to</p><p class="v" style="font-size:18px">FI•• •••• •••• 1234</p></div>
+      <div class="card pad kpi"><p class="muted small">Tilityssumma</p><p class="v">${eur(T.payout)}</p></div>
+      <div class="card pad kpi"><p class="muted small">Tila</p><p class="v" style="font-size:20px"><span class="chip warn">${ic("clock")}Ajastettu 21.10.</span></p></div>
+      <div class="card pad kpi"><p class="muted small">Tilitystili</p><p class="v" style="font-size:18px">FI•• •••• •••• 1234</p></div>
     </div>
     <div class="card" style="margin-top:var(--s3)"><div class="table-wrap"><table>
-      <thead><tr><th>Deal</th><th class="num">Sales incl. VAT</th><th class="num">Sale VAT</th><th class="num">Commission base</th><th class="num">Commission</th><th class="num">Comm. VAT</th><th class="num">Refunds</th><th class="num">Payout</th></tr></thead>
-      <tbody>${lines}<tr class="sum"><td>Total</td><td class="num">${eur(T.gross)}</td><td class="num">${eur(T.saleVat)}</td><td class="num">${eur(T.net)}</td><td class="num">${eur(T.comm)}</td><td class="num">${eur(T.cVat)}</td><td class="num">${T.refund?"−"+eur(T.refund):eur(0)}</td><td class="num">${eur(T.payout)}</td></tr></tbody>
+      <thead><tr><th>Diili</th><th class="num">Myynti sis. ALV</th><th class="num">Myynnin ALV</th><th class="num">Provisiopohja</th><th class="num">Provisio</th><th class="num">Provision ALV</th><th class="num">Hyvitykset</th><th class="num">Tilitys</th></tr></thead>
+      <tbody>${lines}<tr class="sum"><td>Yhteensä</td><td class="num">${eur(T.gross)}</td><td class="num">${eur(T.saleVat)}</td><td class="num">${eur(T.net)}</td><td class="num">${eur(T.comm)}</td><td class="num">${eur(T.cVat)}</td><td class="num">${T.refund?"−"+eur(T.refund):eur(0)}</td><td class="num">${eur(T.payout)}</td></tr></tbody>
     </table></div></div>
-    <div class="notice indigo" style="margin-top:var(--s3)">${ic("info")}<p>Refunds reverse the related commission and commission VAT. A commission invoice for this period is issued with the payout.</p></div>`);
+    <div class="notice indigo" style="margin-top:var(--s3)">${ic("info")}<p>Hyvitykset peruvat niihin liittyvän provision ja provision ALV:n. Tämän kauden provisiolasku toimitetaan tilityksen yhteydessä.</p></div>`);
 }
 
 /* ================= Router ================= */
-function route(){
+let lastRoute = "";
+function route(keepScroll){
   const h = location.hash || "#/";
   const [ , a, b] = h.split("/");
+  const routeId = a+"/"+(b||"");
+  if(routeId!==lastRoute){ ui.qty=1; ui.opt=null; if(a!=="kassa"){ ui.checkoutErrors=null; } }
+  lastRoute = routeId;
   let html;
   if(!a) html = Home();
-  else if(a==="deals") html = Browse();
-  else if(a==="deal") html = Deal(b);
-  else if(a==="checkout") html = Checkout(b);
-  else if(a==="done") html = Confirmation();
-  else if(a==="vouchers") html = Vouchers();
-  else if(a==="how") { location.hash="#/"; setTimeout(()=>document.getElementById("how-sec")?.scrollIntoView(),50); return; }
-  else if(a==="business") html = b==="new"?BizNew():b==="redeem"?BizRedeem():b==="payouts"?BizPayouts():Biz();
+  else if(a==="tarjoukset") html = Browse();
+  else if(a==="tarjous") html = Deal(b);
+  else if(a==="ostoskori") html = Cart();
+  else if(a==="kassa") html = Checkout();
+  else if(a==="kiitos") html = Confirmation();
+  else if(a==="omat") html = Vouchers();
+  else if(a==="yritys") html = b==="uusi"?BizNew():b==="lunasta"?BizRedeem():b==="tilitykset"?BizPayouts():Biz();
   else html = NotFound();
+  if(!html) return;
   document.getElementById("app").innerHTML = html;
   renderProtobar();
-  window.scrollTo(0,0);
-  if(a==="checkout"){ window._qty=1; renderSummary(deal(b),1); }
-  if(a==="business" && b==="new") renderBreakdown();
+  if(!keepScroll) window.scrollTo(0,0);
+  if(a==="yritys" && b==="uusi") renderBreakdown();
 }
-window.addEventListener("hashchange", route);
+window.addEventListener("hashchange", ()=>route());
 
 /* ================= Interactions ================= */
 function toast(msg){
@@ -940,78 +1184,118 @@ function toast(msg){
 }
 const dlg = document.getElementById("dlg");
 function openDialog(html){ dlg.innerHTML=html; dlg.showModal(); }
+const rerender = () => route(true);
 
 document.addEventListener("click", e=>{
-  const el = e.target.closest("[data-act],[data-cat],[data-city],[data-catf]"); if(!el) return;
-  if(el.dataset.cat!==undefined && el.tagName==="A"){ state.catFilter = el.dataset.cat||null; return; }
-  if(el.dataset.city!==undefined){ state.city=el.dataset.city; route(); return; }
-  if(el.dataset.catf!==undefined){ state.catFilter=el.dataset.catf||null; route(); return; }
+  const el = e.target.closest("[data-act],[data-cat],[data-city],[data-catf],[data-jump],[data-focus]"); if(!el) return;
+  if(el.dataset.jump!==undefined){ e.preventDefault(); document.querySelector(el.getAttribute("href"))?.scrollIntoView({behavior:"smooth",block:"start"}); return; }
+  if(el.dataset.focus){ e.preventDefault(); document.getElementById(el.dataset.focus)?.focus(); return; }
+  if(el.dataset.cat!==undefined && el.tagName==="A"){ ui.catFilter = el.dataset.cat||null; if(el.dataset.act!=="dclose") return; }
+  if(el.dataset.city!==undefined){ ui.city=el.dataset.city; if(el.dataset.go){ location.hash="#/tarjoukset"; } else rerender(); return; }
+  if(el.dataset.catf!==undefined){ ui.catFilter=el.dataset.catf||null; rerender(); return; }
   const act = el.dataset.act;
   if(act==="city"){
-    openDialog(`<div class="pad stack"><div class="row between"><h2 style="font-size:20px">Choose your city</h2><button class="btn btn-ghost" data-act="close" aria-label="Close">${ic("x")}</button></div>
-      <div class="stack" role="group" aria-label="Cities">${["All cities",...CITIES].map(c=>`<button class="pay-opt" style="width:100%" data-act="pickcity" data-v="${c}">${ic("pin")}<span>${c}</span>${c===state.city?`<span class="brand" style="color:var(--indigo)">SELECTED</span>`:""}</button>`).join("")}</div></div>`);
+    openDialog(`<div class="pad stack"><div class="row between"><h2 style="font-size:20px">Valitse kaupunki</h2><button class="btn btn-ghost" data-act="close" aria-label="Sulje">${ic("x")}</button></div>
+      <div class="stack" role="group" aria-label="Kaupungit">${[ALL,...CITIES.map(c=>c.name)].map(c=>`<button class="pay-opt" data-act="pickcity" data-v="${c}">${ic("pin")}<span>${c}</span>${c===ui.city?`<span class="brand" style="color:var(--indigo)">VALITTU</span>`:""}</button>`).join("")}</div></div>`);
   }
-  if(act==="pickcity"){ state.city=el.dataset.v; dlg.close(); route(); toast(`Showing deals in ${state.city}`); }
+  if(act==="pickcity"){ ui.city=el.dataset.v; dlg.close(); rerender(); toast(`Näytetään: ${ui.city}`); }
   if(act==="close"){ dlg.close(); }
-  if(act==="reset"){ state.city="All cities"; state.q=""; state.catFilter=null; route(); }
-  if(act==="qty"){
-    const id=location.hash.split("/")[2]; window._qty=Math.max(1,Math.min(5,(window._qty||1)+Number(el.dataset.d)));
-    document.getElementById("qty").textContent=window._qty; renderSummary(deal(id),window._qty);
+  if(act==="clear"){ ui.city=ALL; ui.q=""; ui.catFilter=null; rerender(); }
+  if(act==="reset"){ try{localStorage.removeItem(KEY)}catch{} S=seed(); ui.lastOrder=null; location.hash="#/"; route(); toast("Demo nollattu"); }
+  if(act==="how"){ e.preventDefault(); location.hash="#/"; setTimeout(()=>document.getElementById("how-sec")?.scrollIntoView(),60); }
+  if(act==="dq"){
+    ui.qty=Math.max(1,Math.min(10,ui.qty+Number(el.dataset.d)));
+    document.getElementById("dqty").textContent=ui.qty;
+    document.querySelectorAll('[data-act=dq]').forEach(b=>b.disabled = (b.dataset.d==="-1"&&ui.qty<=1)||(b.dataset.d==="1"&&ui.qty>=10));
   }
+  if(act==="add"){ addToCart(el.dataset.deal, el.dataset.opt, 1); }
+  if(act==="addsel"){ const d=deal(el.dataset.deal); addToCart(d.id, optOf(d,ui.opt).id, ui.qty); }
+  if(act==="drawer"){ openDrawer(false); }
+  if(act==="dclose"){ drawer.close(); }
+  if(act==="cq"){ setQty(el.dataset.k, Number(el.dataset.d)); if(drawer.open) drawer.innerHTML=drawerHTML(false); rerender(); }
+  if(act==="rm"){ removeLine(el.dataset.k); if(drawer.open) drawer.innerHTML=drawerHTML(false); rerender(); toast("Tuote poistettu ostoskorista"); }
   if(act==="toast") toast(el.dataset.msg);
-  if(act==="receipt") toast("Receipt PDF opens here");
-  if(act==="show"){ state.last=state.purchases.find(p=>p.id===el.dataset.id); location.hash="#/done"; }
+  if(act==="show"){ ui.lastOrder=null; const v=S.vouchers.find(x=>x.code===el.dataset.code); ui.showCode=v.code;
+    openDialog(`<div class="pad stack"><div class="row between"><h2 style="font-size:20px">Lahjakortti</h2><button class="btn btn-ghost" data-act="close" aria-label="Sulje">${ic("x")}</button></div></div><div style="padding:0 16px 16px">${voucherCard(v)}</div>`);
+    dlg.style.maxWidth="760px"; }
   if(act==="cancel"){
-    const p=state.purchases.find(x=>x.id===el.dataset.id), d=deal(p.deal);
-    openDialog(`<div class="pad stack"><h2 style="font-size:20px">Cancel this voucher?</h2>
-      <p>${esc(d.title)} · <span style="font-family:ui-monospace,monospace">${p.code}</span></p>
-      <p class="muted">The voucher stops working immediately. ${eur(d.price*p.qty)} is refunded to your original payment method, usually within 5 working days. We'll email you a confirmation.</p>
-      <div class="row wrap-row" style="justify-content:flex-end"><button class="btn btn-secondary" data-act="close">Keep voucher</button><button class="btn btn-primary" data-act="confirmcancel" data-id="${p.id}">Cancel and refund</button></div></div>`);
+    const v=S.vouchers.find(x=>x.code===el.dataset.code), d=deal(v.deal);
+    dlg.style.maxWidth="";
+    openDialog(`<div class="pad stack"><h2 style="font-size:20px">Perutaanko lahjakortti?</h2>
+      <p>${esc(itemTitle(d,optOf(d,v.opt)))} · <span class="mono">${v.code}</span></p>
+      <p class="muted">Lahjakortti lakkaa toimimasta heti. ${eur(v.price)} palautetaan alkuperäiselle maksutavalle, yleensä 5 arkipäivän kuluessa. Lähetämme vahvistuksen sähköpostiisi.</p>
+      <div class="row wrap-row" style="justify-content:flex-end"><button class="btn btn-secondary" data-act="close">Pidä lahjakortti</button><button class="btn btn-primary" data-act="confirmcancel" data-code="${v.code}">Peru ja hyvitä</button></div></div>`);
   }
-  if(act==="confirmcancel"){ const p=state.purchases.find(x=>x.id===el.dataset.id); p.status="refunded"; dlg.close(); route(); toast("Cancelled. Refund confirmation sent by email."); }
+  if(act==="confirmcancel"){ const v=S.vouchers.find(x=>x.code===el.dataset.code); v.status="refunded"; save(); dlg.close(); rerender(); toast("Peruttu. Hyvitysvahvistus lähetetty sähköpostiin."); }
   if(act==="fill"){ document.getElementById("rc").value=el.dataset.code; document.getElementById("rc").focus(); }
   if(act==="doredeem"){
-    const p=state.purchases.find(x=>x.code===el.dataset.code); p.status="redeemed"; p.redeemed=TODAY;
-    document.getElementById("rr").innerHTML=`<div class="notice">${ic("checkc")}<p><b>Redeemed.</b> ${p.code} is now marked as used. ${eur(split(deal(p.deal).price*p.qty,deal(p.deal).vat).payout)} added to your next payout.</p></div>`;
+    const v=S.vouchers.find(x=>x.code===el.dataset.code); v.status="redeemed"; v.redeemed=+TODAY; save();
+    document.getElementById("rr").innerHTML=`<div class="notice">${ic("checkc")}<p><b>Lunastettu.</b> ${v.code} on merkitty käytetyksi. ${eur(split(v.price,deal(v.deal).vat).payout)} lisätty seuraavaan tilitykseen.</p></div>`;
   }
 });
 
 document.addEventListener("change", e=>{
-  if(e.target.dataset.act==="city-select"){ state.city=e.target.value; route(); }
-  if(e.target.id==="nv") renderBreakdown();
+  const t=e.target;
+  if(t.dataset.act==="city-select"){ ui.city=t.value; rerender(); }
+  if(t.dataset.act==="opt"){ ui.opt=t.value; const d=deal(location.hash.split("/")[2]); const p=eur(optOf(d,ui.opt).price); document.getElementById("bprice").textContent=p; document.getElementById("mprice").textContent=p; }
+  if(t.dataset.act==="gift"){ document.getElementById("giftf").hidden=!t.checked; if(t.checked) document.getElementById("gname").focus(); }
+  if(t.dataset.act==="pm"){ document.getElementById("banks").hidden = t.value!=="bank"; }
+  if(t.id==="nv") renderBreakdown();
 });
 document.addEventListener("input", e=>{ if(e.target.id==="np") renderBreakdown(); });
+dlg.addEventListener("close", ()=>{ dlg.style.maxWidth=""; });
+drawer.addEventListener("click", e=>{ if(e.target===drawer) drawer.close(); });
 
 document.addEventListener("submit", e=>{
   const f=e.target, act=f.dataset.act; if(!act) return; e.preventDefault();
-  if(act==="search"){ state.q=f.q.value.trim(); state.catFilter=null; location.hash="#/deals"; if(location.hash==="#/deals") route(); }
+  if(act==="search"){ ui.q=f.q.value.trim(); ui.catFilter=null; if(location.hash==="#/tarjoukset") rerender(); else location.hash="#/tarjoukset"; }
   if(act==="pay"){
-    const terms=f.terms.checked, email=f.email.value.trim();
-    document.getElementById("terms-err").hidden=terms;
-    if(!terms){ f.terms.focus(); return; }
-    if(!/^\S+@\S+\.\S+$/.test(email)){ f.email.focus(); f.email.setAttribute("aria-invalid","true"); return; }
-    const p={id:"o-"+(1000+state.purchases.length+1), deal:f.dataset.deal, qty:window._qty||1, email, code:genCode(), bought:TODAY, status:"active"};
-    state.purchases.push(p); state.last=p; location.hash="#/done";
+    const fd = Object.fromEntries(new FormData(f));
+    const v = {email:fd.email?.trim(), fn:fd.fn?.trim(), ln:fd.ln?.trim(), tel:fd.tel, gift:!!fd.gift, gname:fd.gname?.trim(), gmsg:fd.gmsg, pm:fd.pm, bank:fd.bank, terms:!!fd.terms, news:!!fd.news};
+    const errs = {};
+    if(!/^\S+@\S+\.\S+$/.test(v.email||"")) errs.email = "Anna toimiva sähköpostiosoite.";
+    if(!v.fn) errs.fn = "Anna etunimi.";
+    if(!v.ln) errs.ln = "Anna sukunimi.";
+    if(v.gift && !v.gname) errs.gname = "Anna lahjan saajan nimi.";
+    if(v.pm==="bank" && !v.bank) errs.bank = "Valitse pankkisi.";
+    if(!v.terms) errs.terms = "Hyväksy ehdot jatkaaksesi.";
+    ui.form = v;
+    if(Object.keys(errs).length){ ui.checkoutErrors = errs; rerender(); document.getElementById("errsum")?.focus(); return; }
+    ui.checkoutErrors = null;
+    const pmName = v.pm==="bank"?v.bank:v.pm==="mobilepay"?"MobilePay":"korttimaksu";
+    openDialog(`<div class="pad stack" style="text-align:center;padding:40px 24px"><div class="spin" aria-hidden="true"></div><p style="font-weight:600" role="status">Siirrytään maksupalveluun (${esc(pmName)})…</p><p class="hint">Prototyypissä maksu hyväksytään automaattisesti.</p></div>`);
+    setTimeout(()=>{
+      const t = cartTotals(), order = "VD-"+String(Math.floor(200000+Math.random()*799999)), codes=[];
+      for(const l of t.lines) for(let i=0;i<l.qty;i++){
+        const code = genCode(); codes.push(code);
+        S.vouchers.push({code, deal:l.d.id, opt:l.o.id, price:l.unit, order, email:v.email, bought:+TODAY, status:"active", gift:v.gift?v.gname:null});
+      }
+      ui.lastOrder = {id:order, codes, total:t.total};
+      S.cart = []; save(); ui.form = null;
+      dlg.close(); location.hash="#/kiitos";
+    }, 1400);
   }
   if(act==="redeem"){
     const code=f.code.value.trim().toUpperCase(), out=document.getElementById("rr");
-    const p=state.purchases.find(x=>x.code===code);
-    if(!p){ out.innerHTML=`<div class="notice warn">${ic("xc")}<p><b>Code not found.</b> Check the code and try again.</p></div>`; return; }
-    const d=deal(p.deal);
-    if(p.status==="redeemed"){ out.innerHTML=`<div class="notice warn">${ic("xc")}<p><b>Already used</b> on ${fmtDate(p.redeemed)}. Do not provide the service again.</p></div>`; return; }
-    if(p.status==="refunded"){ out.innerHTML=`<div class="notice warn">${ic("xc")}<p><b>Refunded voucher.</b> The customer cancelled this purchase. It is no longer valid.</p></div>`; return; }
-    out.innerHTML=`<div class="card pad stack" style="box-shadow:none"><span class="chip teal" style="align-self:flex-start">${ic("checkc")}Valid · not used</span>
-      <p style="font-weight:600">${esc(d.title)}${p.qty>1?` × ${p.qty}`:""}</p><p class="muted small">Valid until ${fmtDate(addMonths(p.bought,3))}</p>
-      <button class="btn btn-primary" data-act="doredeem" data-code="${p.code}">Mark as redeemed</button></div>`;
+    const v=S.vouchers.find(x=>x.code===code);
+    if(!v){ out.innerHTML=`<div class="notice warn">${ic("xc")}<p><b>Koodia ei löytynyt.</b> Tarkista koodi ja yritä uudelleen.</p></div>`; return; }
+    const d=deal(v.deal);
+    if(d.merchant!=="Näyte Wellness"){ out.innerHTML=`<div class="notice warn">${ic("xc")}<p><b>Koodi kuuluu toiselle yritykselle</b> (${esc(d.merchant)}). Sitä ei voi lunastaa täällä.</p></div>`; return; }
+    if(v.status==="redeemed"){ out.innerHTML=`<div class="notice warn">${ic("xc")}<p><b>Jo käytetty</b> ${fmtDate(v.redeemed)}. Älä anna palvelua uudelleen.</p></div>`; return; }
+    if(v.status==="refunded"){ out.innerHTML=`<div class="notice warn">${ic("xc")}<p><b>Hyvitetty lahjakortti.</b> Asiakas on perunut ostoksen. Lahjakortti ei ole enää voimassa.</p></div>`; return; }
+    out.innerHTML=`<div class="card pad stack" style="box-shadow:none"><span class="chip teal" style="align-self:flex-start">${ic("checkc")}Voimassa · käyttämätön</span>
+      <p style="font-weight:600">${esc(itemTitle(d,optOf(d,v.opt)))}</p><p class="muted small">Voimassa ${fmtDate(addMonths(v.bought,3))} asti${v.gift?` · Lahja: ${esc(v.gift)}`:""}</p>
+      <button class="btn btn-primary" data-act="doredeem" data-code="${v.code}">Merkitse lunastetuksi</button></div>`;
   }
   if(act==="newdeal"){
     const price=parseFloat(document.getElementById("np").value)||0, vat=parseFloat(document.getElementById("nv").value);
-    state.biz.deals.push({title:f.title.value||"Untitled deal", price, vat, status:"review", sold:0});
-    location.hash="#/business"; setTimeout(()=>toast("Submitted. We'll review it within one working day."),60);
+    S.bizDeals.push({title:f.title.value||"Nimetön diili", price, vat, status:"review", sold:0}); save();
+    location.hash="#/yritys"; setTimeout(()=>toast("Lähetetty. Tarkistamme diilin yhden arkipäivän kuluessa."),60);
   }
 });
 
 route();
+updateBadge();
 </script>
 </body>
 </html>
