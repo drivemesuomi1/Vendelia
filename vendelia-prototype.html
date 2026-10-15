@@ -78,32 +78,38 @@ textarea.input{padding:12px 14px;min-height:96px;resize:vertical}
 
 /* ---------- Header ---------- */
 header.site{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
-.hdr{display:grid;grid-template-columns:auto 1fr auto;gap:var(--s2);align-items:center;min-height:68px}
-.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--navy);min-height:44px}
-.logo svg{height:34px;width:auto}
-.logo .sub{font-weight:600;font-size:15px}
-.city-btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:#fff;cursor:pointer;font-weight:500;font-size:14px;justify-self:start}
+.hdr{display:flex;gap:var(--s2);align-items:center;justify-content:space-between;min-height:64px}
+.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--navy);min-height:44px;flex:none}
+.logo svg{height:32px;width:auto}
+.logo .sub{font-weight:600;font-size:15px;white-space:nowrap}
+.city-btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:#fff;cursor:pointer;font-weight:500;font-size:14px;white-space:nowrap;flex:none;max-width:48%}
+.city-btn>span{overflow:hidden;text-overflow:ellipsis}
 .city-btn .icon{width:18px;height:18px;color:var(--teal)}
+.hdr .city-btn{display:none}
 .search{position:relative}
 .search .icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--navy-50)}
 .search input{padding-left:44px;border-radius:999px;background:var(--soft);border-color:var(--line)}
-.nav{display:flex;gap:4px;align-items:center}
-.nav a,.nav .navbtn{position:relative;display:inline-flex;align-items:center;gap:6px;min-height:44px;min-width:44px;justify-content:center;padding:0 10px;color:var(--navy);text-decoration:none;font-weight:500;font-size:15px;border-radius:var(--radius-sm);background:none;border:0;cursor:pointer}
+.nav{display:flex;gap:2px;align-items:center;flex:none}
+.nav a,.nav .navbtn{position:relative;display:inline-flex;align-items:center;gap:6px;min-height:44px;min-width:44px;justify-content:center;padding:0 8px;white-space:nowrap;color:var(--navy);text-decoration:none;font-weight:500;font-size:15px;border-radius:var(--radius-sm);background:none;border:0;cursor:pointer}
 .nav a:hover,.nav .navbtn:hover{background:var(--soft)}
 .badge{position:absolute;top:4px;right:2px;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--indigo);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;line-height:1}
 .badge[hidden]{display:none}
+/* grid/flex children may shrink below content width (prevents horizontal page scroll) */
+.detail>*,.checkout>*,.split>*,.portal>*,.grid>*,.form-grid>*{min-width:0}
 .hdr-search{display:none}
-.hdr-row2{padding-bottom:12px;display:flex;gap:var(--s1)}
-.hdr-row2 .search{flex:1}
+.hdr-row2{padding-bottom:12px;display:flex;gap:var(--s1);align-items:center}
+.hdr-row2 .search{flex:1;min-width:0}
 .nav .lbl{display:none}
 @media(min-width:960px){
-  .hdr{grid-template-columns:auto auto 1fr auto}
-  .hdr-search{display:block}
+  .hdr .city-btn{display:inline-flex}
+  .hdr-search{display:block;flex:1;min-width:0;max-width:560px}
   .hdr-row2{display:none}
+}
+@media(min-width:1200px){
   .nav .lbl{display:inline}
   .nav .navbtn.cart .badge{position:static;margin-left:2px}
 }
-.lang{font-size:14px;font-weight:600;border:1px solid var(--line);border-radius:999px;min-height:36px;padding:0 10px;background:#fff}
+.lang{font-size:14px;font-weight:600;border:1px solid var(--line);border-radius:999px;min-height:40px;padding:0 6px 0 10px;background:#fff;cursor:pointer;margin-left:4px}
 
 /* ---------- Cards ---------- */
 .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
@@ -139,9 +145,10 @@ header.site{background:#fff;border-bottom:1px solid var(--line);position:sticky;
 .hero p.lead{font-size:18px;color:var(--navy-70);max-width:600px;margin-top:var(--s2)}
 .hero-search{margin-top:var(--s3);display:grid;gap:var(--s1);max-width:760px}
 @media(min-width:640px){.hero-search{grid-template-columns:220px 1fr auto}}
-.cities{display:flex;gap:var(--s2);overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none}
-.city{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;cursor:pointer;min-width:76px;font-size:14px;font-weight:500;color:var(--navy);padding:0}
-.city .c{width:64px;height:64px;border-radius:50%;border:2px solid var(--indigo);display:grid;place-items:center;font-weight:700;color:var(--indigo);background:#fff;letter-spacing:.02em;transition:background .15s}
+.cities{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s1);padding:4px 0 8px;max-width:440px}
+.city{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;cursor:pointer;min-width:0;font-size:13px;font-weight:500;color:var(--navy);padding:0}
+@media(min-width:640px){.city{font-size:14px}}
+.city .c{width:60px;height:60px;border-radius:50%;border:2px solid var(--indigo);display:grid;place-items:center;font-weight:700;color:var(--indigo);background:#fff;letter-spacing:.02em;transition:background .15s}
 .city:hover .c{background:var(--indigo-50)}
 .city[aria-pressed="true"] .c{background:var(--indigo);color:#fff}
 .cats{display:flex;gap:var(--s1);overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
@@ -326,6 +333,27 @@ dialog.drawer[open]{display:flex}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--navy);color:#fff;padding:12px 20px;border-radius:var(--radius-sm);font-weight:500;z-index:50;transition:.25s;display:flex;gap:10px;align-items:center;max-width:calc(100% - 32px);pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation-duration:3s!important}}
+/* ---------- Responsive overrides (keep last) ---------- */
+.is-home .hdr-row2{display:none}
+@media(max-width:639px){
+  .cats{display:grid;grid-template-columns:1fr 1fr;overflow:visible}
+  .cat{white-space:normal;line-height:1.25;font-size:14px;padding-right:12px}
+  .sec-head h2{font-size:22px}
+  .kpis{grid-template-columns:1fr 1fr}
+  .kpi.pad{padding:var(--s2)}
+  .kpi .v{font-size:22px}
+  .hero{padding:var(--s4) 0 var(--s3)}
+  .hero p.lead{font-size:17px}
+}
+.sec-head .btn{white-space:nowrap;flex:none}
+@media(max-width:639px){
+  .stepper{font-size:13px;gap:6px}
+  .stepper li:not(:has(.on)) span:not(.n){font-size:0}
+  .side nav{display:grid;grid-template-columns:1fr 1fr;overflow:visible}
+  .side nav a{white-space:normal;font-size:14px;line-height:1.25;padding:8px 10px}
+  .pad{padding:var(--s2)}
+  .voucher .qr{width:136px;height:136px}
+}
 </style>
 </head>
 <body>
@@ -816,24 +844,26 @@ function renderProtobar(){
 }
 const langSelect = () => `<select class="lang" data-act="lang" aria-label="${t("Kieli")}">${[["fi","FI","Suomi"],["sv","SV","Svenska"],["en","EN","English"]].map(([v,s,l])=>`<option value="${v}" ${v===LANG?"selected":""} lang="${v}" title="${l}">${s}</option>`).join("")}</select>`;
 
-function header(){
+function header(home){
   const n = cartCount();
-  return `<header class="site"><div class="wrap">
+  const cityBtn = `<button class="city-btn" data-act="city" aria-haspopup="dialog" aria-label="${esc(t("Kaupunki: {c}. Vaihda kaupunkia",{c:cityName(ui.city)}))}">${ic("pin")}<span>${esc(cityName(ui.city))}</span>${ic("chev")}</button>`;
+  return `<header class="site${home?" is-home":""}"><div class="wrap">
     <div class="hdr">
       ${logoHTML()}
-      <button class="city-btn" data-act="city" aria-haspopup="dialog" aria-label="${esc(t("Kaupunki: {c}. Vaihda kaupunkia",{c:cityName(ui.city)}))}">${ic("pin")}<span>${esc(cityName(ui.city))}</span>${ic("chev")}</button>
+      ${cityBtn}
       <form class="search hdr-search" role="search" data-act="search">
         <label class="sr-only" for="q1">${t("Hae diilejä")}</label>
         ${ic("search")}<input class="input" id="q1" name="q" placeholder="${t("Hae diilejä, esim. hieronta, brunssi…")}" value="${esc(ui.q)}">
       </form>
       <nav class="nav" aria-label="${t("Päävalikko")}">
-        <a href="#/omat" title="${t("Omat lahjakortit")}">${ic("ticket")}<span class="lbl">${t("Omat lahjakortit")}</span></a>
-        <a href="#/yritys" title="${t("Yrityksille")}">${ic("store")}<span class="lbl">${t("Yrityksille")}</span></a>
+        <a href="#/omat" title="${t("Omat lahjakortit")}" aria-label="${t("Omat lahjakortit")}">${ic("ticket")}<span class="lbl">${t("Omat lahjakortit")}</span></a>
+        <a href="#/yritys" title="${t("Yrityksille")}" aria-label="${t("Yrityksille")}">${ic("store")}<span class="lbl">${t("Yrityksille")}</span></a>
         <button class="navbtn cart" data-act="drawer" aria-haspopup="dialog" aria-label="${cartLabel(n)}">${ic("cart")}<span class="lbl">${t("Ostoskori")}</span><span class="badge" data-cart-count ${n?"":"hidden"}>${n}</span></button>
         ${langSelect()}
       </nav>
     </div>
     <div class="hdr-row2">
+      ${cityBtn}
       <form class="search" role="search" data-act="search">
         <label class="sr-only" for="q2">${t("Hae diilejä")}</label>
         ${ic("search")}<input class="input" id="q2" name="q" placeholder="${t("Hae diilejä")}" value="${esc(ui.q)}">
@@ -895,7 +925,7 @@ const cityOptions = () => [ALL,...CITIES.map(c=>c.name)];
 /* ================= Näkymät: asiakas ================= */
 function Home(){
   const list = filtered().slice(0,6);
-  return header() + `<main>
+  return header(true) + `<main>
   <div class="wrap">
     <div class="hero">
       <h1>${t("Paikallisia elämyksiä reiluun hintaan.")}</h1>
