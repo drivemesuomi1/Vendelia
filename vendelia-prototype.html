@@ -94,16 +94,16 @@ textarea.input{padding:12px 14px;min-height:96px;resize:vertical}
 /* ---------- Header ---------- */
 header.site{background:rgba(255,255,255,.84);-webkit-backdrop-filter:saturate(180%) blur(16px);backdrop-filter:saturate(180%) blur(16px);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;transition:box-shadow .25s var(--ease),background .25s}
 body.scrolled header.site{background:rgba(255,255,255,.94);box-shadow:0 10px 30px -18px rgba(23,34,59,.35)}
-.hdr{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;min-height:72px}
-@media(max-width:520px){.nav a[href="#/yritys"]{display:none}.nav .navbtn.cart{margin-left:2px}.lang{padding:0 22px 0 10px;background-position:right 7px center}}
-.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--navy);min-height:44px;transition:transform .2s var(--ease)}
+.hdr{display:flex;gap:16px;align-items:center;justify-content:space-between;min-height:72px}
+.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--navy);min-height:44px;flex:none;transition:transform .2s var(--ease)}
 .logo:hover{transform:scale(1.04)}
 .logo svg{height:34px;width:auto}
 .logo .sub{font-weight:600;font-size:15px}
-.city-btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px 0 12px;border:1px solid var(--line);border-radius:999px;background:#fff;cursor:pointer;font-weight:600;font-size:14px;justify-self:start;transition:border-color .2s,box-shadow .2s;max-width:100%}
+.city-btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px 0 12px;border:1px solid var(--line);border-radius:999px;background:#fff;cursor:pointer;font-weight:600;font-size:14px;flex:none;white-space:nowrap;transition:border-color .2s,box-shadow .2s;max-width:48%}
 .city-btn span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .city-btn:hover{border-color:var(--indigo-100);box-shadow:0 4px 14px -6px rgba(59,50,179,.3)}
 .city-btn .icon{width:18px;height:18px;color:var(--teal)}
+.hdr .city-btn{display:none}
 .city-btn .icon:last-child{width:16px;height:16px;color:var(--navy-50)}
 .search{position:relative}
 .search .icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--navy-50);pointer-events:none}
@@ -112,7 +112,7 @@ body.scrolled header.site{background:rgba(255,255,255,.94);box-shadow:0 10px 30p
 .search input:focus{background:#fff}
 .search kbd{position:absolute;right:12px;top:50%;transform:translateY(-50%);font:600 12px/1 var(--font);color:var(--navy-50);border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 7px;pointer-events:none}
 .search input:focus~kbd{display:none}
-.nav{display:flex;gap:2px;align-items:center}
+.nav{display:flex;gap:2px;align-items:center;flex:none}
 .nav a,.nav .navbtn{position:relative;display:inline-flex;align-items:center;gap:8px;min-height:44px;min-width:44px;justify-content:center;padding:0 12px;color:var(--navy-70);text-decoration:none;font-weight:500;font-size:15px;border-radius:999px;background:none;border:0;cursor:pointer;transition:background .2s,color .2s}
 .nav a:hover,.nav .navbtn:hover{background:var(--soft);color:var(--navy)}
 .nav .navbtn.cart{background:var(--navy);color:#fff;margin-left:6px}
@@ -120,21 +120,24 @@ body.scrolled header.site{background:rgba(255,255,255,.94);box-shadow:0 10px 30p
 .nav-sep{width:1px;height:24px;background:var(--line);margin:0 6px;display:none}
 .badge{position:absolute;top:-2px;right:-2px;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--teal);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;line-height:1;box-shadow:0 0 0 2px #fff}
 .badge[hidden]{display:none}
+/* grid/flex children may shrink below content width (prevents horizontal page scroll) */
+.detail>*,.checkout>*,.split>*,.portal>*,.grid>*,.form-grid>*{min-width:0}
 .hdr-search{display:none}
-.hdr-row2{padding-bottom:12px;display:flex;gap:var(--s1)}
-.hdr-row2 .search{flex:1}
+.hdr-row2{padding-bottom:12px;display:flex;gap:var(--s1);align-items:center}
+.hdr-row2 .search{flex:1;min-width:0}
 .nav .lbl{display:none}
 @media(min-width:960px){
-  .hdr{grid-template-columns:auto auto 1fr auto;gap:20px}
-  .hdr-search{display:block}
+  .hdr .city-btn{display:inline-flex}
+  .hdr-search{display:block;flex:1;min-width:0;max-width:560px}
   .hdr-search input{min-height:46px}
   .hdr-row2{display:none}
+}
+@media(min-width:1200px){
   .nav .lbl{display:inline}
   .nav-sep{display:block}
   .nav .navbtn.cart{padding:0 16px}
   .nav .navbtn.cart .badge{position:static;margin-left:2px;background:#fff;color:var(--navy);box-shadow:none}
 }
-@media(min-width:960px) and (max-width:1180px){.nav a .lbl{display:none}}
 .lang{appearance:none;-webkit-appearance:none;font-size:13px;font-weight:600;border:1px solid var(--line);border-radius:999px;min-height:40px;padding:0 28px 0 12px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7385' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center/12px;cursor:pointer;transition:border-color .2s}
 .lang:hover{border-color:var(--navy-50)}
 @media(max-width:400px){.city-btn{padding:0 10px}.city-btn span{max-width:88px}}
@@ -174,9 +177,10 @@ body.scrolled header.site{background:rgba(255,255,255,.94);box-shadow:0 10px 30p
 .hero p.lead{font-size:18px;color:var(--navy-70);max-width:600px;margin-top:var(--s2)}
 .hero-search{margin-top:var(--s3);display:grid;gap:var(--s1);max-width:760px}
 @media(min-width:640px){.hero-search{grid-template-columns:220px 1fr auto}}
-.cities{display:flex;gap:var(--s2);overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none}
-.city{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;cursor:pointer;min-width:76px;font-size:14px;font-weight:500;color:var(--navy);padding:0}
-.city .c{width:64px;height:64px;border-radius:50%;border:2px solid var(--indigo);display:grid;place-items:center;font-weight:700;color:var(--indigo);background:#fff;letter-spacing:.02em;transition:background .15s}
+.cities{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s1);padding:4px 0 8px;max-width:440px}
+.city{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;cursor:pointer;min-width:0;font-size:13px;font-weight:500;color:var(--navy);padding:0}
+@media(min-width:640px){.city{font-size:14px}}
+.city .c{width:60px;height:60px;border-radius:50%;border:2px solid var(--indigo);display:grid;place-items:center;font-weight:700;color:var(--indigo);background:#fff;letter-spacing:.02em;transition:background .15s}
 .city:hover .c{background:var(--indigo-50)}
 .city[aria-pressed="true"] .c{background:var(--indigo);color:#fff}
 .cats{display:flex;gap:var(--s1);overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
@@ -423,6 +427,26 @@ dialog.drawer[open]{display:flex}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--navy);color:#fff;padding:12px 20px;border-radius:var(--radius-sm);font-weight:500;z-index:50;transition:.25s;display:flex;gap:10px;align-items:center;max-width:calc(100% - 32px);pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation-duration:3s!important}}
+/* ---------- Responsive overrides (keep last) ---------- */
+@media(max-width:639px){
+  .cats{display:grid;grid-template-columns:1fr 1fr;overflow:visible}
+  .cat{white-space:normal;line-height:1.25;font-size:14px;padding-right:12px}
+  .sec-head h2{font-size:22px}
+  .kpis{grid-template-columns:1fr 1fr}
+  .kpi.pad{padding:var(--s2)}
+  .kpi .v{font-size:22px}
+  .hero{padding:var(--s4) 0 var(--s3)}
+  .hero p.lead{font-size:17px}
+}
+.sec-head .btn{white-space:nowrap;flex:none}
+@media(max-width:639px){
+  .stepper{font-size:13px;gap:6px}
+  .stepper li:not(:has(.on)) span:not(.n){font-size:0}
+  .side nav{display:grid;grid-template-columns:1fr 1fr;overflow:visible}
+  .side nav a{white-space:normal;font-size:14px;line-height:1.25;padding:8px 10px}
+  .pad{padding:var(--s2)}
+  .voucher .qr{width:136px;height:136px}
+}
 </style>
 </head>
 <body>
@@ -937,23 +961,25 @@ const langSelect = () => `<select class="lang" data-act="lang" aria-label="${t("
 
 function header(){
   const n = cartCount();
+  const cityBtn = `<button class="city-btn" data-act="city" aria-haspopup="dialog" aria-label="${esc(t("Kaupunki: {c}. Vaihda kaupunkia",{c:cityName(ui.city)}))}">${ic("pin")}<span>${esc(cityName(ui.city))}</span>${ic("chev")}</button>`;
   return `<header class="site"><div class="wrap">
     <div class="hdr">
       ${logoHTML()}
-      <button class="city-btn" data-act="city" aria-haspopup="dialog" aria-label="${esc(t("Kaupunki: {c}. Vaihda kaupunkia",{c:cityName(ui.city)}))}">${ic("pin")}<span>${esc(cityName(ui.city))}</span>${ic("chev")}</button>
+      ${cityBtn}
       <form class="search hdr-search" role="search" data-act="search">
         <label class="sr-only" for="q1">${t("Hae diilejä")}</label>
         ${ic("search")}<input class="input" id="q1" name="q" placeholder="${t("Hae diilejä, esim. hieronta, brunssi…")}" value="${esc(ui.q)}" autocomplete="off"><kbd aria-hidden="true">/</kbd>
       </form>
       <nav class="nav" aria-label="${t("Päävalikko")}">
-        <a href="#/omat" title="${t("Omat lahjakortit")}">${ic("ticket")}<span class="lbl">${t("Omat lahjakortit")}</span></a>
-        <a href="#/yritys" title="${t("Yrityksille")}">${ic("store")}<span class="lbl">${t("Yrityksille")}</span></a>
+        <a href="#/omat" title="${t("Omat lahjakortit")}" aria-label="${t("Omat lahjakortit")}">${ic("ticket")}<span class="lbl">${t("Omat lahjakortit")}</span></a>
+        <a href="#/yritys" title="${t("Yrityksille")}" aria-label="${t("Yrityksille")}">${ic("store")}<span class="lbl">${t("Yrityksille")}</span></a>
         <span class="nav-sep" aria-hidden="true"></span>
         ${langSelect()}
         <button class="navbtn cart" data-act="drawer" aria-haspopup="dialog" aria-label="${cartLabel(n)}">${ic("cart")}<span class="lbl">${t("Ostoskori")}</span><span class="badge" data-cart-count ${n?"":"hidden"}>${n}</span></button>
       </nav>
     </div>
     <div class="hdr-row2">
+      ${cityBtn}
       <form class="search" role="search" data-act="search">
         <label class="sr-only" for="q2">${t("Hae diilejä")}</label>
         ${ic("search")}<input class="input" id="q2" name="q" placeholder="${t("Hae diilejä")}" value="${esc(ui.q)}">
