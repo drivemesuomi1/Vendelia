@@ -6,7 +6,7 @@
 <title>Vendelia Prototyyppi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ---------- Tokens (from brief) ---------- */
 :root{
@@ -16,7 +16,9 @@
   --teal:#0B7A75; --teal-50:#E3F2F1;
   --warn:#8A5A00; --warn-50:#FFF4DC;
   --danger:#B42318; --danger-50:#FDECEA;
-  --radius:12px; --radius-sm:8px;
+  --radius:16px; --radius-sm:10px; --radius-lg:24px;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --shadow-lg:0 1px 2px rgba(23,34,59,.04),0 24px 56px -24px rgba(23,34,59,.28);
   --s1:8px; --s2:16px; --s3:24px; --s4:32px; --s5:40px; --s6:48px; --s8:64px;
   --shadow:0 1px 2px rgba(23,34,59,.06),0 4px 16px rgba(23,34,59,.06);
   --font:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
@@ -46,11 +48,24 @@ button,input,select,textarea{font:inherit;color:inherit}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 
 /* ---------- Prototype bar ---------- */
-.protobar{background:var(--navy);color:#fff;font-size:13px}
-.protobar .wrap{display:flex;gap:var(--s2);align-items:center;min-height:40px;overflow-x:auto;white-space:nowrap}
-.protobar a,.protobar button{color:#fff;opacity:.8;text-decoration:none;padding:4px 0;background:none;border:0;cursor:pointer;font-size:13px}
-.protobar a:hover,.protobar a[aria-current="page"],.protobar button:hover{opacity:1;text-decoration:underline}
-.protobar .tag{background:rgba(255,255,255,.14);padding:2px 8px;border-radius:999px;font-weight:600}
+.protobar{background:linear-gradient(90deg,#0F1729,#1B2646 50%,#0F1729);color:#fff;font-size:13px;position:relative;z-index:21}
+.protobar .wrap{display:flex;gap:12px;align-items:center;justify-content:space-between;min-height:44px}
+.protobar :focus-visible{outline-color:#fff}
+.pb-l,.pb-r{display:flex;align-items:center;gap:12px;min-width:0}
+.pb-tag{display:inline-flex;align-items:center;gap:8px;font-weight:600;padding:3px 11px 3px 9px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);white-space:nowrap}
+.pb-dot{width:7px;height:7px;border-radius:50%;background:#5EEAD4;box-shadow:0 0 0 3px rgba(94,234,212,.22)}
+.pb-note{opacity:.6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pb-sel{position:relative;display:inline-flex;align-items:center}
+.pb-sel select{appearance:none;-webkit-appearance:none;background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.16);border-radius:999px;min-height:34px;padding:0 34px;font-size:13px;font-weight:500;cursor:pointer;max-width:52vw;text-overflow:ellipsis;transition:background .2s}
+.pb-sel select:hover{background:rgba(255,255,255,.15)}
+.pb-sel select option{color:var(--navy);background:#fff}
+.pb-sel .icon{position:absolute;width:15px;height:15px;pointer-events:none;opacity:.75;left:12px}
+.pb-sel .icon.chv{left:auto;right:12px}
+.pb-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:0;color:#fff;opacity:.72;cursor:pointer;font-size:13px;min-height:34px;padding:0 10px;border-radius:999px;transition:opacity .2s,background .2s;white-space:nowrap}
+.pb-btn:hover{opacity:1;background:rgba(255,255,255,.08)}
+.pb-btn .icon{width:15px;height:15px}
+@media(max-width:720px){.pb-note{display:none}}
+@media(max-width:480px){.pb-btn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}}
 
 /* ---------- Buttons / inputs ---------- */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 var(--s3);border-radius:var(--radius-sm);border:1px solid transparent;font-weight:600;cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s;text-align:center}
@@ -77,44 +92,64 @@ textarea.input{padding:12px 14px;min-height:96px;resize:vertical}
 .check input{width:20px;height:20px;margin-top:2px;accent-color:var(--indigo);flex:none}
 
 /* ---------- Header ---------- */
-header.site{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
-.hdr{display:grid;grid-template-columns:auto 1fr auto;gap:var(--s2);align-items:center;min-height:68px}
-.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--navy);min-height:44px}
+header.site{background:rgba(255,255,255,.84);-webkit-backdrop-filter:saturate(180%) blur(16px);backdrop-filter:saturate(180%) blur(16px);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;transition:box-shadow .25s var(--ease),background .25s}
+body.scrolled header.site{background:rgba(255,255,255,.94);box-shadow:0 10px 30px -18px rgba(23,34,59,.35)}
+.hdr{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;min-height:72px}
+@media(max-width:520px){.nav a[href="#/yritys"]{display:none}.nav .navbtn.cart{margin-left:2px}.lang{padding:0 22px 0 10px;background-position:right 7px center}}
+.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--navy);min-height:44px;transition:transform .2s var(--ease)}
+.logo:hover{transform:scale(1.04)}
 .logo svg{height:34px;width:auto}
 .logo .sub{font-weight:600;font-size:15px}
-.city-btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:#fff;cursor:pointer;font-weight:500;font-size:14px;justify-self:start}
+.city-btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px 0 12px;border:1px solid var(--line);border-radius:999px;background:#fff;cursor:pointer;font-weight:600;font-size:14px;justify-self:start;transition:border-color .2s,box-shadow .2s;max-width:100%}
+.city-btn span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.city-btn:hover{border-color:var(--indigo-100);box-shadow:0 4px 14px -6px rgba(59,50,179,.3)}
 .city-btn .icon{width:18px;height:18px;color:var(--teal)}
+.city-btn .icon:last-child{width:16px;height:16px;color:var(--navy-50)}
 .search{position:relative}
-.search .icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--navy-50)}
-.search input{padding-left:44px;border-radius:999px;background:var(--soft);border-color:var(--line)}
-.nav{display:flex;gap:4px;align-items:center}
-.nav a,.nav .navbtn{position:relative;display:inline-flex;align-items:center;gap:6px;min-height:44px;min-width:44px;justify-content:center;padding:0 10px;color:var(--navy);text-decoration:none;font-weight:500;font-size:15px;border-radius:var(--radius-sm);background:none;border:0;cursor:pointer}
-.nav a:hover,.nav .navbtn:hover{background:var(--soft)}
-.badge{position:absolute;top:4px;right:2px;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--indigo);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;line-height:1}
+.search .icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--navy-50);pointer-events:none}
+.search input{padding-left:46px;border-radius:999px;background:var(--soft);border-color:transparent;transition:background .2s,border-color .2s,box-shadow .2s}
+.search input:hover{border-color:var(--line)}
+.search input:focus{background:#fff}
+.search kbd{position:absolute;right:12px;top:50%;transform:translateY(-50%);font:600 12px/1 var(--font);color:var(--navy-50);border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 7px;pointer-events:none}
+.search input:focus~kbd{display:none}
+.nav{display:flex;gap:2px;align-items:center}
+.nav a,.nav .navbtn{position:relative;display:inline-flex;align-items:center;gap:8px;min-height:44px;min-width:44px;justify-content:center;padding:0 12px;color:var(--navy-70);text-decoration:none;font-weight:500;font-size:15px;border-radius:999px;background:none;border:0;cursor:pointer;transition:background .2s,color .2s}
+.nav a:hover,.nav .navbtn:hover{background:var(--soft);color:var(--navy)}
+.nav .navbtn.cart{background:var(--navy);color:#fff;margin-left:6px}
+.nav .navbtn.cart:hover{background:var(--indigo)}
+.nav-sep{width:1px;height:24px;background:var(--line);margin:0 6px;display:none}
+.badge{position:absolute;top:-2px;right:-2px;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--teal);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;line-height:1;box-shadow:0 0 0 2px #fff}
 .badge[hidden]{display:none}
 .hdr-search{display:none}
 .hdr-row2{padding-bottom:12px;display:flex;gap:var(--s1)}
 .hdr-row2 .search{flex:1}
 .nav .lbl{display:none}
 @media(min-width:960px){
-  .hdr{grid-template-columns:auto auto 1fr auto}
+  .hdr{grid-template-columns:auto auto 1fr auto;gap:20px}
   .hdr-search{display:block}
+  .hdr-search input{min-height:46px}
   .hdr-row2{display:none}
   .nav .lbl{display:inline}
-  .nav .navbtn.cart .badge{position:static;margin-left:2px}
+  .nav-sep{display:block}
+  .nav .navbtn.cart{padding:0 16px}
+  .nav .navbtn.cart .badge{position:static;margin-left:2px;background:#fff;color:var(--navy);box-shadow:none}
 }
-.lang{font-size:14px;font-weight:600;border:1px solid var(--line);border-radius:999px;min-height:36px;padding:0 10px;background:#fff}
+@media(min-width:960px) and (max-width:1180px){.nav a .lbl{display:none}}
+.lang{appearance:none;-webkit-appearance:none;font-size:13px;font-weight:600;border:1px solid var(--line);border-radius:999px;min-height:40px;padding:0 28px 0 12px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7385' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center/12px;cursor:pointer;transition:border-color .2s}
+.lang:hover{border-color:var(--navy-50)}
+@media(max-width:400px){.city-btn{padding:0 10px}.city-btn span{max-width:88px}}
 
 /* ---------- Cards ---------- */
 .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
 .pad{padding:var(--s3)}
 .grid{display:grid;gap:var(--s3)}
 .deals{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
-.deal{display:flex;flex-direction:column;overflow:hidden;transition:transform .15s,box-shadow .15s}
-.deal:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(23,34,59,.06),0 12px 28px rgba(23,34,59,.10)}
+.deal{display:flex;flex-direction:column;overflow:hidden;transition:transform .3s var(--ease),box-shadow .3s var(--ease),border-color .3s}
+.deal:hover{transform:translateY(-4px);border-color:var(--indigo-100);box-shadow:0 2px 4px rgba(23,34,59,.04),0 22px 44px -20px rgba(23,34,59,.32)}
 .media{display:block;aspect-ratio:3/2;background:linear-gradient(135deg,var(--indigo-50),var(--teal-50));position:relative;overflow:hidden}
-.media img{width:100%;height:100%;object-fit:cover}
-.media .chip{position:absolute;left:12px;top:12px}
+.media img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease)}
+.deal:hover .media img{transform:scale(1.05)}
+.media .chip{position:absolute;left:12px;top:12px;background:rgba(255,255,255,.92);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 2px 10px rgba(23,34,59,.12)}
 .deal .body{padding:var(--s2);display:flex;flex-direction:column;gap:6px;flex:1}
 .deal h3 a{color:inherit;text-decoration:none}
 .deal h3 a:hover{text-decoration:underline}
@@ -154,12 +189,74 @@ section{padding:var(--s4) 0}
 @media(min-width:768px){.steps{grid-template-columns:repeat(4,1fr)}}
 .step .n{width:32px;height:32px;border-radius:50%;background:var(--indigo);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px;margin-bottom:12px}
 .merchant-cta{background:var(--navy);color:#fff;border-radius:var(--radius);padding:var(--s4);display:grid;gap:var(--s3)}
-@media(min-width:768px){.merchant-cta{grid-template-columns:1.4fr 1fr;align-items:center;padding:var(--s6)}}
-.merchant-cta ul{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+@media(min-width:768px){.merchant-cta{grid-template-columns:1.4fr 1fr;align-items:center;padding:48px}}
+.merchant-cta ul{margin:0;padding:0;list-style:none;display:grid;gap:12px}
 .merchant-cta li{display:flex;gap:10px;align-items:flex-start}
 .merchant-cta li .icon{color:#7FD6CF;margin-top:2px}
 .merchant-cta .btn-primary{background:#fff;color:var(--navy)}
 .merchant-cta .btn-primary:hover{background:var(--indigo-50)}
+.merchant-cta .btn-line{color:#fff;border-color:rgba(255,255,255,.3)}
+.merchant-cta .btn-line:hover{background:rgba(255,255,255,.08);border-color:#fff}
+
+/* ---------- Home: hero carousel ---------- */
+.home{padding-top:var(--s3)}
+.hero-c{position:relative;height:clamp(440px,52vw,540px);border-radius:var(--radius-lg);overflow:hidden;background:var(--navy);isolation:isolate;box-shadow:0 24px 48px -28px rgba(23,34,59,.5)}
+.hs{position:absolute;inset:0;display:block;color:#fff;text-decoration:none;opacity:0;visibility:hidden;transition:opacity .9s ease,visibility 0s .9s}
+.hs.on{opacity:1;visibility:visible;transition:opacity .9s ease;z-index:1}
+.hs img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.08)}
+.hs.on img{animation:kb 7s ease-out forwards}
+@keyframes kb{from{transform:scale(1.12)}to{transform:scale(1)}}
+.hs::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,23,41,.78) 0%,rgba(15,23,41,.45) 45%,rgba(15,23,41,0) 75%),linear-gradient(0deg,rgba(15,23,41,.7) 0%,rgba(15,23,41,0) 40%)}
+.hs-txt{position:absolute;z-index:1;left:clamp(20px,4vw,48px);right:20px;top:50%;transform:translateY(-62%);max-width:560px}
+.hs.on .hs-txt>*{animation:up .8s var(--ease) both}
+.hs.on .hs-txt>:nth-child(2){animation-delay:.12s}
+.hs.on .hs-txt>:nth-child(3){animation-delay:.22s}
+.hs.on .hs-txt>:nth-child(4){animation-delay:.32s}
+@keyframes up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hs-txt .chip{background:rgba(255,255,255,.16);color:#fff;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.25)}
+.hs-txt h2{font-size:clamp(28px,4.2vw,48px);font-weight:800;letter-spacing:-.03em;line-height:1.08;margin-top:16px;color:#fff;text-wrap:balance}
+.hs-txt p{margin-top:12px;font-size:16px;opacity:.9;display:flex;align-items:center;gap:6px}
+.hs-txt p .icon{width:16px;height:16px}
+.hs-row{display:flex;align-items:center;gap:20px;margin-top:24px;flex-wrap:wrap}
+.hs-price{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.hs-price small{font-size:15px;font-weight:500;opacity:.85;margin-right:6px;letter-spacing:0}
+.hs-price s{font-size:16px;font-weight:500;opacity:.7;margin-left:10px}
+.hs-row .btn{background:#fff;color:var(--navy);border-radius:999px;padding:0 24px;transition:transform .25s var(--ease),box-shadow .25s}
+.hs:hover .hs-row .btn{transform:translateY(-2px);box-shadow:0 12px 24px -10px rgba(0,0,0,.5)}
+.hs-row .btn .icon{transition:transform .25s var(--ease)}
+.hs:hover .hs-row .btn .icon{transform:translateX(3px)}
+.hc-arrow{position:absolute;z-index:3;top:50%;width:48px;height:48px;margin-top:-24px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(15,23,41,.35);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#fff;display:grid;place-items:center;cursor:pointer;opacity:0;transition:opacity .3s,transform .3s var(--ease),background .2s}
+.hc-arrow.prev{left:16px;transform:translateX(-8px)}
+.hc-arrow.next{right:16px;transform:translateX(8px)}
+.hero-c:hover .hc-arrow,.hc-arrow:focus-visible{opacity:1;transform:none}
+.hc-arrow:hover{background:rgba(15,23,41,.6)}
+@media(hover:none){.hc-arrow{display:none}}
+.hc-pause{position:absolute;z-index:3;top:16px;right:16px;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(15,23,41,.35);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#fff;display:grid;place-items:center;cursor:pointer;transition:background .2s}
+.hc-pause:hover{background:rgba(15,23,41,.6)}
+.hc-pause .icon,.hc-arrow .icon{width:18px;height:18px}
+.hero-c :focus-visible{outline-color:#fff}
+.hc-tabs{position:absolute;z-index:3;left:clamp(20px,4vw,48px);right:clamp(20px,4vw,48px);bottom:20px;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:12px}
+.hc-tab{display:flex;flex-direction:column;gap:10px;padding:10px 0 4px;background:none;border:0;color:#fff;text-align:left;cursor:pointer;opacity:.65;transition:opacity .3s;min-width:0}
+.hc-tab:hover,.hc-tab[aria-current="true"]{opacity:1}
+.bar{display:block;height:3px;border-radius:3px;background:rgba(255,255,255,.3);overflow:hidden}
+.bar i{display:block;height:100%;background:#fff;transform:scaleX(0);transform-origin:left}
+.hc-tab[aria-current="true"] .bar i{animation:fill 5s linear forwards}
+@keyframes fill{to{transform:scaleX(1)}}
+.hero-c:is(:hover,:focus-within,.paused) :is(.bar i,.hs.on img){animation-play-state:paused}
+.tl{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl small{display:block;font-size:12px;font-weight:500;opacity:.75}
+@media(max-width:720px){.tl{display:none}.hc-tabs{gap:6px}.hs-txt{top:auto;bottom:56px;transform:none}.hs::after{background:linear-gradient(0deg,rgba(15,23,41,.88) 0%,rgba(15,23,41,.35) 60%,rgba(15,23,41,.1) 100%)}}
+@media(prefers-reduced-motion:reduce){.hs.on img,.hs.on .hs-txt>*{animation:none!important}}
+.catbar{display:flex;gap:8px;overflow-x:auto;padding:20px 0 4px;scrollbar-width:none}
+.pill{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--navy);text-decoration:none;font-weight:500;white-space:nowrap;transition:border-color .2s,color .2s}
+.pill:hover{border-color:var(--indigo);color:var(--indigo)}
+.pill .icon{width:18px;height:18px;color:var(--indigo)}
+.pill small{color:var(--navy-50);font-size:13px}
+.home .deals{grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr))}
+.home section{padding:40px 0 8px}
+.trustbar{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:40px;padding:20px 24px;background:#fff;border:1px solid var(--line);border-radius:var(--radius)}
+.trustbar div{display:flex;gap:12px;align-items:center;font-size:15px;font-weight:500}
+.trustbar .icon{color:var(--teal);width:22px;height:22px}
 footer.site{border-top:1px solid var(--line);background:#fff;margin-top:var(--s6);padding:var(--s5) 0 var(--s4)}
 .foot{display:grid;gap:var(--s3);grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
 .foot h4{font-size:14px;margin-bottom:12px}
@@ -205,7 +302,7 @@ ol.nums{margin:0;padding-left:22px;display:grid;gap:8px}
   repeating-linear-gradient(-45deg,#E7EAF3 0 2px,transparent 2px 30px),#F1F3F9;
   display:grid;place-items:center;color:var(--indigo)}
 .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto;position:sticky;top:68px;background:var(--soft);z-index:5}
-@media(min-width:960px){.tabs{top:68px}}
+@media(min-width:960px){.tabs{top:72px}}
 .tabs a{padding:12px 14px;min-height:44px;color:var(--navy-70);text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap;border-bottom:3px solid transparent}
 .tabs a:hover{color:var(--navy);border-bottom-color:var(--indigo-100)}
 .opt{display:flex;align-items:center;gap:12px;padding:0 var(--s2);min-height:56px;border:1px solid #C9CDDA;border-radius:var(--radius-sm);cursor:pointer;background:#fff}
@@ -537,6 +634,21 @@ const DICT = {
   "Hyvitykset peruvat niihin liittyvän provision ja provision ALV:n. Tämän kauden provisiolasku toimitetaan tilityksen yhteydessä.":["Återbetalningar häver tillhörande provision och moms på provisionen. Provisionsfakturan för perioden skickas med utbetalningen.","Refunds reverse the related commission and its VAT. The commission invoice for this period is sent with the payout."],
   "Lähetetty. Tarkistamme diilin yhden arkipäivän kuluessa.":["Skickat. Vi granskar erbjudandet inom en vardag.","Submitted. We'll review the deal within one working day."],
   "Nimetön diili":["Namnlöst erbjudande","Untitled deal"],
+  // etusivu (uudistus)
+  "Siirry näkymään":["Gå till vy","Go to screen"],
+  "Pääkaupunkiseudun paikalliset elämykset":["Lokala upplevelser i huvudstadsregionen","Local experiences across the Helsinki region"],
+  "Paikallisia elämyksiä":["Lokala upplevelser","Local experiences"], "reiluun hintaan.":["till ett rättvist pris.","at a fair price."],
+  "Missä?":["Var?","Where?"], "Mitä?":["Vad?","What?"], "Hieronta, brunssi, kylpylä…":["Massage, brunch, spa…","Massage, brunch, spa…"],
+  "Suosittuja:":["Populärt:","Popular:"], "hieronta":["massage","massage"], "brunssi":["brunch","brunch"], "kylpylä":["spa","spa"], "retki":["vandring","hike"],
+  "Hinnat sis. ALV":["Priser inkl. moms","Prices incl. VAT"], "14 päivän palautusoikeus":["14 dagars ångerrätt","14-day refund"], "Turvallinen maksu":["Säker betalning","Secure payment"],
+  "Lahjakortti lähetetty":["Presentkort skickat","Voucher sent"],
+  "Tutustu":["Utforska","Explore"], "Selaa kategorioittain":["Bläddra efter kategori","Browse by category"],
+  "Löydä elämyksiä läheltäsi":["Hitta upplevelser nära dig","Find experiences near you"],
+  "Ajankohtaista":["Aktuellt","Right now"], "Käsin valitut tarjoukset aidoilta paikallisilta yrityksiltä.":["Handplockade erbjudanden från äkta lokala företag.","Hand-picked offers from real local businesses."],
+  "Nostetut diilit":["Utvalda erbjudanden","Featured deals"], "Katso diili":["Se erbjudandet","View deal"],
+  "Edellinen":["Föregående","Previous"], "Seuraava":["Nästa","Next"], "Pysäytä":["Pausa","Pause"], "Jatka":["Spela","Play"],
+  "Dia {n}/{m}":["Bild {n}/{m}","Slide {n} of {m}"], "Aidot paikalliset yritykset":["Äkta lokala företag","Real local businesses"],
+  "Neljä selkeää vaihetta ostosta lunastukseen.":["Fyra tydliga steg från köp till inlösen.","Four clear steps from purchase to redemption."],
 };
 const LI = {sv:0, en:1};
 window._miss = new Set();
@@ -731,6 +843,8 @@ const P = {
   logout:'<path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 17l-5-5 5-5M5 12h11"/>',
   cart:'<circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.7 12.4a1 1 0 0 0 1 .8h9.6a1 1 0 0 0 1-.8L21 7H6"/>',
   trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13M9 7V4h6v3"/>',
+  pause:'<path d="M9 5v14M15 5v14"/>',
+  play:'<path d="M8 5.5v13l11-6.5z"/>',
   gift:'<rect x="3" y="8" width="18" height="5" rx="1"/><path d="M5 13v8h14v-8M12 8v13M12 8c-1.5-3-5-4-5-1.5S10 8 12 8zm0 0c1.5-3 5-4 5-1.5S14 8 12 8z"/>',
 };
 const ic = (n,cls="") => `<svg class="icon ${cls}" viewBox="0 0 24 24" aria-hidden="true">${P[n]}</svg>`;
@@ -809,10 +923,15 @@ function renderProtobar(){
   const h = location.hash || "#/";
   const bar = document.getElementById("protobar");
   bar.parentElement.setAttribute("aria-label", t("Prototyypin näkymät"));
+  const known = SCREENS.some(([href])=>href===h);
   bar.innerHTML =
-    `<span class="tag">${t("Prototyyppi")}</span><span style="opacity:.7">${t("Esimerkkisisältö · ei käytössä")}</span>` +
-    SCREENS.map(([href,l])=>`<a href="${href}" ${h===href?'aria-current="page"':''}>${t(l)}</a>`).join("") +
-    `<button data-act="reset">${t("Nollaa demo")}</button>`;
+    `<div class="pb-l"><span class="pb-tag"><span class="pb-dot" aria-hidden="true"></span>${t("Prototyyppi")}</span><span class="pb-note">${t("Esimerkkisisältö · ei käytössä")}</span></div>
+    <div class="pb-r">
+      <label class="pb-sel"><span class="sr-only">${t("Siirry näkymään")}</span>${ic("grid")}
+        <select data-act="proto-go">${known?"":`<option value="" selected disabled hidden>${t("Siirry näkymään")}</option>`}${SCREENS.map(([href,l])=>`<option value="${href}" ${h===href?"selected":""}>${t(l)}</option>`).join("")}</select>${ic("chev","chv")}
+      </label>
+      <button class="pb-btn" data-act="reset">${ic("refund")}<span>${t("Nollaa demo")}</span></button>
+    </div>`;
 }
 const langSelect = () => `<select class="lang" data-act="lang" aria-label="${t("Kieli")}">${[["fi","FI","Suomi"],["sv","SV","Svenska"],["en","EN","English"]].map(([v,s,l])=>`<option value="${v}" ${v===LANG?"selected":""} lang="${v}" title="${l}">${s}</option>`).join("")}</select>`;
 
@@ -824,13 +943,14 @@ function header(){
       <button class="city-btn" data-act="city" aria-haspopup="dialog" aria-label="${esc(t("Kaupunki: {c}. Vaihda kaupunkia",{c:cityName(ui.city)}))}">${ic("pin")}<span>${esc(cityName(ui.city))}</span>${ic("chev")}</button>
       <form class="search hdr-search" role="search" data-act="search">
         <label class="sr-only" for="q1">${t("Hae diilejä")}</label>
-        ${ic("search")}<input class="input" id="q1" name="q" placeholder="${t("Hae diilejä, esim. hieronta, brunssi…")}" value="${esc(ui.q)}">
+        ${ic("search")}<input class="input" id="q1" name="q" placeholder="${t("Hae diilejä, esim. hieronta, brunssi…")}" value="${esc(ui.q)}" autocomplete="off"><kbd aria-hidden="true">/</kbd>
       </form>
       <nav class="nav" aria-label="${t("Päävalikko")}">
         <a href="#/omat" title="${t("Omat lahjakortit")}">${ic("ticket")}<span class="lbl">${t("Omat lahjakortit")}</span></a>
         <a href="#/yritys" title="${t("Yrityksille")}">${ic("store")}<span class="lbl">${t("Yrityksille")}</span></a>
-        <button class="navbtn cart" data-act="drawer" aria-haspopup="dialog" aria-label="${cartLabel(n)}">${ic("cart")}<span class="lbl">${t("Ostoskori")}</span><span class="badge" data-cart-count ${n?"":"hidden"}>${n}</span></button>
+        <span class="nav-sep" aria-hidden="true"></span>
         ${langSelect()}
+        <button class="navbtn cart" data-act="drawer" aria-haspopup="dialog" aria-label="${cartLabel(n)}">${ic("cart")}<span class="lbl">${t("Ostoskori")}</span><span class="badge" data-cart-count ${n?"":"hidden"}>${n}</span></button>
       </nav>
     </div>
     <div class="hdr-row2">
@@ -863,7 +983,8 @@ function dealCard(d){
   return `<article class="card deal">
     <a class="media" href="#/tarjous/${d.id}" tabindex="-1" aria-hidden="true">${photo(d,"")}<span class="chip">${ic(c.icon)}${t(c.name)}</span></a>
     <div class="body">
-      <div class="meta"><span>${esc(d.merchant)}</span><span aria-hidden="true">·</span>${ic("pin")}<span>${esc(t(d.city))}, ${esc(t(d.area))}</span></div>
+      <div class="meta"><span>${esc(d.merchant)}</span></div>
+      <div class="meta" style="margin-top:-4px">${ic("pin")}<span>${esc(t(d.city))}, ${esc(t(d.area))}</span></div>
       <h3><a href="#/tarjous/${d.id}">${esc(loc(d.title))}</a></h3>
       <p class="restrict">${esc(loc(d.restrict))}</p>
       <div class="price-row">
@@ -894,30 +1015,46 @@ const cityOptions = () => [ALL,...CITIES.map(c=>c.name)];
 
 /* ================= Näkymät: asiakas ================= */
 function Home(){
-  const list = filtered().slice(0,6);
-  return header() + `<main>
-  <div class="wrap">
-    <div class="hero">
-      <h1>${t("Paikallisia elämyksiä reiluun hintaan.")}</h1>
-      <p class="lead">${t("Selkeät hinnat sisältäen ALV:n, aidot paikalliset yritykset ja 14 päivän palautusoikeus käyttämättömille lahjakorteille.")}</p>
-      <form class="hero-search" role="search" data-act="search">
-        <div class="field"><label class="sr-only" for="hc">${t("Kaupunki")}</label>
-          <select class="select" id="hc" data-act="city-select">${cityOptions().map(c=>`<option value="${c}" ${c===ui.city?"selected":""}>${cityName(c)}</option>`).join("")}</select></div>
-        <div class="search"><label class="sr-only" for="hq">${t("Mitä etsit?")}</label>${ic("search")}<input class="input" id="hq" name="q" placeholder="${t("Mitä etsit?")}" value="${esc(ui.q)}"></div>
-        <button class="btn btn-primary" type="submit">${t("Hae")}</button>
-      </form>
+  const list = filtered().slice(0,8);
+  const count = id => DEALS.filter(d=>d.cat===id).length;
+  const slides = ["d1","d3","d5","d7","d2"].map(deal);
+  const slideLbl = i => t("Dia {n}/{m}",{n:i+1,m:slides.length});
+  return header() + `<main class="home"><div class="wrap">
+    <h1 class="sr-only">${t("Paikallisia elämyksiä reiluun hintaan.")}</h1>
+    <div class="hero-c" role="region" aria-roledescription="carousel" aria-label="${t("Nostetut diilit")}">
+      ${slides.map((d,i)=>`<a class="hs${i?"":" on"}" href="#/tarjous/${d.id}" aria-roledescription="slide" aria-label="${slideLbl(i)}: ${esc(loc(d.title))}" ${i?'aria-hidden="true" tabindex="-1"':""}>
+        ${photo(d,"")}
+        <div class="hs-txt">
+          <span class="chip">${ic(cat(d.cat).icon)}${t(cat(d.cat).name)}</span>
+          <h2>${esc(loc(d.title))}</h2>
+          <p>${ic("pin")}${esc(d.merchant)} · ${esc(t(d.city))}, ${esc(t(d.area))}</p>
+          <div class="hs-row"><span class="hs-price">${opts(d).length>1?`<small>${t("alk.")}</small>`:""}${eur(minPrice(d))}${d.ref?`<s>${eur(d.ref)}</s>`:""}</span><span class="btn">${t("Katso diili")} ${ic("right")}</span></div>
+        </div>
+      </a>`).join("")}
+      <button class="hc-arrow prev" data-act="sl" data-d="-1" aria-label="${t("Edellinen")}">${ic("left")}</button>
+      <button class="hc-arrow next" data-act="sl" data-d="1" aria-label="${t("Seuraava")}">${ic("right")}</button>
+      <button class="hc-pause" data-act="slpause" aria-label="${t("Pysäytä")}">${ic("pause")}</button>
+      <div class="hc-tabs">
+        ${slides.map((d,i)=>`<button class="hc-tab" data-act="slgo" data-i="${i}" aria-label="${slideLbl(i)}: ${esc(loc(d.title))}" aria-current="${!i}"><span class="bar"><i></i></span><span class="tl"><small>${t(cat(d.cat).name)}</small>${esc(loc(d.base||d.title))}</span></button>`).join("")}
+      </div>
     </div>
 
-    ${cityRow()}
-    <nav class="cats" aria-label="${t("Kategoriat")}" style="margin-top:var(--s2)">
-      ${CATS.map(c=>`<a class="cat" href="#/tarjoukset" data-cat="${c.id}"><span class="ic">${ic(c.icon)}</span>${t(c.name)}</a>`).join("")}
-      <a class="cat" href="#/tarjoukset" data-cat=""><span class="ic">${ic("grid")}</span>${t("Kaikki diilit")}</a>
+    <nav class="catbar" aria-label="${t("Kategoriat")}">
+      <a class="pill" href="#/tarjoukset" data-cat="">${ic("grid")}${t("Kaikki diilit")} <small>${DEALS.length}</small></a>
+      ${CATS.map(c=>`<a class="pill" href="#/tarjoukset" data-cat="${c.id}">${ic(c.icon)}${t(c.name)} <small>${count(c.id)}</small></a>`).join("")}
     </nav>
 
     <section aria-labelledby="live">
       <div class="sec-head"><h2 id="live">${t("Ajankohtaiset diilit")}${ui.city!==ALL?` · ${esc(cityName(ui.city))}`:""}</h2><a class="btn btn-ghost" href="#/tarjoukset" data-cat="">${t("Näytä kaikki")} ${ic("right")}</a></div>
       ${list.length?`<div class="grid deals">${list.map(dealCard).join("")}</div>`:emptyState()}
     </section>
+
+    <div class="trustbar">
+      <div>${ic("checkc")}${t("Hinnat sis. ALV")}</div>
+      <div>${ic("refund")}${t("14 päivän palautusoikeus")}</div>
+      <div>${ic("lock")}${t("Turvallinen maksu")}</div>
+      <div>${ic("store")}${t("Aidot paikalliset yritykset")}</div>
+    </div>
 
     <section aria-labelledby="how" id="how-sec">
       <div class="sec-head"><h2 id="how">${t("Näin se toimii")}</h2></div>
@@ -1399,6 +1536,29 @@ function BizPayouts(){
     <div class="notice indigo" style="margin-top:var(--s3)">${ic("info")}<p>${t("Hyvitykset peruvat niihin liittyvän provision ja provision ALV:n. Tämän kauden provisiolasku toimitetaan tilityksen yhteydessä.")}</p></div>`);
 }
 
+/* ================= Banneri-karuselli ================= */
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+const slider = {i:0, paused:reduceMotion.matches};
+function goSlide(n){
+  const root = document.querySelector(".hero-c"); if(!root) return;
+  const sl = root.querySelectorAll(".hs"), tabs = root.querySelectorAll(".hc-tab");
+  slider.i = (n + sl.length) % sl.length;
+  sl.forEach((el,k)=>{ const on = k===slider.i; el.classList.toggle("on",on); el.toggleAttribute("aria-hidden",!on); if(on) el.removeAttribute("tabindex"); else el.setAttribute("tabindex","-1"); });
+  tabs.forEach((el,k)=>el.setAttribute("aria-current", k===slider.i));
+}
+function pauseBtn(){
+  const root = document.querySelector(".hero-c"); if(!root) return;
+  root.classList.toggle("paused", slider.paused);
+  const b = root.querySelector("[data-act=slpause]");
+  b.innerHTML = ic(slider.paused?"play":"pause"); b.setAttribute("aria-label", t(slider.paused?"Jatka":"Pysäytä"));
+}
+function initSlider(){
+  const root = document.querySelector(".hero-c"); if(!root) return;
+  slider.i = 0; pauseBtn();
+  // Etenemispalkin animaatio ajastaa vaihdon; hover/fokus/tauko pysäyttää sen CSS:llä.
+  root.addEventListener("animationend", e=>{ if(e.animationName==="fill") goSlide(slider.i+1); });
+}
+
 /* ================= Router ================= */
 let lastRoute = "";
 function route(keepScroll){
@@ -1419,6 +1579,7 @@ function route(keepScroll){
   else html = NotFound();
   if(!html) return;
   document.getElementById("app").innerHTML = html;
+  initSlider();
   renderProtobar();
   if(!keepScroll) window.scrollTo(0,0);
   if(a==="yritys" && b==="uusi") renderBreakdown();
@@ -1454,6 +1615,10 @@ document.addEventListener("click", e=>{
     openDialog(`<div class="pad stack"><div class="row between"><h2 style="font-size:20px">${t("Valitse kaupunki")}</h2><button class="btn btn-ghost" data-act="close" aria-label="${t("Sulje")}">${ic("x")}</button></div>
       <div class="stack" role="group" aria-label="${t("Kaupungit")}">${cityOptions().map(c=>`<button class="pay-opt" data-act="pickcity" data-v="${c}">${ic("pin")}<span>${cityName(c)}</span>${c===ui.city?`<span class="brand" style="color:var(--indigo)">${t("VALITTU")}</span>`:""}</button>`).join("")}</div></div>`);
   }
+  if(act==="sl"){ goSlide(slider.i+Number(el.dataset.d)); }
+  if(act==="slgo"){ goSlide(Number(el.dataset.i)); }
+  if(act==="slpause"){ slider.paused = !slider.paused; pauseBtn(); }
+  if(act==="qs"){ ui.q=el.dataset.q; ui.catFilter=null; location.hash="#/tarjoukset"; }
   if(act==="pickcity"){ ui.city=el.dataset.v; dlg.close(); rerender(); toast(t("Näytetään: {c}",{c:cityName(ui.city)})); }
   if(act==="close"){ dlg.close(); }
   if(act==="clear"){ ui.city=ALL; ui.q=""; ui.catFilter=null; rerender(); }
@@ -1493,6 +1658,7 @@ document.addEventListener("click", e=>{
 document.addEventListener("change", e=>{
   const el=e.target;
   if(el.dataset.act==="lang"){ setLang(el.value); return; }
+  if(el.dataset.act==="proto-go"){ location.hash = el.value; return; }
   if(el.dataset.act==="city-select"){ ui.city=el.value; rerender(); }
   if(el.dataset.act==="opt"){ ui.opt=el.value; const d=deal(location.hash.split("/")[2]); const p=eur(optOf(d,ui.opt).price); document.getElementById("bprice").textContent=p; document.getElementById("mprice").textContent=p; }
   if(el.dataset.act==="gift"){ document.getElementById("giftf").hidden=!el.checked; if(el.checked) document.getElementById("gname").focus(); }
@@ -1549,6 +1715,14 @@ document.addEventListener("submit", e=>{
     S.bizDeals.push({title:f.title.value||t("Nimetön diili"), price, vat, status:"review", sold:0}); save();
     location.hash="#/yritys"; setTimeout(()=>toast(t("Lähetetty. Tarkistamme diilin yhden arkipäivän kuluessa.")),60);
   }
+});
+
+window.addEventListener("scroll", ()=>document.body.classList.toggle("scrolled", scrollY>8), {passive:true});
+document.addEventListener("keydown", e=>{
+  if(e.key!=="/" || e.ctrlKey || e.metaKey || e.altKey || dlg.open || drawer.open) return;
+  if(e.target.closest("input,textarea,select,[contenteditable]")) return;
+  const q = [...document.querySelectorAll("#hq,#q1,#q2")].find(i=>i.offsetParent);
+  if(q){ e.preventDefault(); q.focus(); q.select(); }
 });
 
 document.title = {fi:"Vendelia Prototyyppi", sv:"Vendelia Prototyp", en:"Vendelia Prototype"}[LANG];
