@@ -1,7 +1,8 @@
 import "server-only";
 import { cookies } from "next/headers";
 
-const BACKEND = process.env.BACKEND_URL ?? "http://127.0.0.1:4000";
+// In production there is no default: without BACKEND_URL no API is configured and calls fail fast.
+const BACKEND = process.env.BACKEND_URL ?? (process.env.NODE_ENV === "production" ? "" : "http://127.0.0.1:4000");
 
 export class ServerApiError extends Error {
   constructor(public readonly status: number, public readonly code: string) {
@@ -14,6 +15,7 @@ export class ServerApiError extends Error {
  * so the API sees the same session as the browser.
  */
 export async function serverApi<T>(path: string): Promise<T> {
+  if (!BACKEND) throw new ServerApiError(503, "api_not_configured");
   const jar = await cookies();
   const res = await fetch(`${BACKEND}${path}`, {
     headers: { cookie: jar.toString(), accept: "application/json" },

@@ -406,7 +406,14 @@
     "sentAt": "Tid",
     "to": "Mottagare",
     "subject": "Ämne",
-    "audit": "Händelselogg"
+    "audit": "Händelselogg",
+    "login": {
+      "title": "Inloggning för administration",
+      "subtitle": "Endast för Vendelias personal",
+      "invalid": "Fel e-postadress eller lösenord.",
+      "notConfigured": "Administratörsinloggningen har inte konfigurerats för den här miljön än."
+    },
+    "offline": "Bakänden är inte ansluten än, så uppgifterna visas tomma. Funktionerna fungerar när API:et är i drift."
   },
   "errors": {
     "generic": "Kontrollera uppgifterna och försök igen.",
@@ -453,6 +460,7 @@
     "internal_error": "Något gick fel. Försök igen.",
     "not_a_merchant": "Den här funktionen är bara för företagskonton.",
     "deal_not_found": "Erbjudandet hittades inte.",
-    "order_not_found": "Beställningen hittades inte."
+    "order_not_found": "Beställningen hittades inte.",
+    "api_not_configured": "Tjänsten är inte tillgänglig ännu."
   }
 }

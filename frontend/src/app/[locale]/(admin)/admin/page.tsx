@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { AdminDealRowDTO } from "@vendelia/shared";
 import { getT, resolveLocale } from "@/i18n/server";
-import { serverApi } from "@/lib/server-api";
+import { adminData } from "@/lib/admin-api";
 import { DealReviewTable } from "@/features/admin/components/DealReviewTable";
 
 /** Deal approval queue (pending first) and all deals. */
@@ -10,7 +10,7 @@ export default async function AdminDealsPage({ params, searchParams }: { params:
   const t = getT(locale);
   const { status = "pending" } = await searchParams;
   const q = status === "all" ? "" : `?status=${encodeURIComponent(status)}`;
-  const { deals } = await serverApi<{ deals: AdminDealRowDTO[] }>(`/api/admin/deals${q}`);
+  const { deals } = await adminData<{ deals: AdminDealRowDTO[] }>(`/api/admin/deals${q}`, { deals: [] });
   const tabs = ["pending", "live", "rejected", "all"];
   return (
     <>

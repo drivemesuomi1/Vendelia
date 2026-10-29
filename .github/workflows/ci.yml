@@ -17,8 +17,4 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
-      - name: Build frontend (needs the API for server-rendered data)
-        run: |
-          npm run start -w backend &
-          npx --yes wait-on http://127.0.0.1:4000/api/health
-          npm run build -w frontend
+      - run: npm run build

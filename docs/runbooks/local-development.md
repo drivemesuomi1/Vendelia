@@ -1,39 +1,32 @@
 # Local development
 
-Requirements: Node.js 20.11+ (22 recommended). No database install needed.
+Requirements: Node.js 20.11+ (22 recommended).
 
 ```bash
 npm install
-npm run dev          # API on :4000 and web on :3000 together
+npm run dev          # API placeholder on :4000 and web on :3000 together
 ```
 
 Open http://localhost:3000 (redirects to `/fi`).
 
-- First start creates an embedded Postgres (PGlite) in `backend/.data/pglite`, runs migrations and adds the launch cities,
-  categories and commission rate. **No sample merchants or deals** are created — the catalogue starts empty.
-- Demo logins (dev only, password = `DEMO_PASSWORD` in `backend/.env.example`):
-  `admin@vendelia.test` (admin) and `asiakas@vendelia.test` (customer).
-- To get deals: sign up a business at `/fi/register/business`, approve it in **Admin → Businesses**, create a deal in the
-  business portal, then approve the deal in **Admin → Deal review**.
-- Tests use their own fictional merchants and deals (`backend/tests/fixtures/`); the app never loads them.
-- Emails are not sent; they are stored in the `email_outbox` table and shown in **Admin → Support**.
-- Payments use the mock provider: checkout shows a short simulated bank step, then issues vouchers.
+The backend is currently a placeholder (`GET /api/health` only), so the site shows the built-in cities and categories and an empty
+catalogue; sign-in and checkout return "service not available yet". To work against a complete API, check out the reference implementation:
 
-## Reset the database
-Stop the API and delete `backend/.data/`. The next start recreates and reseeds it.
-
-## Use a real Postgres
 ```bash
-docker compose -f infra/docker-compose.yml up -d
+git worktree add ../vendelia-backend-reference backend-reference
+cd ../vendelia-backend-reference && npm install && npm run dev
 ```
-Set `DATABASE_URL=postgres://vendelia:vendelia@localhost:5432/vendelia` in `backend/.env`.
 
-## Change the database schema
-Edit `backend/src/db/schema/*`, then `npm run db:generate` to create a migration in `backend/src/db/migrations/`. Migrations run automatically on API start.
+(It uses an embedded Postgres, demo logins and a mock payment provider; see its own `docs/runbooks/local-development.md`.)
 
 ## Checks
 ```bash
 npm run typecheck
-npm test             # backend unit + integration (in-memory DB), frontend unit
+npm test
 npm run build
 ```
+
+## Deploying the frontend (Vercel)
+The Vercel project `vendelia` is set to: framework Next.js, root directory `frontend`, "include source files outside root" on,
+install command `cd .. && npm ci`. Deploy with `vercel deploy --prod` from the repo root. Set the `BACKEND_URL` environment variable
+in Vercel when an API exists so `/api/*` is forwarded to it.

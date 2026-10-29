@@ -406,7 +406,14 @@
     "sentAt": "Time",
     "to": "To",
     "subject": "Subject",
-    "audit": "Audit log"
+    "audit": "Audit log",
+    "login": {
+      "title": "Admin sign-in",
+      "subtitle": "For Vendelia staff only",
+      "invalid": "Wrong email or password.",
+      "notConfigured": "Admin sign-in has not been configured for this environment yet."
+    },
+    "offline": "The backend is not connected yet, so data is shown empty. Actions will work once the API is running."
   },
   "errors": {
     "generic": "Please check the details and try again.",
@@ -453,6 +460,7 @@
     "internal_error": "Something went wrong. Please try again.",
     "not_a_merchant": "This action is for business accounts only.",
     "deal_not_found": "Deal not found.",
-    "order_not_found": "Order not found."
+    "order_not_found": "Order not found.",
+    "api_not_configured": "This service is not available yet."
   }
 }

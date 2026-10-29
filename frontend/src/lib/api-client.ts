@@ -27,7 +27,12 @@ export async function api<T>(path: string, init: { method?: string; body?: unkno
     body: init.body ? (isForm ? (init.body as FormData) : JSON.stringify(init.body)) : undefined,
   });
   const text = await res.text();
-  const data = text ? JSON.parse(text) : null;
+  let data: unknown = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    /* non-JSON response (e.g. 404 page when no API is configured) */
+  }
   if (!res.ok) {
     const err = (data ?? {}) as Partial<ApiErrorDTO>;
     throw new ApiError(res.status, err.error ?? "internal_error", err.fields ?? {});

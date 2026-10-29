@@ -17,7 +17,8 @@ export function proxy(req: NextRequest) {
 
   const url = req.nextUrl.clone();
   url.pathname = `/${locale}${pathname === "/" ? "" : pathname}`;
-  return NextResponse.redirect(url);
+  // The staff area keeps the short URL /admin (rewrite); everything else gets a visible locale prefix (redirect).
+  return first === "admin" ? NextResponse.rewrite(url) : NextResponse.redirect(url);
 }
 
 export const config = {

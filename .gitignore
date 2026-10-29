@@ -11,3 +11,7 @@ next-env.d.ts
 # backend runtime data (embedded Postgres, uploads, dev email outbox)
 backend/.data/
 backend/uploads/
+
+# local admin login notes
+.admin-password.local
+scratch-admin-env.json

@@ -406,7 +406,14 @@
     "sentAt": "Aika",
     "to": "Vastaanottaja",
     "subject": "Aihe",
-    "audit": "Tapahtumaloki"
+    "audit": "Tapahtumaloki",
+    "login": {
+      "title": "Ylläpidon kirjautuminen",
+      "subtitle": "Vain Vendelian henkilökunnalle",
+      "invalid": "Sähköposti tai salasana on väärin.",
+      "notConfigured": "Ylläpidon kirjautumista ei ole vielä määritetty tähän ympäristöön."
+    },
+    "offline": "Taustapalvelua ei ole vielä yhdistetty, joten tiedot näytetään tyhjinä. Toiminnot toimivat, kun API on käytössä."
   },
   "errors": {
     "generic": "Tarkista tiedot ja yritä uudelleen.",
@@ -453,6 +460,7 @@
     "internal_error": "Jotain meni pieleen. Yritä uudelleen.",
     "not_a_merchant": "Tämä toiminto on vain yritystileille.",
     "deal_not_found": "Diiliä ei löytynyt.",
-    "order_not_found": "Tilausta ei löytynyt."
+    "order_not_found": "Tilausta ei löytynyt.",
+    "api_not_configured": "Palvelu ei ole vielä käytössä."
   }
 }

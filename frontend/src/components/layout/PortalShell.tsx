@@ -7,11 +7,12 @@ import { Icon, type IconName } from "@/components/ui/Icon";
 import { Logo } from "@/components/ui/Logo";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAppData } from "@/lib/meta-context";
+import { adminLogout } from "@/features/admin/actions";
 import { LogoutButton } from "@/features/auth/components/LogoutButton";
 import { LangSwitch } from "./LangSwitch";
 
 /** Sidebar layout shared by the business portal and the admin area. */
-export function PortalShell({ kind, children }: { kind: "business" | "admin"; children: ReactNode }) {
+export function PortalShell({ kind, children, adminEmail }: { kind: "business" | "admin"; children: ReactNode; adminEmail?: string }) {
   const { t, locale } = useI18n();
   const { user } = useAppData();
   const pathname = usePathname();
@@ -34,7 +35,16 @@ export function PortalShell({ kind, children }: { kind: "business" | "admin"; ch
           ))}
           <Link href={`/${locale}`}><Icon name="left" />{t("business.backToSite")}</Link>
         </nav>
-        {user && (
+        {kind === "admin" && adminEmail && (
+          <div className="biz">
+            <p style={{ fontWeight: 600 }}>{t("admin.title")}</p>
+            <p className="muted small">{adminEmail}</p>
+            <form action={adminLogout} style={{ marginTop: 8 }}>
+              <button className="btn btn-ghost btn-sm" type="submit"><Icon name="logout" />{t("auth.logout")}</button>
+            </form>
+          </div>
+        )}
+        {kind === "business" && user && (
           <div className="biz">
             <p style={{ fontWeight: 600 }}>{user.merchant?.companyName ?? user.name}</p>
             {user.merchant && <p className="muted">{t("common.businessId")} {user.merchant.businessId}</p>}
