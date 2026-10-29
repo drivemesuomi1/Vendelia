@@ -531,6 +531,8 @@ details>summary{cursor:pointer}
 .cn-btn[aria-expanded="true"] .cn-chev{transform:rotate(180deg)}
 .cn-menu{position:relative}
 .cn-city .cn-list{top:calc(100% + 8px)}
+/* Invisible bridge over the gap above a list, so hovering from the button into it keeps the menu open */
+.cn-list::before{content:"";position:absolute;left:0;right:0;bottom:100%;height:12px}
 .cn-list{position:absolute;top:100%;left:0;min-width:240px;margin:0;padding:6px;list-style:none;background:#fff;color:var(--navy);border-radius:12px;box-shadow:var(--shadow-lg);border:1px solid var(--line);z-index:30}
 .cn-list a,.cn-list button{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:0 12px;border:0;border-radius:8px;background:none;color:var(--navy);font:500 15px/1.2 var(--font);text-decoration:none;text-align:left;cursor:pointer}
 .cn-list a:hover,.cn-list button:hover,.cn-list a:focus-visible,.cn-list button:focus-visible{background:var(--soft);outline:none}

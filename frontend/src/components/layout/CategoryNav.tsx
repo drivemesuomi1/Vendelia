@@ -108,7 +108,15 @@ function Menu({ label, className = "", icon, current, children }: { label: strin
       document.removeEventListener("keydown", esc);
     };
   }, [open]);
-  const hover = (v: boolean) => (e: React.PointerEvent) => e.pointerType === "mouse" && setOpen(v);
+  // Closing waits a moment so the pointer can travel from the button into the list without it vanishing.
+  const closeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(closeTimer.current), []);
+  const hover = (v: boolean) => (e: React.PointerEvent) => {
+    if (e.pointerType !== "mouse") return;
+    clearTimeout(closeTimer.current);
+    if (v) setOpen(true);
+    else closeTimer.current = setTimeout(() => setOpen(false), 200);
+  };
   // A mouse has already opened the menu on hover, so its click must not toggle it shut; touch and keyboard toggle.
   const viaMouse = useRef(false);
 
