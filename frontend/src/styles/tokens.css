@@ -1,0 +1,15 @@
+/* Design tokens from the brand brief: colours, spacing (8px grid), radii, shadows, font. */
+:root{
+  --indigo:#3B32B3; --indigo-600:#2F279A; --indigo-50:#EEEDFA; --indigo-100:#DCDAF5;
+  --navy:#17223B; --navy-70:#4A5468; --navy-50:#6B7385;
+  --soft:#F7F8FC; --white:#FFFFFF; --line:#E3E5EE;
+  --teal:#0B7A75; --teal-50:#E3F2F1;
+  --warn:#8A5A00; --warn-50:#FFF4DC;
+  --danger:#B42318; --danger-50:#FDECEA;
+  --radius:16px; --radius-sm:10px; --radius-lg:24px;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --shadow-lg:0 1px 2px rgba(23,34,59,.04),0 24px 56px -24px rgba(23,34,59,.28);
+  --s1:8px; --s2:16px; --s3:24px; --s4:32px; --s5:40px; --s6:48px; --s8:64px;
+  --shadow:0 1px 2px rgba(23,34,59,.06),0 4px 16px rgba(23,34,59,.06);
+  --font:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+}

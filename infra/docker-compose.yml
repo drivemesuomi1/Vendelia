@@ -1,0 +1,22 @@
+# Local Postgres for development/testing against a real database server.
+# Start:  docker compose -f infra/docker-compose.yml up -d
+# Then set DATABASE_URL=postgres://vendelia:vendelia@localhost:5432/vendelia in backend/.env
+# (Without DATABASE_URL the backend uses its embedded PGlite database instead.)
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: vendelia
+      POSTGRES_PASSWORD: vendelia
+      POSTGRES_DB: vendelia
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vendelia"]
+      interval: 5s
+      retries: 10
+
+volumes:
+  pgdata:
