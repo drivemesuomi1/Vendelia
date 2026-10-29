@@ -23,11 +23,13 @@ export function HeroCarousel({ slides }: { slides: DealSummaryDTO[] }) {
   }, []);
 
   if (!slides.length) return null;
+  // With a single deal there is nothing to rotate: no arrows, pause button or progress bar.
+  const multi = slides.length > 1;
   const go = (n: number) => setI((n + slides.length) % slides.length);
   const label = (k: number, d: DealSummaryDTO) => `${t("home.slide", { n: k + 1, m: slides.length })}: ${loc(d.title, locale)}`;
 
   return (
-    <div className={`hero-c ${paused ? "paused" : ""}`} role="region" aria-roledescription="carousel" aria-label={t("home.featured")}>
+    <div className={`hero-c ${paused ? "paused" : ""} ${multi ? "" : "single"}`} role="region" aria-roledescription={multi ? "carousel" : undefined} aria-label={t("home.featured")}>
       {slides.map((d, k) => {
         const category = meta.categories.find((c) => c.id === d.categoryId);
         const city = meta.cities.find((c) => c.id === d.cityId);
@@ -37,8 +39,8 @@ export function HeroCarousel({ slides }: { slides: DealSummaryDTO[] }) {
             key={d.id}
             className={`hs ${on ? "on" : ""}`}
             href={`/${locale}/deals/${d.slug}`}
-            aria-roledescription="slide"
-            aria-label={label(k, d)}
+            aria-roledescription={multi ? "slide" : undefined}
+            aria-label={multi ? label(k, d) : undefined}
             aria-hidden={!on}
             tabIndex={on ? undefined : -1}
           >
@@ -59,25 +61,29 @@ export function HeroCarousel({ slides }: { slides: DealSummaryDTO[] }) {
           </Link>
         );
       })}
-      <button className="hc-arrow prev" onClick={() => go(i - 1)} aria-label={t("home.prev")}><Icon name="left" /></button>
-      <button className="hc-arrow next" onClick={() => go(i + 1)} aria-label={t("home.next")}><Icon name="right" /></button>
-      <button className="hc-pause" onClick={() => setPaused((p) => !p)} aria-label={t(paused ? "home.play" : "home.pause")}>
-        <Icon name={paused ? "play" : "pause"} />
-      </button>
-      <div className="hc-tabs">
-        {slides.map((d, k) => {
-          const category = meta.categories.find((c) => c.id === d.categoryId);
-          return (
-            <button key={d.id} className="hc-tab" onClick={() => go(k)} aria-label={label(k, d)} aria-current={k === i}>
-              <span className="bar">
-                {/* key forces the animation to restart for the active tab */}
-                <i key={k === i ? `on-${i}` : "off"} onAnimationEnd={(e) => e.animationName === "fill" && go(i + 1)} />
-              </span>
-              <span className="tl"><small>{loc(category?.name, locale)}</small>{loc(d.title, locale)}</span>
-            </button>
-          );
-        })}
-      </div>
+      {multi && (
+        <>
+          <button className="hc-arrow prev" onClick={() => go(i - 1)} aria-label={t("home.prev")}><Icon name="left" /></button>
+          <button className="hc-arrow next" onClick={() => go(i + 1)} aria-label={t("home.next")}><Icon name="right" /></button>
+          <button className="hc-pause" onClick={() => setPaused((p) => !p)} aria-label={t(paused ? "home.play" : "home.pause")}>
+            <Icon name={paused ? "play" : "pause"} />
+          </button>
+          <div className="hc-tabs">
+            {slides.map((d, k) => {
+              const category = meta.categories.find((c) => c.id === d.categoryId);
+              return (
+                <button key={d.id} className="hc-tab" onClick={() => go(k)} aria-label={label(k, d)} aria-current={k === i}>
+                  <span className="bar">
+                    {/* key forces the animation to restart for the active tab */}
+                    <i key={k === i ? `on-${i}` : "off"} onAnimationEnd={(e) => e.animationName === "fill" && go(i + 1)} />
+                  </span>
+                  <span className="tl"><small>{loc(category?.name, locale)}</small>{loc(d.title, locale)}</span>
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
     </div>
   );
 }

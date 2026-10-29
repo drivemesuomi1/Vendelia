@@ -10,10 +10,11 @@ export function LogoSymbol({ height = 32 }: { height?: number }) {
   );
 }
 
-export function Logo({ href, label, sub }: { href: string; label: string; sub?: string }) {
+export function Logo({ href, label, sub, wordmark }: { href: string; label: string; sub?: string; wordmark?: boolean }) {
   return (
     <Link className="logo" href={href} aria-label={label}>
       <LogoSymbol />
+      {wordmark && <span className="wordmark" aria-hidden="true">Vendelia</span>}
       {sub && <span className="sub">{sub}</span>}
     </Link>
   );

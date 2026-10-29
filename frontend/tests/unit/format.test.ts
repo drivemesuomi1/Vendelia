@@ -1,11 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { discountPct, expiryFromToday, formatMoney, formatPct, itemTitle, loc } from "../../src/lib/format";
+import { discountPct, expiryFromToday, formatDate, formatMoney, formatPct, itemTitle, loc } from "../../src/lib/format";
 import { createTranslator } from "../../src/i18n/translate";
 import en from "../../messages/en.json";
 import fi from "../../messages/fi.json";
 import sv from "../../messages/sv.json";
 
 describe("format", () => {
+  it("formats dates in Helsinki time, same pattern in every JS engine", () => {
+    const d = "2027-01-27T23:30:00Z"; // already 28 Jan in Helsinki
+    expect(formatDate(d, "fi")).toBe("28.1.2027");
+    expect(formatDate(d, "sv")).toBe("28.1.2027");
+    expect(formatDate(d, "en")).toBe("28 January 2027");
+  });
+
   it("formats euros per locale", () => {
     expect(formatMoney(5900, "fi").replace(/\s/g, " ")).toBe("59,00 €");
     expect(formatMoney(5900, "en")).toBe("€59.00");

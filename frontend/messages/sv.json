@@ -23,7 +23,10 @@
     "cityLabel": "Stad: {city}. Byt stad",
     "chooseCity": "Välj stad",
     "cities": "Städer",
-    "selected": "VALD"
+    "selected": "VALD",
+    "categories": "Kategorier",
+    "selectCity": "Välj stad",
+    "services": "Tjänster"
   },
   "footer": {
     "tagline": "Lokala upplevelser och tjänster i Helsingfors, Esbo, Vanda och Grankulla.",
@@ -36,6 +39,9 @@
     "help": "Hjälp"
   },
   "home": {
+    "bannerTitle": "Mer upplevelser, färre euro",
+    "bannerLead": "Upptäck lokala erbjudanden på städning, skönhet och chaufförstjänster.",
+    "bannerCta": "Se erbjudandena",
     "title": "Lokala upplevelser till ett rättvist pris",
     "lead": "Tydliga priser inklusive moms, riktiga lokala företag och 14 dagars returrätt för oanvända presentkort.",
     "featured": "Utvalda erbjudanden",
@@ -113,7 +119,11 @@
     "validUntil": "Giltigt till {date}",
     "refundTick": "14 dagars returrätt om oanvänt",
     "giftTick": "Kan köpas som gåva – välj i kassan",
-    "secureTick": "Säker betalning: nätbank, MobilePay, kort"
+    "secureTick": "Säker betalning: nätbank, MobilePay, kort",
+    "serviceAreaTitle": "Serviceområde",
+    "atYourPlace": "Tjänsten kommer till dig",
+    "website": "Företagets webbplats",
+    "photo": "Bild {n}/{m}"
   },
   "cart": {
     "title": "Varukorg",
@@ -461,6 +471,7 @@
     "not_a_merchant": "Den här funktionen är bara för företagskonton.",
     "deal_not_found": "Erbjudandet hittades inte.",
     "order_not_found": "Beställningen hittades inte.",
-    "api_not_configured": "Tjänsten är inte tillgänglig ännu."
+    "api_not_configured": "Tjänsten är inte tillgänglig ännu.",
+    "paymentUnavailable": "Onlinebetalning är inte tillgänglig just nu och du har inte debiterats. Försök igen om en stund eller skriv till tuki@vendelia.fi."
   }
 }

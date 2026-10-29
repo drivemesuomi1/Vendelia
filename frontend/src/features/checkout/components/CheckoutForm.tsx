@@ -89,7 +89,10 @@ export function CheckoutForm() {
     } catch (e2) {
       setPaying(null);
       if (e2 instanceof ApiError && Object.keys(e2.fields).length) setErrors(e2.fields);
-      setServerError(e2 instanceof ApiError ? e2.code : "network");
+      // A missing or failing payment API is not the customer's mistake: say so instead of "check the details".
+      const down = e2 instanceof ApiError && (e2.status === 404 || e2.status >= 500);
+      setServerError(down ? "paymentUnavailable" : e2 instanceof ApiError ? e2.code : "network");
+      requestAnimationFrame(() => summaryRef.current?.focus());
     }
   }
 
@@ -109,15 +112,20 @@ export function CheckoutForm() {
         <div className="stack">
           {(errorList.length > 0 || serverError) && (
             <div className="err-sum" role="alert" tabIndex={-1} ref={summaryRef}>
-              <b>{t("checkout.checkFields")}</b>
-              <ul>
-                {errorList.map(([path, code]) => (
-                  <li key={path}>
-                    <a href={`#${fieldIdFor(path)}`}>{t(`errors.${code}`)}</a>
-                  </li>
-                ))}
-                {serverError && !errorList.length && <li>{t(`errors.${serverError}`)}</li>}
-              </ul>
+              {errorList.length > 0 ? (
+                <>
+                  <b>{t("checkout.checkFields")}</b>
+                  <ul>
+                    {errorList.map(([path, code]) => (
+                      <li key={path}>
+                        <a href={`#${fieldIdFor(path)}`}>{t(`errors.${code}`)}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              ) : (
+                <p>{t(`errors.${serverError}`)}</p>
+              )}
             </div>
           )}
 

@@ -23,7 +23,10 @@
     "cityLabel": "City: {city}. Change city",
     "chooseCity": "Choose a city",
     "cities": "Cities",
-    "selected": "SELECTED"
+    "selected": "SELECTED",
+    "categories": "Categories",
+    "selectCity": "Select a city",
+    "services": "Services"
   },
   "footer": {
     "tagline": "Local experiences and services in Helsinki, Espoo, Vantaa and Kauniainen.",
@@ -36,6 +39,9 @@
     "help": "Help"
   },
   "home": {
+    "bannerTitle": "More to enjoy, less to pay",
+    "bannerLead": "Discover local deals on cleaning, beauty and chauffeur services.",
+    "bannerCta": "Browse deals",
     "title": "Local experiences at a fair price",
     "lead": "Clear prices including VAT, real local businesses and a 14-day refund on unused vouchers.",
     "featured": "Featured deals",
@@ -113,7 +119,11 @@
     "validUntil": "Valid until {date}",
     "refundTick": "14-day refund if unused",
     "giftTick": "Can be bought as a gift – choose at checkout",
-    "secureTick": "Secure payment: online banking, MobilePay, card"
+    "secureTick": "Secure payment: online banking, MobilePay, card",
+    "serviceAreaTitle": "Service area",
+    "atYourPlace": "The service comes to you",
+    "website": "Company website",
+    "photo": "Photo {n} of {m}"
   },
   "cart": {
     "title": "Cart",
@@ -461,6 +471,7 @@
     "not_a_merchant": "This action is for business accounts only.",
     "deal_not_found": "Deal not found.",
     "order_not_found": "Order not found.",
-    "api_not_configured": "This service is not available yet."
+    "api_not_configured": "This service is not available yet.",
+    "paymentUnavailable": "Online payment isn't available right now and you have not been charged. Please try again shortly or email tuki@vendelia.fi."
   }
 }
