@@ -28,4 +28,4 @@ npm run build
 ## Status
 Working end to end with a **mock payment provider**: browse, cart, checkout (bank / MobilePay / card UI), vouchers, 14-day cancellation,
 merchant sign-up, deal creation with live payout preview, admin approval, redemption, payout statements and runs, emails (outbox).
-Not done yet: real payment provider (Stripe Connect), real email sending, scannable QR codes, image CDN, production deployment of the API. Test
+Not done yet: real payment provider (Stripe Connect), real email sending, scannable QR codes, image CDN, production deployment of the API.
