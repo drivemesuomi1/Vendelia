@@ -47,6 +47,8 @@
     "play": "Jatka",
     "categories": "Kategoriat",
     "allDeals": "Kaikki diilit",
+    "emptyTitle": "Ensimmäiset diilit ovat tulossa",
+    "emptyText": "Paikalliset yritykset liittyvät parhaillaan Vendeliaan. Onko sinulla yritys? Tuo tarjouksesi ensimmäisten joukossa.",
     "current": "Ajankohtaiset diilit",
     "seeAll": "Näytä kaikki",
     "trustVat": "Hinnat sis. ALV",

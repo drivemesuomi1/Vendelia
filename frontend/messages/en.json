@@ -47,6 +47,8 @@
     "play": "Play",
     "categories": "Categories",
     "allDeals": "All deals",
+    "emptyTitle": "The first deals are on their way",
+    "emptyText": "Local businesses are joining Vendelia right now. Run a business? Be among the first to list your offer.",
     "current": "Current deals",
     "seeAll": "See all",
     "trustVat": "Prices incl. VAT",

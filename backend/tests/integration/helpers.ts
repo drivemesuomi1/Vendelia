@@ -2,11 +2,13 @@ import type { FastifyInstance, InjectOptions } from "fastify";
 import { buildApp } from "../../src/app";
 import { loadEnv } from "../../src/config/env";
 import type { AppContext } from "../../src/context";
+import { DEMO_ACCOUNTS } from "../../src/db/seeds/seed";
 import type { Mailer } from "../../src/integrations/email/mailer";
+import { loadFixtures } from "../fixtures/load-fixtures";
 
 export const DEMO_PASSWORD = "test-password-123";
 
-/** Fresh app with an in-memory database, seeded demo data, a controllable clock and a captured mailbox. */
+/** Fresh app with an in-memory database, test fixtures (fictional merchants and deals), a controllable clock and a captured mailbox. */
 export async function createTestApp() {
   let now = new Date(Date.UTC(2026, 9, 14, 10, 0, 0));
   const sent: { to: string; subject: string; template: string }[] = [];
@@ -17,6 +19,7 @@ export async function createTestApp() {
     logger: false,
     overrides: { now: () => now, mailer, registry: { lookup: async (id) => ({ businessId: id, name: "Testi Oy" }) } },
   });
+  await loadFixtures(ctx.db, { password: DEMO_PASSWORD, customerEmail: DEMO_ACCOUNTS.customer, now });
   return {
     app,
     ctx: ctx as AppContext,

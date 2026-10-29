@@ -101,8 +101,9 @@ describe("guest checkout → payment → vouchers → redeem → payout", () => 
     const m = client(t.app);
     await m.login("yritys@vendelia.test");
     const st = (await m.get("/api/merchant/payouts")).body;
-    const row = st.rows.find((r: { sold: number }) => r.sold === 2);
-    expect(row).toMatchObject({ grossCents: 11800, netCents: 9402, saleVatCents: 2398, commissionCents: 1410, commissionVatCents: 360, payoutCents: 10030 });
+    // Massage: 2 bought in this test + 1 fixture purchase in the same period, 59,00 € each.
+    const row = st.rows.find((r: { title: { fi: string } }) => r.title.fi.startsWith("Kuumakivi"));
+    expect(row).toMatchObject({ sold: 3, grossCents: 17700, netCents: 14103, saleVatCents: 3597, commissionCents: 2115, commissionVatCents: 540, payoutCents: 15045 });
     expect(st.pendingPayoutCents).toBe(5015);
 
     const admin = client(t.app);

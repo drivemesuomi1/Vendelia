@@ -47,6 +47,8 @@
     "play": "Fortsätt",
     "categories": "Kategorier",
     "allDeals": "Alla erbjudanden",
+    "emptyTitle": "De första erbjudandena är på väg",
+    "emptyText": "Lokala företag ansluter sig just nu till Vendelia. Har du ett företag? Var bland de första med ditt erbjudande.",
     "current": "Aktuella erbjudanden",
     "seeAll": "Visa alla",
     "trustVat": "Priser inkl. moms",

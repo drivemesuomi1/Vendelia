@@ -8,7 +8,7 @@ import fastifyStatic from "@fastify/static";
 import type { Env } from "./config/env";
 import type { AppContext } from "./context";
 import { connectDb, type DbConnection } from "./db/client";
-import { seedDatabase } from "./db/seeds/seed";
+import { seedDemoAccounts, seedReferenceData } from "./db/seeds/seed";
 import { createOutboxMailer } from "./integrations/email/mailer";
 import { createPaymentProvider } from "./integrations/payments";
 import { createYtjRegistry } from "./integrations/prh/ytj";
@@ -44,9 +44,9 @@ export async function buildApp({ env, overrides = {}, logger = true }: BuildOpti
 
   const conn: DbConnection = await connectDb({ databaseUrl: env.DATABASE_URL, pgliteDir: env.PGLITE_DIR });
   app.log.info(`database: ${conn.driver}`);
+  if ((await seedReferenceData(conn.db)).seeded) app.log.info("seeded cities, categories and commission");
   if (env.SEED_ON_START && env.NODE_ENV !== "production") {
-    const r = await seedDatabase(conn.db, { demoPassword: env.DEMO_PASSWORD });
-    if (r.seeded) app.log.info("seeded demo data");
+    if ((await seedDemoAccounts(conn.db, env.DEMO_PASSWORD)).seeded) app.log.info("seeded demo admin and customer accounts");
   }
 
   const ctx: AppContext = {

@@ -9,9 +9,13 @@ npm run dev          # API on :4000 and web on :3000 together
 
 Open http://localhost:3000 (redirects to `/fi`).
 
-- First start creates an embedded Postgres (PGlite) in `backend/.data/pglite`, runs migrations and seeds demo data.
-- Demo accounts (dev only, password = `DEMO_PASSWORD` in `backend/.env.example`):
-  `asiakas@vendelia.test` (customer), `yritys@vendelia.test` (merchant), `admin@vendelia.test` (admin).
+- First start creates an embedded Postgres (PGlite) in `backend/.data/pglite`, runs migrations and adds the launch cities,
+  categories and commission rate. **No sample merchants or deals** are created — the catalogue starts empty.
+- Demo logins (dev only, password = `DEMO_PASSWORD` in `backend/.env.example`):
+  `admin@vendelia.test` (admin) and `asiakas@vendelia.test` (customer).
+- To get deals: sign up a business at `/fi/register/business`, approve it in **Admin → Businesses**, create a deal in the
+  business portal, then approve the deal in **Admin → Deal review**.
+- Tests use their own fictional merchants and deals (`backend/tests/fixtures/`); the app never loads them.
 - Emails are not sent; they are stored in the `email_outbox` table and shown in **Admin → Support**.
 - Payments use the mock provider: checkout shows a short simulated bank step, then issues vouchers.
 

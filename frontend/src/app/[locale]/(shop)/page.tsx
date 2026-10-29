@@ -25,7 +25,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             <h2 id="live">{t("home.current")}</h2>
             <Link className="btn btn-ghost" href={`/${locale}/deals`}>{t("home.seeAll")} <Icon name="right" /></Link>
           </div>
-          <DealGrid deals={deals.slice(0, 8)} />
+          {deals.length ? (
+            <DealGrid deals={deals.slice(0, 8)} />
+          ) : (
+            <div className="card empty">
+              <p style={{ fontWeight: 600 }}>{t("home.emptyTitle")}</p>
+              <p className="muted" style={{ marginTop: 6, maxWidth: 520, marginInline: "auto" }}>{t("home.emptyText")}</p>
+              <Link className="btn btn-primary" style={{ marginTop: "var(--s2)" }} href={`/${locale}/register/business`}>{t("home.bizJoin")}</Link>
+            </div>
+          )}
         </section>
 
         <div className="trustbar">

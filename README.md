@@ -16,7 +16,7 @@ prototype/  Original HTML prototype (design reference; served by the Vercel proj
 npm install
 npm run dev
 ```
-Open http://localhost:3000. Details, demo accounts and database options: [docs/runbooks/local-development.md](docs/runbooks/local-development.md).
+Open http://localhost:3000. The catalogue starts empty (no sample deals). Details, demo logins and database options: [docs/runbooks/local-development.md](docs/runbooks/local-development.md).
 
 ## Checks
 ```bash
