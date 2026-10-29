@@ -1,0 +1,844 @@
+{
+  "merchants": [
+    {
+      "name": "Näyte Wellness",
+      "companyName": "Näyte Wellness Oy",
+      "businessId": "1234567-8",
+      "phone": "09 123 4567",
+      "street": "Esimerkkikatu 12",
+      "zip": "00530",
+      "cityId": "helsinki"
+    },
+    {
+      "name": "Studio Esimerkki",
+      "companyName": "Studio Esimerkki Oy",
+      "businessId": "2345678-9",
+      "phone": "09 234 5678",
+      "street": "Malliaukio 3",
+      "zip": "02100",
+      "cityId": "espoo"
+    },
+    {
+      "name": "Bistro Malli",
+      "companyName": "Bistro Malli Oy",
+      "businessId": "3456789-0",
+      "phone": "09 345 6789",
+      "street": "Testikatu 8",
+      "zip": "00150",
+      "cityId": "helsinki"
+    },
+    {
+      "name": "Ravintola Kokeilu",
+      "companyName": "Ravintola Kokeilu Oy",
+      "businessId": "4567890-1",
+      "phone": "09 456 7890",
+      "street": "Kokeilutie 21",
+      "zip": "01300",
+      "cityId": "vantaa"
+    },
+    {
+      "name": "Retkeily Esimerkki",
+      "companyName": "Retkeily Esimerkki Oy",
+      "businessId": "5678901-2",
+      "phone": "040 123 4567",
+      "street": "Haukkalammentie 31",
+      "zip": "02820",
+      "cityId": "espoo"
+    },
+    {
+      "name": "Liikuntakeskus Demo",
+      "companyName": "Liikuntakeskus Demo Oy",
+      "businessId": "6789012-3",
+      "phone": "09 567 8901",
+      "street": "Demotie 5",
+      "zip": "02700",
+      "cityId": "kauniainen"
+    },
+    {
+      "name": "Spa Kokeilu",
+      "companyName": "Spa Kokeilu Oy",
+      "businessId": "7890123-4",
+      "phone": "09 678 9012",
+      "street": "Kylpyläpolku 2",
+      "zip": "01600",
+      "cityId": "vantaa"
+    },
+    {
+      "name": "Kahvila Malli",
+      "companyName": "Kahvila Malli Oy",
+      "businessId": "8901234-5",
+      "phone": "09 789 0123",
+      "street": "Mallikuja 4",
+      "zip": "02600",
+      "cityId": "espoo"
+    }
+  ],
+  "deals": [
+    {
+      "key": "d1",
+      "businessId": "1234567-8",
+      "categoryId": "wellness",
+      "cityId": "helsinki",
+      "area": {
+        "fi": "Kallio",
+        "sv": "Berghäll",
+        "en": "Kallio"
+      },
+      "street": "Esimerkkikatu 12",
+      "zip": "00530",
+      "meetingPoint": false,
+      "title": {
+        "fi": "Kuumakivihieronta 60 tai 90 min",
+        "sv": "Hetstensmassage 60 eller 90 min",
+        "en": "Hot stone massage, 60 or 90 min"
+      },
+      "baseTitle": {
+        "fi": "Kuumakivihieronta",
+        "sv": "Hetstensmassage",
+        "en": "Hot stone massage"
+      },
+      "description": {
+        "fi": "Rauhoittava kuumakivihieronta, jossa lämpimät kivet rentouttavat lihaksia ja hieroja käsittelee jännittyneet kohdat. Hoito sopii erityisesti niska-hartiaseudun ja selän jumeihin.",
+        "sv": "Avslappnande hetstensmassage där varma stenar mjukar upp musklerna och massören behandlar spända punkter. Passar särskilt bra för spänningar i nacke, axlar och rygg.",
+        "en": "A calming hot stone massage: warm stones loosen the muscles while the therapist works on tense spots. Especially good for neck, shoulder and back tension."
+      },
+      "restrictions": {
+        "fi": "ma–pe klo 10–17 · 1 henkilö",
+        "sv": "mån–fre kl. 10–17 · 1 person",
+        "en": "Mon–Fri 10–17 · 1 person"
+      },
+      "inclusions": {
+        "fi": [
+          "Kuumakivihieronta valitun keston mukaan",
+          "Rentoutumistila 30 min käytössäsi",
+          "Yrttitee hoidon jälkeen"
+        ],
+        "sv": [
+          "Hetstensmassage enligt vald längd",
+          "Avslappningsrum i 30 min",
+          "Örtte efter behandlingen"
+        ],
+        "en": [
+          "Hot stone massage of the chosen length",
+          "Relaxation lounge for 30 min",
+          "Herbal tea after the treatment"
+        ]
+      },
+      "terms": {
+        "fi": [
+          "Voimassa ma–pe klo 10–17",
+          "Yksi lahjakortti per henkilö per käynti",
+          "Ei voi yhdistää muihin etuihin",
+          "Alle 24 h ennen peruttu aika katsotaan käytetyksi"
+        ],
+        "sv": [
+          "Gäller mån–fre kl. 10–17",
+          "Ett presentkort per person och besök",
+          "Kan inte kombineras med andra förmåner",
+          "Tid som avbokas mindre än 24 h i förväg räknas som använd"
+        ],
+        "en": [
+          "Valid Mon–Fri 10:00–17:00",
+          "One voucher per person per visit",
+          "Cannot be combined with other offers",
+          "Cancelling less than 24 h ahead uses the voucher"
+        ]
+      },
+      "howTo": {
+        "fi": [
+          "Saat lahjakortin sähköpostiisi heti maksun jälkeen.",
+          "Varaa aika puhelimitse tai verkossa vähintään 24 h etukäteen ja mainitse lahjakortin koodi.",
+          "Näytä lahjakortti puhelimesta tai paperilla paikan päällä."
+        ],
+        "sv": [
+          "Du får presentkortet per e-post direkt efter betalningen.",
+          "Boka tid per telefon eller online minst 24 h i förväg och uppge presentkortets kod.",
+          "Visa presentkortet i telefonen eller på papper på plats."
+        ],
+        "en": [
+          "You receive the voucher by email right after payment.",
+          "Book by phone or online at least 24 h ahead and quote the voucher code.",
+          "Show the voucher on your phone or on paper on site."
+        ]
+      },
+      "vatBps": 2550,
+      "referencePriceCents": null,
+      "imageUrl": "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1200&q=70&auto=format&fit=crop",
+      "featured": true,
+      "options": [
+        {
+          "label": {
+            "fi": "60 min",
+            "sv": "60 min",
+            "en": "60 min"
+          },
+          "priceCents": 5900
+        },
+        {
+          "label": {
+            "fi": "90 min",
+            "sv": "90 min",
+            "en": "90 min"
+          },
+          "priceCents": 7900
+        }
+      ]
+    },
+    {
+      "key": "d2",
+      "businessId": "2345678-9",
+      "categoryId": "wellness",
+      "cityId": "espoo",
+      "area": {
+        "fi": "Tapiola",
+        "sv": "Hagalund",
+        "en": "Tapiola"
+      },
+      "street": "Malliaukio 3",
+      "zip": "02100",
+      "meetingPoint": false,
+      "title": {
+        "fi": "Hiustenleikkaus, pesu ja föönaus",
+        "sv": "Klippning, tvätt och föning",
+        "en": "Haircut, wash and blow-dry"
+      },
+      "baseTitle": null,
+      "description": {
+        "fi": "Kokeneen kampaajan tekemä leikkaus, joka alkaa konsultaatiolla ja päättyy viimeisteltyyn föönaukseen.",
+        "sv": "Klippning av en erfaren frisör, från konsultation till färdig föning.",
+        "en": "A cut by an experienced stylist, from consultation to a finished blow-dry."
+      },
+      "restrictions": {
+        "fi": "Lyhyet ja puolipitkät hiukset",
+        "sv": "Kort och halvlångt hår",
+        "en": "Short and medium-length hair"
+      },
+      "inclusions": {
+        "fi": [
+          "Konsultaatio",
+          "Pesu ja hoitoaine",
+          "Leikkaus kokeneelta kampaajalta",
+          "Föönaus ja muotoilu"
+        ],
+        "sv": [
+          "Konsultation",
+          "Tvätt och balsam",
+          "Klippning av erfaren frisör",
+          "Föning och styling"
+        ],
+        "en": [
+          "Consultation",
+          "Wash and conditioner",
+          "Cut by a senior stylist",
+          "Blow-dry and styling"
+        ]
+      },
+      "terms": {
+        "fi": [
+          "Vain lyhyet ja puolipitkät hiukset (olkapäiden yläpuolelle)",
+          "Ei sisällä värjäystä",
+          "Voimassa ti–la"
+        ],
+        "sv": [
+          "Endast kort och halvlångt hår (ovanför axlarna)",
+          "Färgning ingår inte",
+          "Gäller tis–lör"
+        ],
+        "en": [
+          "Short and medium hair only (above the shoulders)",
+          "Colouring not included",
+          "Valid Tue–Sat"
+        ]
+      },
+      "howTo": {
+        "fi": [
+          "Saat lahjakortin sähköpostiisi heti maksun jälkeen.",
+          "Varaa aika liikkeen ajanvarauksesta ja valitse maksutavaksi ”Vendelia-lahjakortti”.",
+          "Näytä koodi kassalla."
+        ],
+        "sv": [
+          "Du får presentkortet per e-post direkt efter betalningen.",
+          "Boka tid i salongens bokningssystem och välj ”Vendelia-presentkort” som betalningssätt.",
+          "Visa koden i kassan."
+        ],
+        "en": [
+          "You receive the voucher by email right after payment.",
+          "Book in the salon's online booking and choose “Vendelia voucher” as payment.",
+          "Show the code at the till."
+        ]
+      },
+      "vatBps": 2550,
+      "referencePriceCents": 5500,
+      "imageUrl": "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&q=70&auto=format&fit=crop",
+      "featured": true,
+      "options": [
+        {
+          "label": null,
+          "priceCents": 3900
+        }
+      ]
+    },
+    {
+      "key": "d3",
+      "businessId": "3456789-0",
+      "categoryId": "food",
+      "cityId": "helsinki",
+      "area": {
+        "fi": "Punavuori",
+        "sv": "Rödbergen",
+        "en": "Punavuori"
+      },
+      "street": "Testikatu 8",
+      "zip": "00150",
+      "meetingPoint": false,
+      "title": {
+        "fi": "Kolmen ruokalajin kausimenu",
+        "sv": "Säsongsmeny med tre rätter",
+        "en": "Three-course seasonal menu"
+      },
+      "baseTitle": null,
+      "description": {
+        "fi": "Keittiömestarin kausimenu kotimaisista raaka-aineista rennossa punavuorelaisessa bistrossa.",
+        "sv": "Kökschefens säsongsmeny av inhemska råvaror i en avslappnad bistro i Rödbergen.",
+        "en": "The chef's seasonal menu made with Finnish produce, in a relaxed Punavuori bistro."
+      },
+      "restrictions": {
+        "fi": "su–to · juomat eivät sisälly",
+        "sv": "sön–tor · drycker ingår inte",
+        "en": "Sun–Thu · drinks not included"
+      },
+      "inclusions": {
+        "fi": [
+          "Alkuruoka, pääruoka ja jälkiruoka",
+          "Keittiömestarin kausimenu",
+          "Leipä ja talon vesi"
+        ],
+        "sv": [
+          "Förrätt, varmrätt och efterrätt",
+          "Kökschefens säsongsmeny",
+          "Bröd och husets vatten"
+        ],
+        "en": [
+          "Starter, main course and dessert",
+          "Chef's seasonal menu",
+          "Bread and house water"
+        ]
+      },
+      "terms": {
+        "fi": [
+          "Voimassa sunnuntaista torstaihin",
+          "Juomat veloitetaan erikseen",
+          "Kerro allergioista varauksen yhteydessä",
+          "Ei voimassa juhlapyhinä"
+        ],
+        "sv": [
+          "Gäller söndag–torsdag",
+          "Drycker debiteras separat",
+          "Meddela allergier vid bokningen",
+          "Gäller inte på helgdagar"
+        ],
+        "en": [
+          "Valid Sunday–Thursday",
+          "Drinks are charged separately",
+          "Mention allergies when booking",
+          "Not valid on public holidays"
+        ]
+      },
+      "howTo": {
+        "fi": [
+          "Saat lahjakortin sähköpostiisi heti maksun jälkeen.",
+          "Varaa pöytä puhelimitse ja mainitse Vendelia-lahjakortti.",
+          "Näytä koodi saapuessasi."
+        ],
+        "sv": [
+          "Du får presentkortet per e-post direkt efter betalningen.",
+          "Boka bord per telefon och nämn Vendelia-presentkortet.",
+          "Visa koden när du kommer."
+        ],
+        "en": [
+          "You receive the voucher by email right after payment.",
+          "Book a table by phone and mention the Vendelia voucher.",
+          "Show the code when you arrive."
+        ]
+      },
+      "vatBps": 1350,
+      "referencePriceCents": null,
+      "imageUrl": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=70&auto=format&fit=crop",
+      "featured": true,
+      "options": [
+        {
+          "label": {
+            "fi": "Kahdelle",
+            "sv": "För två",
+            "en": "For two"
+          },
+          "priceCents": 7900
+        },
+        {
+          "label": {
+            "fi": "Neljälle",
+            "sv": "För fyra",
+            "en": "For four"
+          },
+          "priceCents": 15200
+        }
+      ]
+    },
+    {
+      "key": "d4",
+      "businessId": "4567890-1",
+      "categoryId": "food",
+      "cityId": "vantaa",
+      "area": {
+        "fi": "Tikkurila",
+        "sv": "Dickursby",
+        "en": "Tikkurila"
+      },
+      "street": "Kokeilutie 21",
+      "zip": "01300",
+      "meetingPoint": false,
+      "title": {
+        "fi": "Viikonloppubrunssi kahdelle",
+        "sv": "Helgbrunch för två",
+        "en": "Weekend brunch for two"
+      },
+      "baseTitle": null,
+      "description": {
+        "fi": "Runsas brunssibuffet viikonloppuaamuun: lämpimiä ruokia, leivonnaisia ja tuoreita hedelmiä.",
+        "sv": "En riklig brunchbuffé för helgmorgonen: varma rätter, bakverk och färsk frukt.",
+        "en": "A generous weekend brunch buffet: hot dishes, pastries and fresh fruit."
+      },
+      "restrictions": {
+        "fi": "la–su klo 10–14 · varaus vaaditaan",
+        "sv": "lör–sön kl. 10–14 · bokning krävs",
+        "en": "Sat–Sun 10–14 · booking required"
+      },
+      "inclusions": {
+        "fi": [
+          "Brunssibuffet kahdelle",
+          "Kahvi ja tee",
+          "Tuorepuristettu mehu"
+        ],
+        "sv": [
+          "Brunchbuffé för två",
+          "Kaffe och te",
+          "Färskpressad juice"
+        ],
+        "en": [
+          "Brunch buffet for two",
+          "Coffee and tea",
+          "Freshly squeezed juice"
+        ]
+      },
+      "terms": {
+        "fi": [
+          "Voimassa lauantaisin ja sunnuntaisin klo 10–14",
+          "Alle 4-vuotiaat syövät ilmaiseksi"
+        ],
+        "sv": [
+          "Gäller lördagar och söndagar kl. 10–14",
+          "Barn under 4 år äter gratis"
+        ],
+        "en": [
+          "Valid Saturdays and Sundays 10:00–14:00",
+          "Children under 4 eat free"
+        ]
+      },
+      "howTo": {
+        "fi": [
+          "Saat lahjakortin sähköpostiisi heti maksun jälkeen.",
+          "Varaa brunssiaika ravintolan verkkosivuilta.",
+          "Näytä koodi kassalla."
+        ],
+        "sv": [
+          "Du får presentkortet per e-post direkt efter betalningen.",
+          "Boka brunchtid på restaurangens webbplats.",
+          "Visa koden i kassan."
+        ],
+        "en": [
+          "You receive the voucher by email right after payment.",
+          "Book a brunch slot on the restaurant's website.",
+          "Show the code at the till."
+        ]
+      },
+      "vatBps": 1350,
+      "referencePriceCents": null,
+      "imageUrl": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=70&auto=format&fit=crop",
+      "featured": false,
+      "options": [
+        {
+          "label": null,
+          "priceCents": 4200
+        }
+      ]
+    },
+    {
+      "key": "d5",
+      "businessId": "5678901-2",
+      "categoryId": "activities",
+      "cityId": "espoo",
+      "area": {
+        "fi": "Nuuksio",
+        "sv": "Noux",
+        "en": "Nuuksio"
+      },
+      "street": "Haukkalammentie 31",
+      "zip": "02820",
+      "meetingPoint": true,
+      "title": {
+        "fi": "Opastettu 3 tunnin metsäretki Nuuksiossa",
+        "sv": "Guidad 3 timmars skogsvandring i Noux",
+        "en": "Guided 3-hour forest hike in Nuuksio"
+      },
+      "baseTitle": {
+        "fi": "Opastettu metsäretki Nuuksiossa",
+        "sv": "Guidad skogsvandring i Noux",
+        "en": "Guided forest hike in Nuuksio"
+      },
+      "description": {
+        "fi": "Kokenut opas vie Nuuksion polulle, kertoo luonnosta ja sytyttää nuotion matkan puolivälissä.",
+        "sv": "En erfaren guide tar dig ut på stigarna i Noux, berättar om naturen och tänder en lägereld halvvägs.",
+        "en": "An experienced guide takes you along Nuuksio's trails, talks about the nature and lights a campfire halfway."
+      },
+      "restrictions": {
+        "fi": "Yli 12-vuotiaille · kohtalainen kunto",
+        "sv": "Från 12 år · måttlig kondition",
+        "en": "Ages 12+ · moderate fitness"
+      },
+      "inclusions": {
+        "fi": [
+          "3 tunnin opastettu retki suomeksi tai englanniksi",
+          "Nuotioeväs ja kuuma juoma",
+          "Vaellussauvat lainaan"
+        ],
+        "sv": [
+          "3 timmars guidad vandring på finska eller engelska",
+          "Lägereldsmellanmål och varm dryck",
+          "Vandringsstavar att låna"
+        ],
+        "en": [
+          "3-hour guided hike in Finnish or English",
+          "Campfire snack and hot drink",
+          "Trekking poles on loan"
+        ]
+      },
+      "terms": {
+        "fi": [
+          "Yli 12-vuotiaille",
+          "Säänmukainen vaatetus",
+          "Vähintään 3 osallistujaa retkellä"
+        ],
+        "sv": [
+          "Från 12 år",
+          "Klädsel efter väder",
+          "Minst 3 deltagare per tur"
+        ],
+        "en": [
+          "Ages 12 and over",
+          "Weather-appropriate clothing",
+          "Minimum 3 participants per tour"
+        ]
+      },
+      "howTo": {
+        "fi": [
+          "Saat lahjakortin sähköpostiisi heti maksun jälkeen.",
+          "Valitse retkipäivä järjestäjän kalenterista. Päivättyä retkeä voi vaihtaa 48 h ennen.",
+          "Näytä koodi oppaalle kokoontumispaikalla."
+        ],
+        "sv": [
+          "Du får presentkortet per e-post direkt efter betalningen.",
+          "Välj datum i arrangörens kalender. En daterad tur kan ändras fram till 48 h före.",
+          "Visa koden för guiden vid mötesplatsen."
+        ],
+        "en": [
+          "You receive the voucher by email right after payment.",
+          "Choose a date in the organiser's calendar. A dated tour can be changed until 48 h before.",
+          "Show the code to the guide at the meeting point."
+        ]
+      },
+      "vatBps": 2550,
+      "referencePriceCents": null,
+      "imageUrl": "https://images.unsplash.com/photo-1551632811-561732d1e306?w=1200&q=70&auto=format&fit=crop",
+      "featured": true,
+      "options": [
+        {
+          "label": {
+            "fi": "1 henkilö",
+            "sv": "1 person",
+            "en": "1 person"
+          },
+          "priceCents": 3500
+        },
+        {
+          "label": {
+            "fi": "2 henkilöä",
+            "sv": "2 personer",
+            "en": "2 people"
+          },
+          "priceCents": 6500
+        }
+      ]
+    },
+    {
+      "key": "d6",
+      "businessId": "6789012-3",
+      "categoryId": "activities",
+      "cityId": "kauniainen",
+      "area": {
+        "fi": "Keskusta",
+        "sv": "Centrum",
+        "en": "Centre"
+      },
+      "street": "Demotie 5",
+      "zip": "02700",
+      "meetingPoint": false,
+      "title": {
+        "fi": "10 kerran kuntosali- ja ryhmäliikuntakortti",
+        "sv": "10-gångerskort till gym och gruppträning",
+        "en": "10-visit gym and group class card"
+      },
+      "baseTitle": null,
+      "description": {
+        "fi": "Kymmenen käyntiä kuntosalille tai ohjatuille ryhmäliikuntatunneille, sauna ja pukukaappi mukaan lukien.",
+        "sv": "Tio besök på gymmet eller ledda grupppass, inklusive bastu och klädskåp.",
+        "en": "Ten visits to the gym or instructor-led group classes, including sauna and locker."
+      },
+      "restrictions": {
+        "fi": "10 käyntikertaa · henkilökohtainen",
+        "sv": "10 besök · personligt",
+        "en": "10 visits · personal"
+      },
+      "inclusions": {
+        "fi": [
+          "10 käyntiä kuntosalille tai ryhmäliikuntaan",
+          "Pukukaappi ja sauna",
+          "Opastus ensimmäisellä käynnillä"
+        ],
+        "sv": [
+          "10 besök på gym eller gruppträning",
+          "Klädskåp och bastu",
+          "Introduktion vid första besöket"
+        ],
+        "en": [
+          "10 visits to the gym or group classes",
+          "Locker and sauna",
+          "Introduction on your first visit"
+        ]
+      },
+      "terms": {
+        "fi": [
+          "Kortti on henkilökohtainen",
+          "Käyntikerrat käytettävä lahjakortin voimassaoloaikana",
+          "Yli 16-vuotiaille"
+        ],
+        "sv": [
+          "Kortet är personligt",
+          "Besöken ska användas under presentkortets giltighetstid",
+          "Från 16 år"
+        ],
+        "en": [
+          "The card is personal",
+          "Visits must be used within the voucher's validity",
+          "Ages 16 and over"
+        ]
+      },
+      "howTo": {
+        "fi": [
+          "Saat lahjakortin sähköpostiisi heti maksun jälkeen.",
+          "Aktivoi kortti vastaanotossa ensimmäisellä käynnillä.",
+          "Varaa ryhmäliikuntatunnit keskuksen sovelluksessa."
+        ],
+        "sv": [
+          "Du får presentkortet per e-post direkt efter betalningen.",
+          "Aktivera kortet i receptionen vid första besöket.",
+          "Boka grupppass i centrets app."
+        ],
+        "en": [
+          "You receive the voucher by email right after payment.",
+          "Activate the card at reception on your first visit.",
+          "Book group classes in the centre's app."
+        ]
+      },
+      "vatBps": 1350,
+      "referencePriceCents": null,
+      "imageUrl": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&q=70&auto=format&fit=crop",
+      "featured": false,
+      "options": [
+        {
+          "label": null,
+          "priceCents": 6900
+        }
+      ]
+    },
+    {
+      "key": "d7",
+      "businessId": "7890123-4",
+      "categoryId": "wellness",
+      "cityId": "vantaa",
+      "area": {
+        "fi": "Myyrmäki",
+        "sv": "Myrbacka",
+        "en": "Myyrmäki"
+      },
+      "street": "Kylpyläpolku 2",
+      "zip": "01600",
+      "meetingPoint": false,
+      "title": {
+        "fi": "Kylpyläpäivä ja 30 min kasvohoito",
+        "sv": "Spadag och 30 min ansiktsbehandling",
+        "en": "Spa day with a 30-min facial"
+      },
+      "baseTitle": null,
+      "description": {
+        "fi": "Rentouttava päivä altailla ja saunoissa sekä kosteuttava kasvohoito.",
+        "sv": "En avkopplande dag i bassänger och bastur samt en återfuktande ansiktsbehandling.",
+        "en": "A relaxing day in the pools and saunas plus a hydrating facial."
+      },
+      "restrictions": {
+        "fi": "Joka päivä · 1 henkilö",
+        "sv": "Alla dagar · 1 person",
+        "en": "Every day · 1 person"
+      },
+      "inclusions": {
+        "fi": [
+          "Kylpyläsisäänpääsy (altaat ja saunat)",
+          "30 minuutin kosteuttava kasvohoito",
+          "Pyyhe ja kylpytakki"
+        ],
+        "sv": [
+          "Spaentré (bassänger och bastur)",
+          "30 minuters återfuktande ansiktsbehandling",
+          "Handduk och badrock"
+        ],
+        "en": [
+          "Spa entry (pools and saunas)",
+          "30-minute hydrating facial",
+          "Towel and bathrobe"
+        ]
+      },
+      "terms": {
+        "fi": [
+          "Kasvohoito varattava etukäteen",
+          "Yli 18-vuotiaille"
+        ],
+        "sv": [
+          "Ansiktsbehandlingen ska bokas i förväg",
+          "Från 18 år"
+        ],
+        "en": [
+          "The facial must be booked in advance",
+          "Ages 18 and over"
+        ]
+      },
+      "howTo": {
+        "fi": [
+          "Saat lahjakortin sähköpostiisi heti maksun jälkeen.",
+          "Varaa kasvohoito puhelimitse. Kylpyläkäynti ei vaadi varausta.",
+          "Näytä koodi vastaanotossa."
+        ],
+        "sv": [
+          "Du får presentkortet per e-post direkt efter betalningen.",
+          "Boka ansiktsbehandlingen per telefon. Spabesöket kräver ingen bokning.",
+          "Visa koden i receptionen."
+        ],
+        "en": [
+          "You receive the voucher by email right after payment.",
+          "Book the facial by phone. Spa entry needs no booking.",
+          "Show the code at reception."
+        ]
+      },
+      "vatBps": 2550,
+      "referencePriceCents": null,
+      "imageUrl": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1200&q=70&auto=format&fit=crop",
+      "featured": true,
+      "options": [
+        {
+          "label": null,
+          "priceCents": 4900
+        }
+      ]
+    },
+    {
+      "key": "d8",
+      "businessId": "8901234-5",
+      "categoryId": "food",
+      "cityId": "espoo",
+      "area": {
+        "fi": "Leppävaara",
+        "sv": "Alberga",
+        "en": "Leppävaara"
+      },
+      "street": "Mallikuja 4",
+      "zip": "02600",
+      "meetingPoint": false,
+      "title": {
+        "fi": "Iltapäivätee kahdelle",
+        "sv": "Afternoon tea för två",
+        "en": "Afternoon tea for two"
+      },
+      "baseTitle": null,
+      "description": {
+        "fi": "Klassinen iltapäivätee voileipineen ja leivonnaisineen tunnelmallisessa kahvilassa.",
+        "sv": "Klassiskt afternoon tea med smörgåsar och bakverk i ett stämningsfullt kafé.",
+        "en": "Classic afternoon tea with sandwiches and pastries in a cosy café."
+      },
+      "restrictions": {
+        "fi": "ma–la klo 13–17",
+        "sv": "mån–lör kl. 13–17",
+        "en": "Mon–Sat 13–17"
+      },
+      "inclusions": {
+        "fi": [
+          "Valikoima voileipiä ja leivonnaisia kahdelle",
+          "Tee tai kahvi, santsikupit"
+        ],
+        "sv": [
+          "Ett urval smörgåsar och bakverk för två",
+          "Te eller kaffe med påfyllning"
+        ],
+        "en": [
+          "Selection of sandwiches and pastries for two",
+          "Tea or coffee, refills included"
+        ]
+      },
+      "terms": {
+        "fi": [
+          "Voimassa ma–la klo 13–17"
+        ],
+        "sv": [
+          "Gäller mån–lör kl. 13–17"
+        ],
+        "en": [
+          "Valid Mon–Sat 13:00–17:00"
+        ]
+      },
+      "howTo": {
+        "fi": [
+          "Saat lahjakortin sähköpostiisi heti maksun jälkeen.",
+          "Arkisin ei tarvitse varata. Lauantait varataan puhelimitse.",
+          "Näytä koodi tiskillä."
+        ],
+        "sv": [
+          "Du får presentkortet per e-post direkt efter betalningen.",
+          "Ingen bokning behövs på vardagar. Lördagar bokas per telefon.",
+          "Visa koden vid disken."
+        ],
+        "en": [
+          "You receive the voucher by email right after payment.",
+          "No booking needed on weekdays. Book Saturdays by phone.",
+          "Show the code at the counter."
+        ]
+      },
+      "vatBps": 1350,
+      "referencePriceCents": null,
+      "imageUrl": "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200&q=70&auto=format&fit=crop",
+      "featured": false,
+      "options": [
+        {
+          "label": null,
+          "priceCents": 3200
+        }
+      ]
+    }
+  ]
+}
