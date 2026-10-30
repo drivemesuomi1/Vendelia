@@ -9,7 +9,9 @@ const nextConfig: NextConfig = {
   transpilePackages: ["@vendelia/shared", "@vendelia/backend"],
   // Include backend workspace dependencies in the Vercel server function trace.
   outputFileTracingRoot: path.resolve(import.meta.dirname, ".."),
-  serverExternalPackages: ["fastify", "@fastify/cors", "postgres", "drizzle-orm"],
+  // Fastify stays bundled: its light-my-request dependency require()s the ESM-only `cookie`
+  // package, which Vercel's function runtime rejects (ERR_REQUIRE_ESM) when loaded externally.
+  serverExternalPackages: ["postgres", "drizzle-orm"],
   // API requests are handled by app/api/[...path], in-process or via BACKEND_URL.
   async rewrites() {
     if (!backend) return [];
