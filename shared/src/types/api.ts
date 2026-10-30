@@ -31,6 +31,12 @@ export interface DealOptionDTO {
   id: string;
   label: LocalizedText | null;
   priceCents: number;
+  /** Per-option reference price when options differ in value; falls back to the deal's. */
+  referencePriceCents?: number | null;
+  /** Heading the option is listed under when a deal has several kinds of options. */
+  group?: LocalizedText | null;
+  /** Compact label for the option tile, e.g. "3 h" (label stays the full name used in the cart). */
+  shortLabel?: LocalizedText;
 }
 
 export interface MerchantPublicDTO {
@@ -38,7 +44,10 @@ export interface MerchantPublicDTO {
   companyName: string;
   businessId: string;
   phone: string;
+  email?: string;
+  website?: string;
 }
+
 
 export interface DealSummaryDTO {
   id: string;
@@ -70,6 +79,10 @@ export interface DealDetailDTO extends DealSummaryDTO {
   options: DealOptionDTO[];
   merchant: MerchantPublicDTO;
   status: DealStatus;
+  /** Extra photos after imageUrl. */
+  gallery?: string[];
+  /** Set for services done at the customer's address: shown instead of a street address. */
+  serviceArea?: LocalizedText;
 }
 
 export type DealStatus = "draft" | "pending" | "live" | "rejected";

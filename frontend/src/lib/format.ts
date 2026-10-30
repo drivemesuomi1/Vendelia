@@ -8,9 +8,12 @@ export function formatMoney(cents: number, locale: Locale): string {
 
 export function formatDate(iso: string | Date, locale: Locale): string {
   const d = typeof iso === "string" ? new Date(iso) : iso;
-  return locale === "en"
-    ? d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Helsinki" })
-    : d.toLocaleDateString(LOCALE_LABELS[locale].intl, { timeZone: "Europe/Helsinki" });
+  if (locale === "en") return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Helsinki" });
+  // fi and sv both use D.M.YYYY in Finland. Built from numeric parts because Node and browsers
+  // disagree on the sv-FI pattern ("2027-01-28" vs "28.1.2027"), which breaks hydration.
+  const parts = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "numeric", year: "numeric", timeZone: "Europe/Helsinki" }).formatToParts(d);
+  const part = (type: Intl.DateTimeFormatPartTypes) => Number(parts.find((p) => p.type === type)!.value);
+  return `${part("day")}.${part("month")}.${part("year")}`;
 }
 
 /** Basis points → "25,5 %" (fi/sv) or "25.5%" (en). */

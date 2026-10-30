@@ -23,7 +23,10 @@
     "cityLabel": "Kaupunki: {city}. Vaihda kaupunkia",
     "chooseCity": "Valitse kaupunki",
     "cities": "Kaupungit",
-    "selected": "VALITTU"
+    "selected": "VALITTU",
+    "categories": "Kategoriat",
+    "selectCity": "Valitse kaupunki",
+    "services": "Palvelut"
   },
   "footer": {
     "tagline": "Paikallisia elämyksiä ja palveluita Helsingissä, Espoossa, Vantaalla ja Kauniaisissa.",
@@ -36,6 +39,9 @@
     "help": "Apua"
   },
   "home": {
+    "bannerTitle": "Enemmän elämyksiä, vähemmän euroja",
+    "bannerLead": "Löydä paikalliset diilit siivoukseen, kauneuteen ja kuljettajapalveluihin.",
+    "bannerCta": "Katso tarjoukset",
     "title": "Paikallisia elämyksiä reiluun hintaan",
     "lead": "Selkeät hinnat sisältäen ALV:n, aidot paikalliset yritykset ja 14 päivän palautusoikeus käyttämättömille lahjakorteille.",
     "featured": "Nostetut diilit",
@@ -113,7 +119,11 @@
     "validUntil": "Voimassa {date} asti",
     "refundTick": "14 päivän palautusoikeus käyttämättömälle",
     "giftTick": "Voit ostaa lahjaksi – valitse kassalla",
-    "secureTick": "Turvallinen maksu: verkkopankki, MobilePay, kortti"
+    "secureTick": "Turvallinen maksu: verkkopankki, MobilePay, kortti",
+    "serviceAreaTitle": "Palvelualue",
+    "atYourPlace": "Palvelu tulee luoksesi",
+    "website": "Yrityksen sivut",
+    "photo": "Kuva {n}/{m}"
   },
   "cart": {
     "title": "Ostoskori",
@@ -461,6 +471,7 @@
     "not_a_merchant": "Tämä toiminto on vain yritystileille.",
     "deal_not_found": "Diiliä ei löytynyt.",
     "order_not_found": "Tilausta ei löytynyt.",
-    "api_not_configured": "Palvelu ei ole vielä käytössä."
+    "api_not_configured": "Palvelu ei ole vielä käytössä.",
+    "paymentUnavailable": "Verkkomaksu ei ole juuri nyt käytettävissä, eikä sinulta veloitettu mitään. Yritä hetken kuluttua uudelleen tai kirjoita osoitteeseen tuki@vendelia.fi."
   }
 }

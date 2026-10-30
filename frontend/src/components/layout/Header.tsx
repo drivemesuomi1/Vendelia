@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { Logo } from "@/components/ui/Logo";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAppData } from "@/lib/meta-context";
 import { useCart } from "@/features/cart/store";
+import { CategoryNav } from "./CategoryNav";
 import { CityPicker } from "./CityPicker";
 import { LangSwitch } from "./LangSwitch";
 
@@ -17,6 +18,15 @@ export function Header({ home }: { home?: boolean }) {
   const cart = useCart();
   const router = useRouter();
   const [q, setQ] = useState("");
+  const ref = useRef<HTMLElement>(null);
+  // Publish the real header height (one row on desktop, two on phones) for sticky bars and jump links below it.
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => document.documentElement.style.setProperty("--header-h", `${el.offsetHeight}px`));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
   const search = (e: FormEvent) => {
     e.preventDefault();
     router.push(`/${locale}/deals${q.trim() ? `?q=${encodeURIComponent(q.trim())}` : ""}`);
@@ -34,32 +44,35 @@ export function Header({ home }: { home?: boolean }) {
   );
 
   return (
-    <header className={`site ${home ? "is-home" : ""}`}>
-      <div className="wrap">
-        <div className="hdr">
-          <Logo href={`/${locale}`} label={t("nav.homeLabel")} />
-          <CityPicker />
-          {searchForm("q1", t("nav.searchPlaceholder"), "hdr-search")}
-          <nav className="nav" aria-label={t("nav.main")}>
-            <Link href={`/${locale}/account/vouchers`} title={t("nav.myVouchers")} aria-label={t("nav.myVouchers")}>
-              <Icon name="ticket" /><span className="lbl">{t("nav.myVouchers")}</span>
-            </Link>
-            <Link href={portal.href} title={portal.label} aria-label={portal.label}>
-              <Icon name={portal.icon} /><span className="lbl">{portal.label}</span>
-            </Link>
-            <span className="nav-sep" aria-hidden="true" />
-            <LangSwitch />
-            <button className="navbtn cart" onClick={() => cart.openDrawer()} aria-haspopup="dialog" aria-label={cartLabel}>
-              <Icon name="cart" /><span className="lbl">{t("cart.title")}</span>
-              <span className="badge" hidden={!count}>{count}</span>
-            </button>
-          </nav>
+    <>
+      <header ref={ref} className={`site ${home ? "is-home" : ""}`}>
+        <div className="wrap">
+          <div className="hdr">
+            <Logo href={`/${locale}`} label={t("nav.homeLabel")} wordmark />
+            <CityPicker />
+            {searchForm("q1", t("nav.searchPlaceholder"), "hdr-search")}
+            <nav className="nav" aria-label={t("nav.main")}>
+              <Link href={`/${locale}/account/vouchers`} title={t("nav.myVouchers")} aria-label={t("nav.myVouchers")}>
+                <Icon name="ticket" /><span className="lbl">{t("nav.myVouchers")}</span>
+              </Link>
+              <Link href={portal.href} title={portal.label} aria-label={portal.label}>
+                <Icon name={portal.icon} /><span className="lbl">{portal.label}</span>
+              </Link>
+              <span className="nav-sep" aria-hidden="true" />
+              <LangSwitch />
+              <button className="navbtn cart" onClick={() => cart.openDrawer()} aria-haspopup="dialog" aria-label={cartLabel}>
+                <Icon name="cart" /><span className="lbl">{t("cart.title")}</span>
+                <span className="badge" hidden={!count}>{count}</span>
+              </button>
+            </nav>
+          </div>
+          <div className="hdr-row2">
+            <CityPicker />
+            {searchForm("q2", t("nav.search"))}
+          </div>
         </div>
-        <div className="hdr-row2">
-          <CityPicker />
-          {searchForm("q2", t("nav.search"))}
-        </div>
-      </div>
-    </header>
+      </header>
+      <CategoryNav />
+    </>
   );
 }

@@ -15,21 +15,31 @@ function readCity() {
   return m ? decodeURIComponent(m[1]!) : "";
 }
 
+/** The remembered city (cookie) and a picker that saves it and opens the filtered deal list. */
+export function useCity() {
+  const { locale } = useI18n();
+  const router = useRouter();
+  const [city, setCity] = useState("");
+  useEffect(() => setCity(readCity()), []);
+  function pick(id: string) {
+    document.cookie = `${CITY_COOKIE}=${id}; path=/; max-age=31536000; samesite=lax`;
+    setCity(id);
+    router.push(`/${locale}/deals${id ? `?city=${id}` : ""}`);
+  }
+  return { city, pick };
+}
+
 /** City pill in the header; choosing a city opens the filtered deal list. */
 export function CityPicker() {
   const { t, locale } = useI18n();
   const { meta } = useAppData();
-  const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [city, setCity] = useState("");
-  useEffect(() => setCity(readCity()), []);
+  const { city, pick: pickCity } = useCity();
 
   const name = city ? loc(meta.cities.find((c) => c.id === city)?.name, locale) : t("common.allCities");
   function pick(id: string) {
-    document.cookie = `${CITY_COOKIE}=${id}; path=/; max-age=31536000; samesite=lax`;
-    setCity(id);
     setOpen(false);
-    router.push(`/${locale}/deals${id ? `?city=${id}` : ""}`);
+    pickCity(id);
   }
 
   return (

@@ -2,22 +2,22 @@ import Link from "next/link";
 import { Icon } from "@/components/ui/Icon";
 import { Notice } from "@/components/ui/Notice";
 import { getT, resolveLocale } from "@/i18n/server";
-import { listDeals } from "@/features/deals/api";
+import { getMeta, listDeals } from "@/features/deals/api";
 import { CategoryBar } from "@/features/deals/components/CategoryBar";
 import { DealGrid } from "@/features/deals/components/DealCard";
-import { HeroCarousel } from "@/features/deals/components/HeroCarousel";
+import { PromoBanner } from "@/features/deals/components/PromoBanner";
 
-/** Home: featured carousel, categories, current deals, how it works, merchant sign-up. */
+/** Home: promo banner, categories, current deals, how it works, merchant sign-up. */
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const locale = await resolveLocale(params);
   const t = getT(locale);
-  const [featured, deals] = await Promise.all([listDeals({ featured: true }), listDeals()]);
+  const [meta, deals] = await Promise.all([getMeta(), listDeals()]);
 
   return (
     <main className="home">
       <div className="wrap">
         <h1 className="sr-only">{t("home.title")}</h1>
-        <HeroCarousel slides={featured} />
+        <PromoBanner locale={locale} meta={meta} />
         <CategoryBar />
 
         <section aria-labelledby="live">
