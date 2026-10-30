@@ -9,23 +9,17 @@ import { useAppData } from "@/lib/meta-context";
 import { loc } from "@/lib/format";
 import { useCity } from "./CityPicker";
 
-/** Top-level categories in the bar, in order; "services" groups several categories in a dropdown. */
-const ITEMS: ({ category: string } | { group: "services"; categories: string[] })[] = [
-  { category: "food" },
-  { category: "beauty" },
-  { category: "wellness" },
-  { group: "services", categories: ["cleaning", "chauffeur"] },
-];
-
 /** Category bar under the header: city menu, categories and the Services menu. */
 export function CategoryNav() {
   const { t, locale } = useI18n();
   const { meta } = useAppData();
   const { city, pick } = useCity();
   const [active, setActive] = useState("");
+  // Presentation grouping; category labels, icons, order and availability come from the API.
+  const isService = (id: string) => id === "cleaning" || id === "chauffeur";
+  const services = meta.categories.filter((category) => isService(category.id));
 
-  const category = (id: string) => meta.categories.find((c) => c.id === id);
-  const href = (id: string) => `/${locale}/deals?category=${id}`;
+  const href = (id: string) => `/${locale}/deals?category=${encodeURIComponent(id)}`;
   const cityName = loc(meta.cities.find((c) => c.id === city)?.name, locale);
 
   return (
@@ -43,36 +37,27 @@ export function CategoryNav() {
             </li>
           ))}
         </Menu>
-        {ITEMS.map((item) => {
-          if ("category" in item) {
-            const c = category(item.category);
-            if (!c) return null;
-            return (
-              <Link key={c.id} className="cn-link" href={href(c.id)} aria-current={active === c.id ? "page" : undefined}>
-                {loc(c.name, locale)}
-              </Link>
-            );
-          }
-          const children = item.categories.map(category).filter((c) => c !== undefined);
-          if (!children.length) return null;
-          return [
-            <Menu key="services" label={t("nav.services")} className="desk-only" current={children.some((c) => c.id === active)}>
-              {children.map((c) => (
-                <li key={c.id}>
-                  <Link href={href(c.id)} aria-current={active === c.id ? "page" : undefined}>
-                    <Icon name={c.icon as IconName} />{loc(c.name, locale)}
-                  </Link>
-                </li>
-              ))}
-            </Menu>,
-            // Phones: no dropdowns in a swipeable row, so the services are listed directly.
-            ...children.map((c) => (
-              <Link key={`m-${c.id}`} className="cn-link mob-only" href={href(c.id)} aria-current={active === c.id ? "page" : undefined}>
-                {loc(c.name, locale)}
-              </Link>
-            )),
-          ];
-        })}
+        {meta.categories.filter((c) => !isService(c.id)).map((c) => (
+          <Link key={c.id} className="cn-link" href={href(c.id)} aria-current={active === c.id ? "page" : undefined}>
+            {loc(c.name, locale)}
+          </Link>
+        ))}
+        {services.length > 0 && (
+          <Menu label={t("nav.services")} className="desk-only" current={services.some((c) => c.id === active)}>
+            {services.map((c) => (
+              <li key={c.id}>
+                <Link href={href(c.id)} aria-current={active === c.id ? "page" : undefined}>
+                  <Icon name={c.icon as IconName} />{loc(c.name, locale)}
+                </Link>
+              </li>
+            ))}
+          </Menu>
+        )}
+        {services.map((c) => (
+          <Link key={c.id} className="cn-link mob-only" href={href(c.id)} aria-current={active === c.id ? "page" : undefined}>
+            {loc(c.name, locale)}
+          </Link>
+        ))}
       </div>
     </nav>
   );

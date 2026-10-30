@@ -1,5 +1,6 @@
 {
   "common": {
+    "retry": "Försök igen",
     "allCities": "Alla städer",
     "businessId": "FO-nummer",
     "close": "Stäng",
@@ -29,7 +30,7 @@
     "services": "Tjänster"
   },
   "footer": {
-    "tagline": "Lokala upplevelser och tjänster i Helsingfors, Esbo, Vanda och Grankulla.",
+    "tagline": "Lokala upplevelser och tjänster: {cities}.",
     "paymentMethods": "Betalningssätt",
     "customers": "För kunder",
     "howVouchersWork": "Så fungerar presentkorten",
@@ -43,7 +44,7 @@
     "bannerLead": "Upptäck lokala erbjudanden på städning, skönhet och chaufförstjänster.",
     "bannerCta": "Se erbjudandena",
     "title": "Lokala upplevelser till ett rättvist pris",
-    "lead": "Tydliga priser inklusive moms, riktiga lokala företag och 14 dagars returrätt för oanvända presentkort.",
+    "lead": "Tydliga priser inklusive moms, riktiga lokala företag och {days} dagars returrätt för oanvända presentkort.",
     "featured": "Utvalda erbjudanden",
     "slide": "Bild {n}/{m}",
     "seeDeal": "Se erbjudandet",
@@ -58,7 +59,7 @@
     "current": "Aktuella erbjudanden",
     "seeAll": "Visa alla",
     "trustVat": "Priser inkl. moms",
-    "trustRefund": "14 dagars returrätt",
+    "trustRefund": "{days} dagars returrätt",
     "trustSecure": "Säker betalning",
     "trustLocal": "Riktiga lokala företag",
     "howTitle": "Så fungerar det",
@@ -70,12 +71,12 @@
     "step3Text": "Presentkortet och dess exakta sista giltighetsdag skickas till din e-post och till Mina presentkort.",
     "step4Title": "Boka och lös in",
     "step4Text": "Boka tid hos företaget enligt anvisningarna och visa koden på plats.",
-    "refundTitle": "14 dagars returrätt.",
-    "refundText": "Ändrade planer? Avbeställ ett oanvänt presentkort i Mina presentkort inom 14 dagar från köpet. Presentkorten gäller i 3 kalendermånader.",
+    "refundTitle": "{days} dagars returrätt.",
+    "refundText": "Ändrade planer? Avbeställ ett oanvänt presentkort i Mina presentkort inom {days} dagar från köpet. Presentkorten gäller i {months} kalendermånader.",
     "bizTitle": "Har du ett lokalt företag?",
     "bizText": "Nå nya kunder i huvudstadsregionen. Du bestämmer erbjudandet – vi sköter betalningar, presentkort och kundtjänst.",
     "bizJoin": "Bli säljare",
-    "bizPoint1": "15 % provision på försäljningen exklusive moms. Inga anslutnings- eller månadsavgifter.",
+    "bizPoint1": "{rate} provision på försäljningen exklusive moms. Inga anslutnings- eller månadsavgifter.",
     "bizPoint2": "Varje rad i redovisningen syns: försäljning, moms, provision och utbetalning.",
     "bizPoint3": "Lös in presentkort med telefonen."
   },
@@ -93,7 +94,7 @@
   "deal": {
     "from": "från",
     "referencePrice": "Jämförpris",
-    "cardHint": "Inkl. moms · giltigt 3 mån",
+    "cardHint": "Inkl. moms · giltigt {months} mån",
     "chooseOption": "Välj alternativ",
     "addToCart": "Lägg i varukorgen",
     "buy": "Köp",
@@ -113,11 +114,10 @@
     "refundBody": "Du kan avbeställa ett oanvänt presentkort och få pengarna tillbaka inom {days} dagar från köpet i Mina presentkort eller via e-post till tuki@vendelia.fi. Vi skickar en bekräftelse och återbetalar till ditt ursprungliga betalningssätt. För använda presentkort gäller företagets villkor och dina lagstadgade rättigheter.",
     "phone": "tfn",
     "onBehalf": "Vendelia säljer presentkortet för företagets räkning. Tjänsten tillhandahålls av företaget.",
-    "referenceNote": "Lägsta pris i den här salongen under de senaste 30 dagarna: {price}",
     "finalPrice": "Slutpris, inkl. moms {vat}. Inga service- eller leveransavgifter.",
     "quantity": "Antal",
     "validUntil": "Giltigt till {date}",
-    "refundTick": "14 dagars returrätt om oanvänt",
+    "refundTick": "{days} dagars returrätt om oanvänt",
     "giftTick": "Kan köpas som gåva – välj i kassan",
     "secureTick": "Säker betalning: nätbank, MobilePay, kort",
     "serviceAreaTitle": "Serviceområde",
@@ -426,6 +426,7 @@
     "offline": "Bakänden är inte ansluten än, så uppgifterna visas tomma. Funktionerna fungerar när API:et är i drift."
   },
   "errors": {
+    "catalogueUnavailable": "Erbjudandena är tillfälligt otillgängliga",
     "generic": "Kontrollera uppgifterna och försök igen.",
     "network": "Anslutningsfel. Försök igen.",
     "pageNotFound": "Sidan hittades inte",

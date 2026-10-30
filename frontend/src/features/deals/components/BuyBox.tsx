@@ -7,11 +7,13 @@ import { QtyStepper } from "@/components/ui/QtyStepper";
 import { useI18n } from "@/i18n/I18nProvider";
 import { discountPct, formatMoney, formatPct, loc } from "@/lib/format";
 import { useCart } from "@/features/cart/store";
+import { useAppData } from "@/lib/meta-context";
 
 /** Option picker, quantity and "Add to cart" (desktop sidebar + sticky mobile bar). */
 export function BuyBox({ deal, expiry }: { deal: DealDetailDTO; expiry: string }) {
   const { t, locale } = useI18n();
   const cart = useCart();
+  const { meta } = useAppData();
   const [optionId, setOptionId] = useState(deal.options[0]!.id);
   const [qty, setQty] = useState(1);
   // On phones the bottom bar duplicates the box's own button, so hide it while that button is on screen.
@@ -24,12 +26,12 @@ export function BuyBox({ deal, expiry }: { deal: DealDetailDTO; expiry: string }
     io.observe(el);
     return () => io.disconnect();
   }, []);
-  const option = deal.options.find((o) => o.id === optionId)!;
+  const option = deal.options.find((o) => o.id === optionId) ?? deal.options[0]!;
   const refOf = (o: DealOptionDTO) => (o.referencePriceCents !== undefined ? o.referencePriceCents : deal.referencePriceCents);
   const ref = refOf(option);
   const off = discountPct(option.priceCents, ref);
   const total = option.priceCents * qty;
-  const add = () => cart.add({ dealId: deal.id, optionId, qty });
+  const add = () => cart.add({ dealId: deal.id, optionId: option.id, qty });
   // Consecutive options with the same group heading form one tab.
   const groups: { label: DealOptionDTO["group"]; options: DealOptionDTO[] }[] = [];
   for (const o of deal.options) {
@@ -63,7 +65,7 @@ export function BuyBox({ deal, expiry }: { deal: DealDetailDTO; expiry: string }
                 const r = refOf(o);
                 return (
                   <label className="tile" key={o.id}>
-                    <input className="sr-only" type="radio" name="opt" checked={o.id === optionId} onChange={() => setOptionId(o.id)} />
+                    <input className="sr-only" type="radio" name="opt" checked={o.id === option.id} onChange={() => setOptionId(o.id)} />
                     <span className="tile-name">{loc(o.shortLabel, locale)}</span>
                     <span className="tile-price">{formatMoney(o.priceCents, locale)}</span>
                     {groupHasRef && (r && r > o.priceCents ? <s className="tile-ref">{formatMoney(r, locale)}</s> : <span className="tile-ref" aria-hidden="true">&nbsp;</span>)}
@@ -78,7 +80,7 @@ export function BuyBox({ deal, expiry }: { deal: DealDetailDTO; expiry: string }
             <legend className="label" style={{ marginBottom: 8 }}>{t("deal.chooseOption")}</legend>
             {deal.options.map((o) => (
               <label className="opt" key={o.id}>
-                <input type="radio" name="opt" checked={o.id === optionId} onChange={() => setOptionId(o.id)} />
+                <input type="radio" name="opt" checked={o.id === option.id} onChange={() => setOptionId(o.id)} />
                 {loc(o.label, locale)}
                 <span className="p">{formatMoney(o.priceCents, locale)}</span>
               </label>
@@ -94,7 +96,7 @@ export function BuyBox({ deal, expiry }: { deal: DealDetailDTO; expiry: string }
               <span className="chip teal">−{off} %</span>
             </>
           )}
-        </div>        {off !== null && <p className="hint">{t("deal.referenceNote", { price: formatMoney(ref!, locale) })}</p>}
+        </div>
         <p className="muted small">{t("deal.finalPrice", { vat: formatPct(deal.vatBps, locale) })}</p>
         <div className="row between">
           <span className="label">{t("deal.quantity")}</span>
@@ -103,7 +105,7 @@ export function BuyBox({ deal, expiry }: { deal: DealDetailDTO; expiry: string }
         <button ref={addRef} className="btn btn-primary btn-block" onClick={add}><Icon name="cart" />{t("deal.addToCart")}</button>
         <ul className="ticks small">
           <li><Icon name="cal" /><span>{t("deal.validUntil", { date: expiry })}</span></li>
-          <li><Icon name="refund" /><span>{t("deal.refundTick")}</span></li>
+          <li><Icon name="refund" /><span>{t("deal.refundTick", { days: meta.refundWindowDays })}</span></li>
           <li><Icon name="gift" /><span>{t("deal.giftTick")}</span></li>
           <li><Icon name="lock" /><span>{t("deal.secureTick")}</span></li>
         </ul>

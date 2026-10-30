@@ -5,7 +5,7 @@ export const dealQuerySchema = z.object({
   city: z.string().trim().optional(),
   category: z.string().trim().optional(),
   q: z.string().trim().max(100).optional(),
-  featured: z.coerce.boolean().optional(),
+  featured: z.union([z.boolean(), z.enum(["true", "false"]).transform((value) => value === "true")]).optional(),
 });
 export type DealQuery = z.infer<typeof dealQuerySchema>;
 

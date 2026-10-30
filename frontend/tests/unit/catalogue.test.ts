@@ -1,42 +1,33 @@
-import { describe, expect, it } from "vitest";
-import { PARTNER_DEALS, partnerDeal, partnerDeals, partnerQuote } from "../../src/features/deals/catalogue";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+vi.mock("server-only", () => ({}));
+vi.mock("@/lib/server-api", () => ({ serverApi: vi.fn(), serverApiOrNull: vi.fn() }));
+import { serverApi, serverApiOrNull } from "../../src/lib/server-api";
+import { getDeal, getMeta, listDeals } from "../../src/features/deals/api";
 
-const deal = PARTNER_DEALS[0]!;
-const option = (label: string) => deal.options.find((o) => o.label!.fi.includes(label))!;
-
-describe("partner catalogue", () => {
-  it("prices the cart as unit price × quantity", () => {
-    const o = option("61–80");
-    const q = partnerQuote([{ dealId: deal.id, optionId: o.id, qty: 2 }]);
-    expect(q.totalCents).toBe(59800);
-    expect(q.lines[0]!.totalCents).toBe(59800);
+beforeEach(() => vi.resetAllMocks());
+describe("database catalogue loaders", () => {
+  it("uses API metadata without adding built-in cities or counts", async () => {
+    const meta = { cities: [], categories: [{ id: "new-category", dealCount: 0 }] };
+    vi.mocked(serverApi).mockResolvedValue(meta);
+    expect(await getMeta()).toEqual(meta);
   });
-
-  it("includes VAT inside the price, not on top", () => {
-    const o = option("3 h");
-    const q = partnerQuote([{ dealId: deal.id, optionId: o.id, qty: 3 }]);
-    expect(q.totalCents).toBe(8900 * 3);
-    expect(q.vatByRate["2550"]).toBe(Math.round((8900 * 3 * 2550) / 12550));
+  it("honors empty results and does not resurrect the former partner deal", async () => {
+    vi.mocked(serverApi).mockResolvedValue({ deals: [] });
+    expect(await listDeals()).toEqual([]);
+    vi.mocked(serverApiOrNull).mockResolvedValue(null);
+    expect(await getDeal("cleava-kotisiivous-ja-muuttosiivous")).toBeNull();
   });
-
-  it("sums several lines and flags unknown options", () => {
-    const q = partnerQuote([
-      { dealId: deal.id, optionId: option("3 h").id, qty: 1 },
-      { dealId: deal.id, optionId: option("8 h").id, qty: 2 },
-      { dealId: deal.id, optionId: "00000000-0000-4000-8000-000000000000", qty: 1 },
-    ]);
-    expect(q.totalCents).toBe(8900 + 23900 * 2);
-    expect(q.unavailable).toHaveLength(1);
+  it("encodes filters, including featured=false", async () => {
+    vi.mocked(serverApi).mockResolvedValue({ deals: [] });
+    await listDeals({ city: "espoo", q: "home & office", featured: false });
+    expect(serverApi).toHaveBeenCalledWith("/api/deals?city=espoo&q=home+%26+office&featured=false");
   });
-
-  it("every discounted option has a lower price than its reference", () => {
-    for (const o of deal.options) if (o.referencePriceCents) expect(o.priceCents).toBeLessThan(o.referencePriceCents);
-  });
-
-  it("is found by slug, city filter and search", () => {
-    expect(partnerDeal(deal.slug)?.id).toBe(deal.id);
-    expect(partnerDeals({ city: "espoo" })).toHaveLength(1);
-    expect(partnerDeals({ q: "muuttosiivous" })).toHaveLength(1);
-    expect(partnerDeals({ category: "food" })).toHaveLength(0);
+  it("propagates outages instead of stale data or a false 404", async () => {
+    const outage = new Error("service_unavailable");
+    vi.mocked(serverApi).mockRejectedValue(outage);
+    vi.mocked(serverApiOrNull).mockRejectedValue(outage);
+    await expect(getMeta()).rejects.toThrow(outage);
+    await expect(listDeals()).rejects.toThrow(outage);
+    await expect(getDeal("cleava-kotisiivous-ja-muuttosiivous")).rejects.toThrow(outage);
   });
 });

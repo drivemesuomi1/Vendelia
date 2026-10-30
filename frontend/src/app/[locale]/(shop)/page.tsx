@@ -6,6 +6,7 @@ import { getMeta, listDeals } from "@/features/deals/api";
 import { CategoryBar } from "@/features/deals/components/CategoryBar";
 import { DealGrid } from "@/features/deals/components/DealCard";
 import { PromoBanner } from "@/features/deals/components/PromoBanner";
+import { formatPct } from "@/lib/format";
 
 /** Home: promo banner, categories, current deals, how it works, merchant sign-up. */
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
@@ -38,7 +39,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
         <div className="trustbar">
           <div><Icon name="checkc" />{t("home.trustVat")}</div>
-          <div><Icon name="refund" />{t("home.trustRefund")}</div>
+          <div><Icon name="refund" />{t("home.trustRefund", { days: meta.refundWindowDays })}</div>
           <div><Icon name="lock" />{t("home.trustSecure")}</div>
           <div><Icon name="store" />{t("home.trustLocal")}</div>
         </div>
@@ -54,7 +55,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               </div>
             ))}
           </div>
-          <Notice className="mt" icon="refund"><p><b>{t("home.refundTitle")}</b> {t("home.refundText")}</p></Notice>
+          <Notice className="mt" icon="refund"><p><b>{t("home.refundTitle", { days: meta.refundWindowDays })}</b> {t("home.refundText", { days: meta.refundWindowDays, months: meta.voucherValidityMonths })}</p></Notice>
         </section>
 
         <section aria-labelledby="biz">
@@ -67,7 +68,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               </div>
             </div>
             <ul>
-              <li><Icon name="check" /><span>{t("home.bizPoint1")}</span></li>
+              <li><Icon name="check" /><span>{t("home.bizPoint1", { rate: formatPct(meta.commissionBps, locale) })}</span></li>
               <li><Icon name="check" /><span>{t("home.bizPoint2")}</span></li>
               <li><Icon name="check" /><span>{t("home.bizPoint3")}</span></li>
             </ul>

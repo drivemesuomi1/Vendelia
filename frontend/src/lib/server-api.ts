@@ -20,6 +20,7 @@ export async function serverApi<T>(path: string): Promise<T> {
   const res = await fetch(`${BACKEND}${path}`, {
     headers: { cookie: jar.toString(), accept: "application/json" },
     cache: "no-store",
+    signal: AbortSignal.timeout(15000),
   });
   if (!res.ok) {
     const body = (await res.json().catch(() => ({}))) as { error?: string };

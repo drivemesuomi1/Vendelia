@@ -10,6 +10,18 @@ export const cartItemSchema = z.object({
 });
 export type CartItemInput = z.infer<typeof cartItemSchema>;
 
+export const cartQuoteSchema = z.object({
+  items: z.array(cartItemSchema).max(20).superRefine((items, ctx) => {
+    const seen = new Set<string>();
+    items.forEach((item, index) => {
+      if (seen.has(item.optionId)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: [index, "optionId"], message: "duplicateOption" });
+      }
+      seen.add(item.optionId);
+    });
+  }),
+});
+
 export const PAYMENT_METHODS = ["bank", "mobilepay", "card"] as const;
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 

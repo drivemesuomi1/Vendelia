@@ -14,9 +14,10 @@ const inter = Inter({ subsets: ["latin", "latin-ext"], weight: ["400", "500", "6
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const t = getT(isLocale(locale) ? locale : "fi");
+  const meta = await getMeta();
   return {
     title: { default: `Vendelia – ${t("home.title")}`, template: "%s · Vendelia" },
-    description: t("home.lead"),
+    description: t("home.lead", { days: meta.refundWindowDays }),
     icons: { icon: "/favicon.svg" },
     alternates: { languages: Object.fromEntries(LOCALES.map((l) => [l, `/${l}`])) },
   };

@@ -8,9 +8,11 @@
     "start": "tsx src/server.ts",
     "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
-    "test": "echo \"backend: no tests yet\""
+    "test": "node --import tsx tests/catalogue.test.ts",
+    "db:check": "tsx scripts/check-catalogue.ts"
   },
   "dependencies": {
+    "@vendelia/shared": "*",
     "@fastify/cors": "^11.3.1",
     "dotenv": "^18.0.9",
     "drizzle-orm": "^0.45.4",

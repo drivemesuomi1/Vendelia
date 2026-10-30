@@ -4,20 +4,17 @@ Requirements: Node.js 20.11+ (22 recommended).
 
 ```bash
 npm install
-npm run dev          # API placeholder on :4000 and web on :3000 together
+# Copy backend/.env.example to backend/.env and configure Supabase DATABASE_URL.
+npm run dev          # Supabase-backed API on :4000 and web on :3000 together
 ```
 
 Open http://localhost:3000 (redirects to `/fi`).
 
-The backend is currently a placeholder (`GET /api/health` only), so the site shows the built-in cities and categories and an empty
-catalogue; sign-in and checkout return "service not available yet". To work against a complete API, check out the reference implementation:
-
-```bash
-git worktree add ../vendelia-backend-reference backend-reference
-cd ../vendelia-backend-reference && npm install && npm run dev
-```
-
-(It uses an embedded Postgres, demo logins and a mock payment provider; see its own `docs/runbooks/local-development.md`.)
+The backend now serves the catalogue and cart quotes from Supabase. Run
+`npm run db:check -w backend` to verify current database rows through the API.
+There are no hardcoded deal or reference-data fallbacks; an unreachable backend
+shows a retry screen. Sign-in, checkout and merchant/admin writes remain separate
+API work. See [database catalogue setup](../database-catalogue.md).
 
 ## Checks
 ```bash
@@ -27,6 +24,8 @@ npm run build
 ```
 
 ## Deploying the frontend (Vercel)
-The Vercel project `vendelia` is set to: framework Next.js, root directory `frontend`, "include source files outside root" on,
-install command `cd .. && npm ci`. Deploy with `vercel deploy --prod` from the repo root. Set the `BACKEND_URL` environment variable
-in Vercel when an API exists so `/api/*` is forwarded to it.
+The Vercel project `vendelia` uses framework Next.js, root directory `frontend`,
+"include source files outside root" on, and install command `cd .. && npm ci`.
+Deploy the Fastify API separately and set BACKEND_URL in Vercel to its HTTPS origin
+before rebuilding the frontend. Browsers use the same-origin /api rewrite; server
+components fetch that API directly. DATABASE_URL belongs only on the backend host.

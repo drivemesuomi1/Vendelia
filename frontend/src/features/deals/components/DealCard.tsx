@@ -47,7 +47,7 @@ export function DealCard({ deal }: { deal: DealSummaryDTO }) {
             </>
           )}
         </div>
-        <p className="hint">{t("deal.cardHint")}</p>
+        <p className="hint">{t("deal.cardHint", { months: meta.voucherValidityMonths })}</p>
         {multi ? (
           <Link className="btn btn-secondary btn-sm" href={href} style={{ marginTop: 8 }}>{t("deal.chooseOption")}</Link>
         ) : (

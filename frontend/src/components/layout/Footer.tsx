@@ -3,9 +3,12 @@
 import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
 import { useI18n } from "@/i18n/I18nProvider";
+import { useAppData } from "@/lib/meta-context";
+import { loc } from "@/lib/format";
 
 export function Footer() {
   const { t, locale } = useI18n();
+  const { meta } = useAppData();
   const l = (p: string) => `/${locale}${p}`;
   return (
     <footer className="site">
@@ -13,7 +16,7 @@ export function Footer() {
         <div className="foot">
           <div>
             <Logo href={l("")} label={t("nav.homeLabel")} />
-            <p className="muted small" style={{ marginTop: 12, maxWidth: 260 }}>{t("footer.tagline")}</p>
+            <p className="muted small" style={{ marginTop: 12, maxWidth: 260 }}>{t("footer.tagline", { cities: meta.cities.map((city) => loc(city.name, locale)).join(", ") })}</p>
             <div className="paylogos" aria-label={t("footer.paymentMethods")}>
               <span>{t("checkout.bank")}</span><span>MobilePay</span><span>Visa</span><span>Mastercard</span>
             </div>

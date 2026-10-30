@@ -1,5 +1,6 @@
 {
   "common": {
+    "retry": "Try again",
     "allCities": "All cities",
     "businessId": "Business ID",
     "close": "Close",
@@ -29,7 +30,7 @@
     "services": "Services"
   },
   "footer": {
-    "tagline": "Local experiences and services in Helsinki, Espoo, Vantaa and Kauniainen.",
+    "tagline": "Local experiences and services in {cities}.",
     "paymentMethods": "Payment methods",
     "customers": "For customers",
     "howVouchersWork": "How vouchers work",
@@ -43,7 +44,7 @@
     "bannerLead": "Discover local deals on cleaning, beauty and chauffeur services.",
     "bannerCta": "Browse deals",
     "title": "Local experiences at a fair price",
-    "lead": "Clear prices including VAT, real local businesses and a 14-day refund on unused vouchers.",
+    "lead": "Clear prices including VAT, real local businesses and a {days}-day refund on unused vouchers.",
     "featured": "Featured deals",
     "slide": "Slide {n} of {m}",
     "seeDeal": "See deal",
@@ -58,7 +59,7 @@
     "current": "Current deals",
     "seeAll": "See all",
     "trustVat": "Prices incl. VAT",
-    "trustRefund": "14-day refund",
+    "trustRefund": "{days}-day refund",
     "trustSecure": "Secure payment",
     "trustLocal": "Real local businesses",
     "howTitle": "How it works",
@@ -70,12 +71,12 @@
     "step3Text": "Your voucher and its exact expiry date arrive by email and in My vouchers.",
     "step4Title": "Book and redeem",
     "step4Text": "Book with the business as the deal describes and show your code on site.",
-    "refundTitle": "14-day refund.",
-    "refundText": "Changed your plans? Cancel an unused voucher in My vouchers within 14 days of purchase. Vouchers are valid for 3 calendar months.",
+    "refundTitle": "{days}-day refund.",
+    "refundText": "Changed your plans? Cancel an unused voucher in My vouchers within {days} days of purchase. Vouchers are valid for {months} calendar months.",
     "bizTitle": "Run a local business?",
     "bizText": "Reach new customers in the Helsinki region. You set the offer – we handle payments, vouchers and support.",
     "bizJoin": "Become a seller",
-    "bizPoint1": "15% commission on the VAT-exclusive sale. No sign-up or monthly fees.",
+    "bizPoint1": "{rate} commission on the VAT-exclusive sale. No sign-up or monthly fees.",
     "bizPoint2": "Every statement line is visible: sale, VAT, commission and payout.",
     "bizPoint3": "Redeem vouchers with your phone."
   },
@@ -93,7 +94,7 @@
   "deal": {
     "from": "from",
     "referencePrice": "Reference price",
-    "cardHint": "Incl. VAT · valid 3 months",
+    "cardHint": "Incl. VAT · valid {months} months",
     "chooseOption": "Choose an option",
     "addToCart": "Add to cart",
     "buy": "Buy",
@@ -113,11 +114,10 @@
     "refundBody": "You can cancel an unused voucher for a full refund within {days} days of purchase in My vouchers or by emailing tuki@vendelia.fi. We send a confirmation and refund your original payment method. Used vouchers follow the business's terms and your statutory rights.",
     "phone": "tel.",
     "onBehalf": "Vendelia sells the voucher on behalf of the business. The business provides the service.",
-    "referenceNote": "Lowest price at this business in the last 30 days: {price}",
     "finalPrice": "Final price, incl. VAT {vat}. No service or delivery fees.",
     "quantity": "Quantity",
     "validUntil": "Valid until {date}",
-    "refundTick": "14-day refund if unused",
+    "refundTick": "{days}-day refund if unused",
     "giftTick": "Can be bought as a gift – choose at checkout",
     "secureTick": "Secure payment: online banking, MobilePay, card",
     "serviceAreaTitle": "Service area",
@@ -426,6 +426,7 @@
     "offline": "The backend is not connected yet, so data is shown empty. Actions will work once the API is running."
   },
   "errors": {
+    "catalogueUnavailable": "The catalogue is temporarily unavailable",
     "generic": "Please check the details and try again.",
     "network": "Connection error. Please try again.",
     "pageNotFound": "Page not found",

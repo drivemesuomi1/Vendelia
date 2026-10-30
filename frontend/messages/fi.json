@@ -1,5 +1,6 @@
 {
   "common": {
+    "retry": "Yritä uudelleen",
     "allCities": "Kaikki kaupungit",
     "businessId": "Y-tunnus",
     "close": "Sulje",
@@ -29,7 +30,7 @@
     "services": "Palvelut"
   },
   "footer": {
-    "tagline": "Paikallisia elämyksiä ja palveluita Helsingissä, Espoossa, Vantaalla ja Kauniaisissa.",
+    "tagline": "Paikallisia elämyksiä ja palveluita: {cities}.",
     "paymentMethods": "Maksutavat",
     "customers": "Asiakkaille",
     "howVouchersWork": "Näin lahjakortit toimivat",
@@ -43,7 +44,7 @@
     "bannerLead": "Löydä paikalliset diilit siivoukseen, kauneuteen ja kuljettajapalveluihin.",
     "bannerCta": "Katso tarjoukset",
     "title": "Paikallisia elämyksiä reiluun hintaan",
-    "lead": "Selkeät hinnat sisältäen ALV:n, aidot paikalliset yritykset ja 14 päivän palautusoikeus käyttämättömille lahjakorteille.",
+    "lead": "Selkeät hinnat sisältäen ALV:n, aidot paikalliset yritykset ja {days} päivän palautusoikeus käyttämättömille lahjakorteille.",
     "featured": "Nostetut diilit",
     "slide": "Dia {n}/{m}",
     "seeDeal": "Katso diili",
@@ -58,7 +59,7 @@
     "current": "Ajankohtaiset diilit",
     "seeAll": "Näytä kaikki",
     "trustVat": "Hinnat sis. ALV",
-    "trustRefund": "14 päivän palautusoikeus",
+    "trustRefund": "{days} päivän palautusoikeus",
     "trustSecure": "Turvallinen maksu",
     "trustLocal": "Aidot paikalliset yritykset",
     "howTitle": "Näin se toimii",
@@ -70,12 +71,12 @@
     "step3Text": "Lahjakortti ja sen tarkka viimeinen voimassaolopäivä tulevat sähköpostiisi ja Omiin lahjakortteihin.",
     "step4Title": "Varaa ja lunasta",
     "step4Text": "Varaa aika yrityksestä diilin ohjeiden mukaan ja näytä koodi paikan päällä.",
-    "refundTitle": "14 päivän palautusoikeus.",
-    "refundText": "Muuttuivatko suunnitelmat? Peru käyttämätön lahjakortti Omissa lahjakorteissa 14 päivän kuluessa ostosta. Lahjakortit ovat voimassa 3 kalenterikuukautta.",
+    "refundTitle": "{days} päivän palautusoikeus.",
+    "refundText": "Muuttuivatko suunnitelmat? Peru käyttämätön lahjakortti Omissa lahjakorteissa {days} päivän kuluessa ostosta. Lahjakortit ovat voimassa {months} kalenterikuukautta.",
     "bizTitle": "Onko sinulla paikallinen yritys?",
     "bizText": "Tavoita uusia asiakkaita pääkaupunkiseudulla. Sinä päätät tarjouksesta – me hoidamme maksut, lahjakortit ja asiakastuen.",
     "bizJoin": "Liity myyjäksi",
-    "bizPoint1": "15 % provisio arvonlisäverottomasta myynnistä. Ei liittymis- eikä kuukausimaksuja.",
+    "bizPoint1": "{rate} provisio arvonlisäverottomasta myynnistä. Ei liittymis- eikä kuukausimaksuja.",
     "bizPoint2": "Jokainen tilitysrivi näkyvissä: myynti, ALV, provisio ja tilitys.",
     "bizPoint3": "Lunasta lahjakortit puhelimella."
   },
@@ -93,7 +94,7 @@
   "deal": {
     "from": "alk.",
     "referencePrice": "Vertailuhinta",
-    "cardHint": "Sis. ALV · voimassa 3 kk",
+    "cardHint": "Sis. ALV · voimassa {months} kk",
     "chooseOption": "Valitse vaihtoehto",
     "addToCart": "Lisää ostoskoriin",
     "buy": "Osta",
@@ -113,11 +114,10 @@
     "refundBody": "Voit perua käyttämättömän lahjakortin ja saada rahat takaisin {days} päivän kuluessa ostosta Omissa lahjakorteissa tai sähköpostitse osoitteeseen tuki@vendelia.fi. Lähetämme vahvistuksen ja palautamme rahat alkuperäiselle maksutavalle. Käytettyihin lahjakortteihin sovelletaan yrityksen ehtoja ja lakisääteisiä oikeuksiasi.",
     "phone": "puh.",
     "onBehalf": "Vendelia myy lahjakortin yrityksen puolesta. Palvelun tuottaa yritys.",
-    "referenceNote": "Alin hinta tässä liikkeessä viimeisen 30 päivän aikana: {price}",
     "finalPrice": "Lopullinen hinta, sis. ALV {vat}. Ei palvelu- eikä toimitusmaksuja.",
     "quantity": "Määrä",
     "validUntil": "Voimassa {date} asti",
-    "refundTick": "14 päivän palautusoikeus käyttämättömälle",
+    "refundTick": "{days} päivän palautusoikeus käyttämättömälle",
     "giftTick": "Voit ostaa lahjaksi – valitse kassalla",
     "secureTick": "Turvallinen maksu: verkkopankki, MobilePay, kortti",
     "serviceAreaTitle": "Palvelualue",
@@ -426,6 +426,7 @@
     "offline": "Taustapalvelua ei ole vielä yhdistetty, joten tiedot näytetään tyhjinä. Toiminnot toimivat, kun API on käytössä."
   },
   "errors": {
+    "catalogueUnavailable": "Tarjoukset eivät ole juuri nyt saatavilla",
     "generic": "Tarkista tiedot ja yritä uudelleen.",
     "network": "Yhteysvirhe. Yritä uudelleen.",
     "pageNotFound": "Sivua ei löytynyt",
