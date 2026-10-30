@@ -1,8 +1,6 @@
 import "server-only";
 import { cookies } from "next/headers";
-
-// In production there is no default: without BACKEND_URL no API is configured and calls fail fast.
-const BACKEND = process.env.BACKEND_URL ?? (process.env.NODE_ENV === "production" ? "" : "http://127.0.0.1:4000");
+import { backendRequest } from "./backend-request";
 
 export class ServerApiError extends Error {
   constructor(public readonly status: number, public readonly code: string) {
@@ -11,16 +9,13 @@ export class ServerApiError extends Error {
 }
 
 /**
- * Server-component fetch straight to the backend, forwarding the user's cookies
- * so the API sees the same session as the browser.
+ * Server components use the same backend as /api, forwarding the user's cookies.
+ * With no BACKEND_URL, the Fastify app runs inside the Next.js Node runtime.
  */
 export async function serverApi<T>(path: string): Promise<T> {
-  if (!BACKEND) throw new ServerApiError(503, "api_not_configured");
   const jar = await cookies();
-  const res = await fetch(`${BACKEND}${path}`, {
+  const res = await backendRequest(path, {
     headers: { cookie: jar.toString(), accept: "application/json" },
-    cache: "no-store",
-    signal: AbortSignal.timeout(15000),
   });
   if (!res.ok) {
     const body = (await res.json().catch(() => ({}))) as { error?: string };

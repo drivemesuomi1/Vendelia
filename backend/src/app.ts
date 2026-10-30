@@ -2,8 +2,8 @@ import cors from "@fastify/cors";
 import Fastify, { type FastifyError } from "fastify";
 import type { Sql } from "postgres";
 import { cartQuoteSchema, dealQuerySchema } from "@vendelia/shared";
-import { CatalogueRepository } from "./modules/catalogue.js";
-import { platformConfig, type PlatformConfig } from "./config.js";
+import { CatalogueRepository } from "./modules/catalogue";
+import { platformConfig, type PlatformConfig } from "./config";
 
 export function buildApp(database: Sql, options: { config?: PlatformConfig; logger?: boolean } = {}) {
   const app = Fastify({ logger: options.logger ?? false });

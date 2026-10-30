@@ -12,8 +12,11 @@ The import snapshot remains in `backend/sql/seed-catalogue.sql` for reproducibil
 3. Use the seven existing tables created in Supabase. If importing into an empty
    catalogue, run `backend/sql/seed-catalogue.sql` in Supabase SQL Editor. The seed
    fills missing records, preserves existing values and does not invent past prices.
-4. Start both processes with `npm run dev`. Backend dotenv resolves its file
-   relative to the database module, so it works from either workspace or repo root.
+4. Start with `npm run dev:frontend`; the API runs inside Next.js when BACKEND_URL
+   is unset. `npm run dev` still starts both processes for separate-backend development.
+   Set frontend BACKEND_URL=http://127.0.0.1:4000 to use that separate local process.
+   Backend dotenv resolves its file relative to the module, so the in-process API
+   also finds backend/.env locally. Vercel uses its server-side environment instead.
 5. Run `npm run db:check -w backend` for a read-only API smoke check against the
    configured database. It prints reference counts, live deal counts, option counts,
    starting prices and whether cart prices match the database.
@@ -99,13 +102,33 @@ uses DATABASE_URL, never drops tables, and refuses a different database name.
 Integration tests are skipped when TEST_DATABASE_URL is absent. Local fixture DDL
 matches the catalogue columns/constraints but does not exercise Supabase Data API
 permissions. Test database changes do not touch Supabase.
-The GitHub Actions check job provisions a fresh Postgres service and runs this suite.
+Tests are run manually; the GitHub Actions CI workflow has been removed.
 
 ## Deployment
 
-Deploy Fastify on a Node host with DATABASE_URL, API_HOST=0.0.0.0 and FRONTEND_URL set
-to https://www.vendelia.fi. Set Vercel's BACKEND_URL to that API's HTTPS origin,
-without /api appended, and rebuild/redeploy the frontend so its rewrite is updated.
-Server components fetch that origin and browsers use the same-origin /api proxy.
-No Supabase credentials belong in the Vercel browser bundle. Local code changes
-do not change the public site until the API and frontend are deployed.
+For the current Vercel-only deployment:
+
+1. Keep project root directory `frontend` and install dependencies from the repo root.
+2. Set DATABASE_URL in Vercel's Production environment to the Supabase connection
+   pooler URI. Use the transaction pooler for serverless deployments; the driver
+   disables prepared statements. Do not put this secret in a NEXT_PUBLIC variable.
+3. Remove BACKEND_URL, or leave it empty. It is optional and selects an external
+   API only when explicitly supplied. Do not set it to localhost or the frontend URL.
+4. Policy variables such as COMMISSION_BPS are optional; defaults remain the same.
+5. Redeploy. Verify /api/health and /api/meta return JSON, then load /en and the deal page.
+
+The catch-all Next Node route at /api/[...path] runs the existing Fastify app via
+in-process injection; server components use the same app directly. Business rules,
+validation and queries remain in backend/. The app and small DB pool are reused
+within a warm server instance. No HTTP listener or separate backend host is needed.
+Initialization is lazy so the production build does not require an active database.
+The repo tracing root includes backend/shared dependencies in the Vercel functions.
+
+For an optional separately deployed Fastify server, set its DATABASE_URL,
+API_HOST=0.0.0.0 and FRONTEND_URL=https://www.vendelia.fi. Set Vercel BACKEND_URL to
+that API's HTTPS origin, without /api appended. Both server components and /api
+then forward to it. API requests use a route handler; uploads retain an external
+rewrite when an external API is configured. Credentials stay server-side in both modes.
+
+No CI workflow is required for either deployment mode. Changing local .env files
+does not update Vercel environment variables or the already-deployed public site.

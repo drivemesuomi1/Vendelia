@@ -26,6 +26,7 @@ npm run build
 ## Deploying the frontend (Vercel)
 The Vercel project `vendelia` uses framework Next.js, root directory `frontend`,
 "include source files outside root" on, and install command `cd .. && npm ci`.
-Deploy the Fastify API separately and set BACKEND_URL in Vercel to its HTTPS origin
-before rebuilding the frontend. Browsers use the same-origin /api rewrite; server
-components fetch that API directly. DATABASE_URL belongs only on the backend host.
+Set DATABASE_URL in Vercel to the Supabase pooler URI and leave BACKEND_URL unset.
+The Next.js Node API route hosts the existing Fastify app in that deployment;
+no separate backend host is required. Redeploy after updating environment variables.
+See [deployment setup](../database-catalogue.md#deployment) for the optional external API mode.

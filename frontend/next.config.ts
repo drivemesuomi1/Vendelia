@@ -1,17 +1,19 @@
 import type { NextConfig } from "next";
+import path from "node:path";
 
-// Production has no default API: set BACKEND_URL once the backend is deployed.
-const backend = process.env.BACKEND_URL ?? (process.env.NODE_ENV === "production" ? undefined : "http://127.0.0.1:4000");
+// Optional external API. Without it, Next's /api route hosts the existing Fastify app.
+const backend = process.env.BACKEND_URL?.trim().replace(/\/+$/, "");
 
 const nextConfig: NextConfig = {
   // The shared workspace package ships TypeScript source.
-  transpilePackages: ["@vendelia/shared"],
-  // The browser talks to /api on the same origin; Next forwards it to the backend.
-  // Same-origin keeps the session cookie first-party and avoids CORS in the browser.
+  transpilePackages: ["@vendelia/shared", "@vendelia/backend"],
+  // Include backend workspace dependencies in the Vercel server function trace.
+  outputFileTracingRoot: path.resolve(import.meta.dirname, ".."),
+  serverExternalPackages: ["fastify", "@fastify/cors", "postgres", "drizzle-orm"],
+  // API requests are handled by app/api/[...path], in-process or via BACKEND_URL.
   async rewrites() {
     if (!backend) return [];
     return [
-      { source: "/api/:path*", destination: `${backend}/api/:path*` },
       { source: "/uploads/:path*", destination: `${backend}/uploads/:path*` },
     ];
   },

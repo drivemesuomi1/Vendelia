@@ -32,4 +32,6 @@ npm run build
 - **Backend:** database health, catalogue metadata/list/detail, and server-priced cart quotes are implemented.
   Sign-in, merchant/admin writes, orders, payments and vouchers still need their API implementations.
   Remaining contract: [docs/api/endpoints.md](docs/api/endpoints.md).
-- **Deploy:** the Vercel project builds `frontend/` (root directory `frontend`, install from the repo root). Set `BACKEND_URL` there once an API is deployed.
+- **Deploy:** the Vercel project builds `frontend/` (root directory `frontend`, install from the repo root).
+  Set server-side `DATABASE_URL` in Vercel and leave `BACKEND_URL` unset: the existing Fastify API runs inside Next.js.
+  A separately hosted API remains optional through `BACKEND_URL`. See [deployment setup](docs/database-catalogue.md#deployment).
