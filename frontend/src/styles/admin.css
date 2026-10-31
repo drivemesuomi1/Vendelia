@@ -1,5 +1,11 @@
 /* Admin portal: sign-in, dashboard panels, charts and tables. Uses the brand tokens from tokens.css. */
 
+/* ---------- Typeface (Geist, loaded in the admin layout) ---------- */
+.admin-font{font-family:var(--font-admin),var(--font);letter-spacing:-.005em;-webkit-font-smoothing:antialiased}
+.admin-font h1,.admin-font h2,.admin-font .kt-value,.admin-font .panel-big,.admin-font .alogin-claim{letter-spacing:-.025em}
+.admin-font .mono,.admin-font .code{font-family:var(--font-admin-mono),ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.admin-font .kt-value,.admin-font .num,.admin-font td,.admin-font .axis{font-variant-numeric:tabular-nums}
+
 /* ---------- Sign-in ---------- */
 .alogin{min-height:100vh;display:grid;background:#fff}
 @media(min-width:960px){.alogin{grid-template-columns:minmax(380px,44%) 1fr}}
