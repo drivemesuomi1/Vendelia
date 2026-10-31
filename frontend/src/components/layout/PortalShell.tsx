@@ -23,7 +23,16 @@ export function PortalShell({ kind, children, adminEmail, account }: { kind: "bu
   const items: [string, string, IconName][] =
     kind === "business"
       ? [[base, t("business.myDeals"), "grid"], [`${base}/deals/new`, t("business.createDeal"), "plus"]]
-      : [[base, t("admin.overview"), "grid"], [`${base}/businesses`, t("admin.merchants"), "store"], [`${base}/deals`, t("admin.deals"), "doc"]];
+      : [
+          [base, t("admin.overview"), "grid"],
+          [`${base}/businesses`, t("admin.merchants"), "store"],
+          [`${base}/deals`, t("admin.deals"), "doc"],
+          [`${base}/orders`, t("admin.orders"), "cart"],
+          [`${base}/finance`, t("admin.finance.title"), "bank"],
+          [`${base}/refunds`, t("admin.refunds"), "refund"],
+          [`${base}/commission`, t("admin.commission"), "card"],
+          [`${base}/support`, t("admin.support"), "help"],
+        ];
 
   return (
     <div className={`portal portal-${kind} portal-ui`}>
