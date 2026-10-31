@@ -20,10 +20,19 @@ export function PortalShell({ kind, children, adminEmail }: { kind: "business" |
   const items: [string, string, IconName][] =
     kind === "business"
       ? [[base, t("business.overview"), "grid"], [`${base}/deals/new`, t("business.createDeal"), "plus"], [`${base}/redeem`, t("business.redeem"), "scan"], [`${base}/payouts`, t("business.payouts"), "bank"]]
-      : [[base, t("admin.deals"), "doc"], [`${base}/merchants`, t("admin.merchants"), "store"], [`${base}/refunds`, t("admin.refunds"), "refund"], [`${base}/commission`, t("admin.commission"), "card"], [`${base}/support`, t("admin.support"), "help"]];
+      : [
+          [base, t("admin.overview"), "grid"],
+          [`${base}/deals`, t("admin.deals"), "doc"],
+          [`${base}/merchants`, t("admin.merchants"), "store"],
+          [`${base}/orders`, t("admin.orders"), "cart"],
+          [`${base}/finance`, t("admin.finance.title"), "bank"],
+          [`${base}/refunds`, t("admin.refunds"), "refund"],
+          [`${base}/commission`, t("admin.commission"), "card"],
+          [`${base}/support`, t("admin.support"), "help"],
+        ];
 
   return (
-    <div className="portal">
+    <div className={`portal portal-${kind}`}>
       <aside className="side">
         <div className="row between" style={{ gap: 8 }}>
           <Logo href={base} label={t("nav.homeLabel")} sub={kind === "business" ? t("business.portal") : t("admin.title")} />

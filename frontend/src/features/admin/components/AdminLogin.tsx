@@ -1,39 +1,68 @@
 "use client";
 
-import { useActionState } from "react";
-import { Field, TextInput } from "@/components/ui/Field";
+import { useActionState, useState } from "react";
+import { Icon } from "@/components/ui/Icon";
 import { LogoSymbol } from "@/components/ui/Logo";
-import { Notice } from "@/components/ui/Notice";
+import { LangSwitch } from "@/components/layout/LangSwitch";
 import { useI18n } from "@/i18n/I18nProvider";
 import { adminLogin, type AdminLoginState } from "../actions";
 
-/** Staff sign-in shown at /admin when there is no admin session. */
-export function AdminLogin({ configured }: { configured: boolean }) {
+/** Staff sign-in shown at /admin when there is no admin session: brand panel + a single focused form. */
+export function AdminLogin({ configured, devHint = false }: { configured: boolean; devHint?: boolean }) {
   const { t } = useI18n();
   const [state, action, pending] = useActionState<AdminLoginState | null, FormData>(adminLogin, null);
+  const [show, setShow] = useState(false);
   const error = !configured ? "notConfigured" : state?.error;
 
   return (
-    <main className="wrap auth-wrap">
-      <form className="card pad stack" action={action}>
-        <div className="row" style={{ gap: 12 }}>
-          <LogoSymbol height={36} />
-          <div>
-            <h1 style={{ fontSize: 26 }}>{t("admin.login.title")}</h1>
-            <p className="muted small">{t("admin.login.subtitle")}</p>
-          </div>
+    <main className="alogin">
+      <aside className="alogin-brand" aria-hidden="true">
+        <div className="alogin-mark"><LogoSymbol height={40} /></div>
+        <div>
+          <p className="alogin-eyebrow">Vendelia</p>
+          <p className="alogin-claim">{t("admin.login.claim")}</p>
         </div>
-        {error && <Notice tone="danger" icon="xc">{t(`admin.login.${error}`)}</Notice>}
-        <Field id="admin-email" label={t("checkout.email")}>
-          <TextInput id="admin-email" name="email" type="text" autoComplete="username" required disabled={!configured} />
-        </Field>
-        <Field id="admin-pw" label={t("auth.password")}>
-          <TextInput id="admin-pw" name="password" type="password" autoComplete="current-password" required disabled={!configured} />
-        </Field>
-        <button className="btn btn-primary btn-block" type="submit" disabled={pending || !configured}>
-          {t("auth.login")}
-        </button>
-      </form>
+        <p className="alogin-foot">© Mansio Group Oy</p>
+      </aside>
+
+      <section className="alogin-main">
+        <div className="alogin-top"><LangSwitch /></div>
+        <form className="alogin-form" action={action} noValidate>
+          <div className="alogin-mobile-mark"><LogoSymbol height={32} /></div>
+          <h1>{t("admin.login.title")}</h1>
+          <p className="muted">{t("admin.login.subtitle")}</p>
+
+          {error && (
+            <p className="alogin-err" role="alert"><Icon name="xc" />{t(`admin.login.${error}`)}</p>
+          )}
+
+          <label className="afield">
+            <span>{t("admin.login.user")}</span>
+            <span className="afield-box">
+              <Icon name="mail" />
+              <input name="email" type="text" autoComplete="username" autoFocus required disabled={!configured} />
+            </span>
+          </label>
+
+          <label className="afield">
+            <span>{t("auth.password")}</span>
+            <span className="afield-box">
+              <Icon name="lock" />
+              <input name="password" type={show ? "text" : "password"} autoComplete="current-password" required disabled={!configured} />
+              <button type="button" className="afield-eye" onClick={() => setShow((v) => !v)} aria-pressed={show}>
+                {t(show ? "admin.login.hide" : "admin.login.show")}
+              </button>
+            </span>
+          </label>
+
+          <button className="btn btn-primary btn-block" type="submit" disabled={pending || !configured}>
+            {pending ? t("admin.login.signingIn") : t("auth.login")}
+          </button>
+
+          <p className="alogin-note"><Icon name="lock" />{t("admin.login.note")}</p>
+          {devHint && <p className="alogin-dev">{t("admin.login.dev")}</p>}
+        </form>
+      </section>
     </main>
   );
 }

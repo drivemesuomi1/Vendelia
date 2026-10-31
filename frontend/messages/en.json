@@ -371,7 +371,8 @@
       "pending": "Pending",
       "live": "Live",
       "rejected": "Rejected",
-      "all": "All"
+      "all": "All",
+      "draft": "Drafts"
     },
     "nothingToReview": "Nothing to review.",
     "merchant": "Business",
@@ -418,12 +419,137 @@
     "subject": "Subject",
     "audit": "Audit log",
     "login": {
-      "title": "Admin sign-in",
-      "subtitle": "For Vendelia staff only",
-      "invalid": "Wrong email or password.",
-      "notConfigured": "Admin sign-in has not been configured for this environment yet."
+      "title": "Sign in to admin",
+      "subtitle": "For Vendelia staff only.",
+      "invalid": "Wrong username or password.",
+      "notConfigured": "Admin sign-in has not been configured for this environment yet.",
+      "claim": "Deals, businesses and payments – in one view.",
+      "user": "Username or email",
+      "show": "Show",
+      "hide": "Hide",
+      "signingIn": "Signing in…",
+      "note": "Your session ends after 8 hours.",
+      "dev": "Development mode: username 123, password 123"
     },
-    "offline": "The backend is not connected yet, so data is shown empty. Actions will work once the API is running."
+    "offline": "The backend is not connected yet, so data is shown empty. Actions will work once the API is running.",
+    "overview": "Overview",
+    "orders": "Orders",
+    "ordersSub": "Latest orders and payment status",
+    "financeSub": "Sales, commission, VAT and payouts to businesses",
+    "dealsSub": "Approve or reject deals submitted by businesses",
+    "demo": "Demo data",
+    "demoHint": "Figures are sample data until the admin API is connected. Actions are not saved.",
+    "range": "{n} days",
+    "rangeLabel": "Period",
+    "kpiTitle": "Key figures",
+    "vsPrev": "Change compared with the previous {days} days",
+    "deltaUp": "Up {v} on the previous {days} days",
+    "deltaDown": "Down {v} on the previous {days} days",
+    "pts": "pts",
+    "total": "Total",
+    "attention": "Needs attention",
+    "nextPayout": "Next payout run",
+    "toMerchants": "to {n} businesses",
+    "topDeals": "Top deals",
+    "viewAll": "View all",
+    "recentOrders": "Recent orders",
+    "activity": "Recent activity",
+    "ordersSearch": "Search by order, email or deal",
+    "noResults": "No matching orders.",
+    "kpi": {
+      "gross": "Gross sales",
+      "grossHint": "incl. VAT",
+      "revenue": "Vendelia revenue",
+      "revenueHint": "commission excl. VAT",
+      "vouchers": "Vouchers sold",
+      "orders": "Orders",
+      "aov": "Average order",
+      "redemption": "Redemption rate",
+      "refundRate": "Refund rate",
+      "merchants": "Active businesses",
+      "liveDealsHint": "{n} deals live"
+    },
+    "chart": {
+      "sales": "Sales",
+      "salesSub": "Gross sales per day, incl. VAT",
+      "thisPeriod": "This period",
+      "prevPeriod": "Previous period",
+      "byCategory": "Sales by category",
+      "byCity": "Sales by city",
+      "voucherStatus": "Voucher status",
+      "voucherStatusSub": "Vouchers sold in the period",
+      "split": "Where the money goes",
+      "splitSub": "Gross sales for the period, broken down"
+    },
+    "vstatus": {
+      "redeemed": "Redeemed",
+      "active": "Active",
+      "expired": "Expired",
+      "refunded": "Refunded"
+    },
+    "attn": {
+      "deals": "Deals waiting for review",
+      "merchants": "Businesses waiting for approval",
+      "payouts": "Failed payouts",
+      "tickets": "Open support tickets"
+    },
+    "split": {
+      "gross": "Gross sales (incl. VAT)",
+      "saleVat": "VAT on sales",
+      "net": "Net sales",
+      "commission": "Commission {rate}",
+      "commissionVat": "VAT on commission {rate}",
+      "payout": "Owed to businesses",
+      "note": "Commission is charged on the VAT-exclusive price. Payment provider fees are not included.",
+      "grossShort": "Gross",
+      "saleVatShort": "VAT",
+      "netShort": "Net",
+      "commissionShort": "Commission",
+      "commissionVatShort": "Commission VAT",
+      "payoutShort": "Payout"
+    },
+    "col": {
+      "deal": "Deal",
+      "sold": "Sold",
+      "gross": "Gross",
+      "redeemed": "Redeemed",
+      "month": "Month",
+      "period": "Period",
+      "amount": "Amount"
+    },
+    "ostatus": {
+      "paid": "Paid",
+      "pending": "Pending",
+      "failed": "Failed",
+      "refunded": "Refunded"
+    },
+    "pstatus": {
+      "scheduled": "Scheduled",
+      "paid": "Paid",
+      "failed": "Failed"
+    },
+    "act": {
+      "approved": "Approved deal {target}",
+      "rejected": "Rejected deal {target}",
+      "merchantActivated": "Activated business {target}",
+      "suspended": "Suspended business {target}",
+      "refund": "Refunded voucher {target}",
+      "commission": "Changed commission to {target}",
+      "payout": "Ran payouts to {target} businesses"
+    },
+    "order": {
+      "number": "Order",
+      "customer": "Customer",
+      "method": "Payment",
+      "status": "Status",
+      "total": "Total"
+    },
+    "finance": {
+      "title": "Finance",
+      "revenueTrend": "Vendelia revenue per week",
+      "monthly": "Monthly statement",
+      "payouts": "Payouts to businesses"
+    }
   },
   "errors": {
     "catalogueUnavailable": "The catalogue is temporarily unavailable",

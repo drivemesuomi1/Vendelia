@@ -371,7 +371,8 @@
       "pending": "Väntar",
       "live": "Till salu",
       "rejected": "Avvisade",
-      "all": "Alla"
+      "all": "Alla",
+      "draft": "Utkast"
     },
     "nothingToReview": "Inget att granska.",
     "merchant": "Företag",
@@ -418,12 +419,137 @@
     "subject": "Ämne",
     "audit": "Händelselogg",
     "login": {
-      "title": "Inloggning för administration",
-      "subtitle": "Endast för Vendelias personal",
-      "invalid": "Fel e-postadress eller lösenord.",
-      "notConfigured": "Administratörsinloggningen har inte konfigurerats för den här miljön än."
+      "title": "Logga in i administrationen",
+      "subtitle": "Endast för Vendelias personal.",
+      "invalid": "Fel användarnamn eller lösenord.",
+      "notConfigured": "Administratörsinloggningen har inte konfigurerats för den här miljön än.",
+      "claim": "Erbjudanden, företag och betalningar – i en vy.",
+      "user": "Användarnamn eller e-post",
+      "show": "Visa",
+      "hide": "Dölj",
+      "signingIn": "Loggar in…",
+      "note": "Sessionen upphör efter 8 timmar.",
+      "dev": "Utvecklingsläge: användarnamn 123, lösenord 123"
     },
-    "offline": "Bakänden är inte ansluten än, så uppgifterna visas tomma. Funktionerna fungerar när API:et är i drift."
+    "offline": "Bakänden är inte ansluten än, så uppgifterna visas tomma. Funktionerna fungerar när API:et är i drift.",
+    "overview": "Översikt",
+    "orders": "Beställningar",
+    "ordersSub": "Senaste beställningar och betalningsstatus",
+    "financeSub": "Försäljning, provisioner, moms och utbetalningar till företag",
+    "dealsSub": "Godkänn eller avvisa erbjudanden som företagen skickat",
+    "demo": "Exempeldata",
+    "demoHint": "Siffrorna är exempeldata tills admin-API:t är anslutet. Åtgärder sparas inte.",
+    "range": "{n} d",
+    "rangeLabel": "Period",
+    "kpiTitle": "Nyckeltal",
+    "vsPrev": "Förändring jämfört med föregående {days} dagar",
+    "deltaUp": "Upp {v} jämfört med föregående {days} dagar",
+    "deltaDown": "Ned {v} jämfört med föregående {days} dagar",
+    "pts": "%-enh.",
+    "total": "Totalt",
+    "attention": "Kräver uppmärksamhet",
+    "nextPayout": "Nästa utbetalning",
+    "toMerchants": "till {n} företag",
+    "topDeals": "Bästsäljande erbjudanden",
+    "viewAll": "Visa alla",
+    "recentOrders": "Senaste beställningar",
+    "activity": "Senaste händelser",
+    "ordersSearch": "Sök på ordernummer, e-post eller erbjudande",
+    "noResults": "Inga matchande beställningar.",
+    "kpi": {
+      "gross": "Bruttoförsäljning",
+      "grossHint": "inkl. moms",
+      "revenue": "Vendelias intäkter",
+      "revenueHint": "provision exkl. moms",
+      "vouchers": "Sålda presentkort",
+      "orders": "Beställningar",
+      "aov": "Snittorder",
+      "redemption": "Inlösengrad",
+      "refundRate": "Återbetalningsgrad",
+      "merchants": "Aktiva företag",
+      "liveDealsHint": "{n} erbjudanden live"
+    },
+    "chart": {
+      "sales": "Försäljning",
+      "salesSub": "Bruttoförsäljning per dag, inkl. moms",
+      "thisPeriod": "Denna period",
+      "prevPeriod": "Föregående period",
+      "byCategory": "Försäljning per kategori",
+      "byCity": "Försäljning per stad",
+      "voucherStatus": "Presentkortens status",
+      "voucherStatusSub": "Presentkort sålda under perioden",
+      "split": "Hur pengarna fördelas",
+      "splitSub": "Periodens bruttoförsäljning uppdelad"
+    },
+    "vstatus": {
+      "redeemed": "Inlöst",
+      "active": "Giltigt",
+      "expired": "Utgånget",
+      "refunded": "Återbetalt"
+    },
+    "attn": {
+      "deals": "Erbjudanden väntar på granskning",
+      "merchants": "Företag väntar på godkännande",
+      "payouts": "Misslyckade utbetalningar",
+      "tickets": "Öppna supportärenden"
+    },
+    "split": {
+      "gross": "Bruttoförsäljning (inkl. moms)",
+      "saleVat": "Moms på försäljningen",
+      "net": "Nettoförsäljning",
+      "commission": "Provision {rate}",
+      "commissionVat": "Moms på provision {rate}",
+      "payout": "Betalas ut till företag",
+      "note": "Provisionen räknas på priset exkl. moms. Betalningsavgifter ingår inte.",
+      "grossShort": "Brutto",
+      "saleVatShort": "Moms",
+      "netShort": "Netto",
+      "commissionShort": "Provision",
+      "commissionVatShort": "Moms på provision",
+      "payoutShort": "Utbetalning"
+    },
+    "col": {
+      "deal": "Erbjudande",
+      "sold": "Sålt",
+      "gross": "Brutto",
+      "redeemed": "Inlöst",
+      "month": "Månad",
+      "period": "Period",
+      "amount": "Belopp"
+    },
+    "ostatus": {
+      "paid": "Betald",
+      "pending": "Väntar",
+      "failed": "Misslyckad",
+      "refunded": "Återbetald"
+    },
+    "pstatus": {
+      "scheduled": "Schemalagd",
+      "paid": "Betald",
+      "failed": "Misslyckad"
+    },
+    "act": {
+      "approved": "Godkände erbjudandet {target}",
+      "rejected": "Avvisade erbjudandet {target}",
+      "merchantActivated": "Aktiverade företaget {target}",
+      "suspended": "Stängde av företaget {target}",
+      "refund": "Återbetalade presentkortet {target}",
+      "commission": "Ändrade provisionen: {target}",
+      "payout": "Körde utbetalningar till {target} företag"
+    },
+    "order": {
+      "number": "Beställning",
+      "customer": "Kund",
+      "method": "Betalsätt",
+      "status": "Status",
+      "total": "Summa"
+    },
+    "finance": {
+      "title": "Ekonomi",
+      "revenueTrend": "Vendelias intäkter per vecka",
+      "monthly": "Månadsrapport",
+      "payouts": "Utbetalningar till företag"
+    }
   },
   "errors": {
     "catalogueUnavailable": "Erbjudandena är tillfälligt otillgängliga",

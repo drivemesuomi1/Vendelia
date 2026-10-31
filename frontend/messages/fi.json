@@ -371,7 +371,8 @@
       "pending": "Odottaa",
       "live": "Myynnissä",
       "rejected": "Hylätyt",
-      "all": "Kaikki"
+      "all": "Kaikki",
+      "draft": "Luonnokset"
     },
     "nothingToReview": "Ei tarkistettavaa.",
     "merchant": "Yritys",
@@ -418,12 +419,137 @@
     "subject": "Aihe",
     "audit": "Tapahtumaloki",
     "login": {
-      "title": "Ylläpidon kirjautuminen",
-      "subtitle": "Vain Vendelian henkilökunnalle",
-      "invalid": "Sähköposti tai salasana on väärin.",
-      "notConfigured": "Ylläpidon kirjautumista ei ole vielä määritetty tähän ympäristöön."
+      "title": "Kirjaudu hallintaan",
+      "subtitle": "Vain Vendelian henkilökunnalle.",
+      "invalid": "Väärä käyttäjätunnus tai salasana.",
+      "notConfigured": "Ylläpidon kirjautumista ei ole vielä määritetty tähän ympäristöön.",
+      "claim": "Diilit, yritykset ja maksut – yhdestä näkymästä.",
+      "user": "Käyttäjätunnus tai sähköposti",
+      "show": "Näytä",
+      "hide": "Piilota",
+      "signingIn": "Kirjaudutaan…",
+      "note": "Istunto päättyy 8 tunnin kuluttua.",
+      "dev": "Kehitystila: käyttäjätunnus 123, salasana 123"
     },
-    "offline": "Taustapalvelua ei ole vielä yhdistetty, joten tiedot näytetään tyhjinä. Toiminnot toimivat, kun API on käytössä."
+    "offline": "Taustapalvelua ei ole vielä yhdistetty, joten tiedot näytetään tyhjinä. Toiminnot toimivat, kun API on käytössä.",
+    "overview": "Yleiskatsaus",
+    "orders": "Tilaukset",
+    "ordersSub": "Viimeisimmät tilaukset ja maksujen tila",
+    "financeSub": "Myynti, provisiot, ALV ja tilitykset yrityksille",
+    "dealsSub": "Hyväksy tai hylkää yritysten lähettämät diilit",
+    "demo": "Esimerkkidata",
+    "demoHint": "Luvut ovat esimerkkidataa, kunnes hallinnan rajapinta on käytössä. Toiminnot eivät tallennu.",
+    "range": "{n} pv",
+    "rangeLabel": "Aikajakso",
+    "kpiTitle": "Avainluvut",
+    "vsPrev": "Muutos verrattuna edellisiin {days} päivään",
+    "deltaUp": "Nousu {v} edellisistä {days} päivästä",
+    "deltaDown": "Lasku {v} edellisistä {days} päivästä",
+    "pts": "%-yks.",
+    "total": "Yhteensä",
+    "attention": "Vaatii huomiota",
+    "nextPayout": "Seuraava tilitys",
+    "toMerchants": "{n} yritykselle",
+    "topDeals": "Myydyimmät diilit",
+    "viewAll": "Näytä kaikki",
+    "recentOrders": "Viimeisimmät tilaukset",
+    "activity": "Viimeisimmät tapahtumat",
+    "ordersSearch": "Hae tilausnumerolla, sähköpostilla tai diilillä",
+    "noResults": "Ei hakua vastaavia tilauksia.",
+    "kpi": {
+      "gross": "Bruttomyynti",
+      "grossHint": "sis. ALV",
+      "revenue": "Vendelian tulot",
+      "revenueHint": "provisio ilman ALV:tä",
+      "vouchers": "Myydyt lahjakortit",
+      "orders": "Tilaukset",
+      "aov": "Keskiostos",
+      "redemption": "Käyttöaste",
+      "refundRate": "Hyvitysaste",
+      "merchants": "Aktiiviset yritykset",
+      "liveDealsHint": "{n} diiliä myynnissä"
+    },
+    "chart": {
+      "sales": "Myynti",
+      "salesSub": "Bruttomyynti päivittäin, sis. ALV",
+      "thisPeriod": "Tämä jakso",
+      "prevPeriod": "Edellinen jakso",
+      "byCategory": "Myynti kategorioittain",
+      "byCity": "Myynti kaupungeittain",
+      "voucherStatus": "Lahjakorttien tila",
+      "voucherStatusSub": "Jaksolla myydyt lahjakortit",
+      "split": "Rahan jakautuminen",
+      "splitSub": "Jakson bruttomyynti eriteltynä"
+    },
+    "vstatus": {
+      "redeemed": "Käytetty",
+      "active": "Voimassa",
+      "expired": "Vanhentunut",
+      "refunded": "Hyvitetty"
+    },
+    "attn": {
+      "deals": "Diilit odottavat tarkistusta",
+      "merchants": "Yritykset odottavat hyväksyntää",
+      "payouts": "Epäonnistuneet tilitykset",
+      "tickets": "Avoimet tukipyynnöt"
+    },
+    "split": {
+      "gross": "Bruttomyynti (sis. ALV)",
+      "saleVat": "Myynnin ALV",
+      "net": "Nettomyynti",
+      "commission": "Provisio {rate}",
+      "commissionVat": "Provision ALV {rate}",
+      "payout": "Tilitetään yrityksille",
+      "note": "Provisio lasketaan ALV:ttomasta hinnasta. Maksunvälittäjän kulut eivät ole mukana.",
+      "grossShort": "Brutto",
+      "saleVatShort": "ALV",
+      "netShort": "Netto",
+      "commissionShort": "Provisio",
+      "commissionVatShort": "Provision ALV",
+      "payoutShort": "Tilitys"
+    },
+    "col": {
+      "deal": "Diili",
+      "sold": "Myyty",
+      "gross": "Brutto",
+      "redeemed": "Käytetty",
+      "month": "Kuukausi",
+      "period": "Jakso",
+      "amount": "Summa"
+    },
+    "ostatus": {
+      "paid": "Maksettu",
+      "pending": "Odottaa",
+      "failed": "Epäonnistui",
+      "refunded": "Hyvitetty"
+    },
+    "pstatus": {
+      "scheduled": "Ajastettu",
+      "paid": "Maksettu",
+      "failed": "Epäonnistui"
+    },
+    "act": {
+      "approved": "Hyväksyi diilin {target}",
+      "rejected": "Hylkäsi diilin {target}",
+      "merchantActivated": "Aktivoi yrityksen {target}",
+      "suspended": "Jäädytti yrityksen {target}",
+      "refund": "Hyvitti lahjakortin {target}",
+      "commission": "Muutti provision: {target}",
+      "payout": "Ajoi tilitykset {target} yritykselle"
+    },
+    "order": {
+      "number": "Tilaus",
+      "customer": "Asiakas",
+      "method": "Maksutapa",
+      "status": "Tila",
+      "total": "Summa"
+    },
+    "finance": {
+      "title": "Talous",
+      "revenueTrend": "Vendelian tulot viikoittain",
+      "monthly": "Kuukausiraportti",
+      "payouts": "Tilitykset yrityksille"
+    }
   },
   "errors": {
     "catalogueUnavailable": "Tarjoukset eivät ole juuri nyt saatavilla",
