@@ -25,7 +25,7 @@ export function AdminLogin({ configured }: { configured: boolean }) {
         </div>
         {error && <Notice tone="danger" icon="xc">{t(`admin.login.${error}`)}</Notice>}
         <Field id="admin-email" label={t("checkout.email")}>
-          <TextInput id="admin-email" name="email" type="email" autoComplete="username" required disabled={!configured} />
+          <TextInput id="admin-email" name="email" type="text" autoComplete="username" required disabled={!configured} />
         </Field>
         <Field id="admin-pw" label={t("auth.password")}>
           <TextInput id="admin-pw" name="password" type="password" autoComplete="current-password" required disabled={!configured} />

@@ -2,8 +2,20 @@ import "server-only";
 import { cookies } from "next/headers";
 import { ADMIN_COOKIE, verifyToken } from "./admin-token";
 
+/**
+ * Temporary development login: username "123", password "123". Only active outside production builds
+ * (`next dev`); Vercel production and preview builds ignore it and use the environment variables below.
+ * Remove when real admin accounts exist.
+ */
+const DEV_ADMIN = {
+  email: "123",
+  passwordHash: "scrypt$nKunJhexSWfbOxXmdFnVVA==$ERhOK0kPbAiAB7Jrfy3NRsIPRIRppg0Jxg1Pmcd6cBOtR7IJnCGz3FYIafJRM333Z0bMx/VOTGJgKzJZ46EHyw==",
+  secret: "dev-only-admin-session-secret-not-for-production",
+};
+
 /** Admin identity configured through environment variables (see frontend/.env.example). Null when not configured. */
 export function adminConfig() {
+  if (process.env.NODE_ENV !== "production") return DEV_ADMIN;
   const email = (process.env.ADMIN_EMAIL ?? "").trim().toLowerCase();
   const passwordHash = process.env.ADMIN_PASSWORD_HASH ?? "";
   const secret = process.env.ADMIN_SESSION_SECRET ?? "";

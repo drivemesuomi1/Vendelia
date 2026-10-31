@@ -1,0 +1,954 @@
+// =====================================================================================
+// Vendelia – database model (v2)  ·  paste into https://dbdiagram.io
+// =====================================================================================
+// Conventions
+//   * Money is stored as integers in the currency's MINOR unit (cents for EUR, whole krona for ISK).
+//     Columns ending in _minor are always paired with a currency code.
+//   * Rates are basis points (bps): 2550 = 25.5 %.
+//   * LocalizedText = jsonb map keyed by locale code, e.g. {"fi":"Hieronta","sv":"Massage","en":"Massage"}.
+//     Fall back to the market's default locale when a key is missing.
+//   * Ledger and audit tables are APPEND-ONLY. Corrections are new rows that reverse old ones.
+//   * Personal data (order_contacts, profiles) is kept apart from financial records so a customer can
+//     be anonymised without touching records the accounting law requires you to keep (6-10 years).
+//   * Check constraints and triggers that DBML cannot express are listed in column/table notes.
+// =====================================================================================
+
+Project vendelia {
+  database_type: 'PostgreSQL'
+  Note: 'Vendelia local-deals marketplace. Multi-market (FI first, then SE / DK / IS), multi-currency, append-only ledger.'
+}
+
+// ----------------------------------------------------------------------------- ENUMS
+
+Enum platform_role {
+  customer
+  support
+  admin
+}
+
+Enum member_role {
+  owner
+  manager
+  staff
+}
+
+Enum merchant_status {
+  pending
+  active
+  suspended
+  closed
+}
+
+Enum provider_onboarding_status {
+  not_started
+  pending
+  verified
+  restricted
+}
+
+Enum deal_status {
+  draft
+  pending_review
+  live
+  paused
+  ended
+  rejected
+  archived
+}
+
+Enum order_status {
+  pending
+  paid
+  failed
+  expired
+  cancelled
+  partially_refunded
+  refunded
+}
+
+Enum payment_method {
+  bank
+  mobilepay
+  card
+}
+
+Enum payment_status {
+  requires_action
+  pending
+  succeeded
+  failed
+  cancelled
+  partially_refunded
+  refunded
+}
+
+Enum fee_bearer {
+  platform
+  merchant
+  split
+}
+
+Enum refund_status {
+  requested
+  approved
+  processing
+  succeeded
+  failed
+  rejected
+}
+
+Enum refund_reason {
+  customer_cancel_14d
+  statutory_withdrawal
+  support_goodwill
+  merchant_closed
+  duplicate_purchase
+  fraud
+  other
+}
+
+Enum voucher_status {
+  active
+  redeemed
+  refunded
+  expired
+  void
+}
+
+Enum redemption_method {
+  qr_scan
+  manual_code
+}
+
+Enum redemption_attempt_result {
+  success
+  not_found
+  other_merchant
+  already_used
+  refunded
+  expired
+  rate_limited
+}
+
+Enum ledger_entry_type {
+  sale
+  commission
+  commission_vat
+  refund
+  refund_commission
+  refund_commission_vat
+  payout
+  payout_reversal
+  adjustment
+}
+
+Enum payout_status {
+  scheduled
+  processing
+  paid
+  failed
+  cancelled
+}
+
+Enum invoice_type {
+  commission_invoice
+  credit_note
+}
+
+Enum invoice_status {
+  draft
+  issued
+  paid
+  void
+}
+
+Enum commission_scope {
+  global
+  country
+  category
+  merchant
+}
+
+Enum terms_doc_type {
+  customer_terms
+  merchant_terms
+  privacy_policy
+  refund_policy
+}
+
+Enum review_status {
+  pending
+  published
+  hidden
+}
+
+Enum ticket_status {
+  open
+  waiting_customer
+  waiting_merchant
+  resolved
+  closed
+}
+
+Enum ticket_priority {
+  low
+  normal
+  high
+  urgent
+}
+
+Enum actor_type {
+  user
+  system
+  webhook
+}
+
+Enum dac7_status {
+  draft
+  ready
+  submitted
+  corrected
+}
+
+Enum outbox_status {
+  queued
+  sending
+  sent
+  failed
+  cancelled
+}
+
+// ============================================================================ REFERENCE & CONFIG
+
+Table currencies {
+  code char(3) [pk, note: 'ISO 4217, e.g. EUR, SEK, DKK, ISK']
+  minor_units smallint [not null, default: 2, note: 'Decimals: EUR 2, ISK 0. Money columns store this minor unit.']
+  symbol varchar(8) [not null]
+  name varchar(60) [not null]
+  Note: 'Currencies we trade in. Never assume 2 decimals.'
+}
+
+Table countries {
+  code char(2) [pk, note: 'ISO 3166-1 alpha-2: FI, SE, DK, IS']
+  name jsonb [not null, note: 'LocalizedText']
+  default_currency char(3) [not null, ref: > currencies.code]
+  default_locale varchar(5) [not null, note: 'fi, sv, da, is, en']
+  supported_locales varchar(5)[] [not null, note: 'Languages offered in this market']
+  vat_id_prefix varchar(4) [note: 'e.g. FI']
+  launched boolean [not null, default: false, note: 'Market open to customers']
+  launched_at date
+  Note: 'One row per market. Drives currency, languages, VAT and payout rules.'
+}
+
+Table cities {
+  id uuid [pk, default: `gen_random_uuid()`]
+  country_code char(2) [not null, ref: > countries.code]
+  slug varchar(60) [not null]
+  short_code varchar(4) [not null, note: 'Display badge, e.g. HKI, ESP, VAN, KAU']
+  name jsonb [not null, note: 'LocalizedText: Helsinki / Helsingfors / Helsinki']
+  sort_order int [not null, default: 0]
+  active boolean [not null, default: true]
+  indexes {
+    (country_code, slug) [unique]
+    (country_code, short_code) [unique]
+  }
+}
+
+Table categories {
+  id uuid [pk, default: `gen_random_uuid()`]
+  parent_id uuid [ref: > categories.id, note: 'Optional hierarchy']
+  slug varchar(60) [unique, not null]
+  name jsonb [not null, note: 'LocalizedText']
+  icon varchar(40) [not null]
+  sort_order int [not null, default: 0]
+  active boolean [not null, default: true]
+}
+
+Table vat_rates {
+  id uuid [pk, default: `gen_random_uuid()`]
+  country_code char(2) [not null, ref: > countries.code]
+  rate_code varchar(30) [not null, note: 'general | reduced_food | reduced_culture | ...']
+  label jsonb [not null, note: 'LocalizedText shown to merchants']
+  rate_bps int [not null, note: '2550 = 25.5 %']
+  valid_from date [not null]
+  valid_to date [note: 'NULL = currently valid. Rates change: keep history, never edit in place.']
+  indexes {
+    (country_code, rate_code, valid_from) [unique]
+  }
+  Note: 'Dated VAT rates per country. Orders snapshot the rate they used.'
+}
+
+Table commission_rules {
+  id uuid [pk, default: `gen_random_uuid()`]
+  scope commission_scope [not null]
+  country_code char(2) [ref: > countries.code]
+  category_id uuid [ref: > categories.id]
+  merchant_id uuid [ref: > merchants.id]
+  rate_bps int [not null, note: '1500 = 15 %, applied to the VAT-exclusive sale']
+  commission_vat_bps int [not null, note: 'VAT charged on top of the commission, e.g. 2550']
+  valid_from timestamptz [not null]
+  valid_to timestamptz [note: 'e.g. founding-business discount with an end date']
+  reason varchar(200)
+  created_by uuid [ref: > profiles.id]
+  created_at timestamptz [not null, default: `now()`]
+  indexes {
+    (scope, merchant_id, category_id, country_code, valid_from)
+  }
+  Note: 'Most specific active rule wins: merchant > category > country > global. CHECK: the key that matches scope is set.'
+}
+
+Table platform_settings {
+  setting_key varchar(80) [pk, note: 'voucher_validity_months, refund_window_days, payout_schedule ...']
+  setting_value jsonb [not null]
+  updated_by uuid [ref: > profiles.id]
+  updated_at timestamptz [not null, default: `now()`]
+  Note: 'Operational settings. Values that affect past sales are snapshotted on the order/voucher, never read live.'
+}
+
+Table terms_documents {
+  id uuid [pk, default: `gen_random_uuid()`]
+  doc_type terms_doc_type [not null]
+  version varchar(20) [not null]
+  locale varchar(5) [not null]
+  content_hash char(64) [not null, note: 'SHA-256 of the published text']
+  document_url varchar(500) [not null]
+  effective_from timestamptz [not null]
+  indexes {
+    (doc_type, version, locale) [unique]
+  }
+}
+
+// ============================================================================ IDENTITY & MERCHANTS
+
+Table profiles {
+  id uuid [pk, default: `gen_random_uuid()`]
+  auth_subject varchar(120) [unique, not null, note: 'Id from the auth provider. Kept as plain text so the domain is not tied to one vendor schema.']
+  email varchar(254) [unique, not null]
+  name varchar(120) [not null]
+  phone varchar(30)
+  platform_role platform_role [not null, default: 'customer', note: 'Platform-level only. Merchant roles live in merchant_members.']
+  locale varchar(5) [not null, default: 'fi']
+  marketing_consent_at timestamptz [note: 'NULL = no consent. Guest opt-ins are copied here on account creation.']
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+  deleted_at timestamptz
+  anonymized_at timestamptz [note: 'GDPR erasure: personal fields overwritten, row kept for referential integrity']
+}
+
+Table merchants {
+  id uuid [pk, default: `gen_random_uuid()`]
+  country_code char(2) [not null, ref: > countries.code]
+  business_id varchar(20) [not null, note: 'Y-tunnus 1234567-8 (national company id)']
+  company_name varchar(200) [not null, note: 'Legal name from the trade register']
+  display_name varchar(120) [not null, note: 'Name shown to customers']
+  vat_registered boolean [not null, default: true]
+  vat_number varchar(20)
+  contact_name varchar(120) [not null]
+  contact_email varchar(254) [not null]
+  contact_phone varchar(30) [not null]
+  status merchant_status [not null, default: 'pending']
+  provider_account_id varchar(120) [unique, note: 'Payment provider connected account (e.g. Stripe). Bank details live THERE, not here.']
+  provider_onboarding provider_onboarding_status [not null, default: 'not_started']
+  payout_account_hint varchar(20) [note: 'Display only, e.g. last 4 of IBAN']
+  approved_by uuid [ref: > profiles.id]
+  approved_at timestamptz
+  suspended_at timestamptz
+  suspension_reason varchar(300)
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+  indexes {
+    (country_code, business_id) [unique]
+  }
+}
+
+Table merchant_members {
+  merchant_id uuid [not null]
+  profile_id uuid [not null]
+  member_role member_role [not null, default: 'staff']
+  invited_at timestamptz [not null, default: `now()`]
+  accepted_at timestamptz
+  indexes {
+    (merchant_id, profile_id) [pk]
+  }
+  Note: 'Many users per business, many businesses per user. Replaces the old one-owner-per-merchant column. Staff accounts need no schema change.'
+}
+
+Table merchant_locations {
+  id uuid [pk, default: `gen_random_uuid()`]
+  merchant_id uuid [not null]
+  name varchar(120) [not null, note: 'e.g. Kamppi branch']
+  street varchar(160) [not null]
+  zip varchar(12) [not null]
+  city_id uuid [not null, ref: > cities.id]
+  country_code char(2) [not null, ref: > countries.code]
+  latitude decimal(9,6)
+  longitude decimal(9,6)
+  phone varchar(30)
+  opening_hours jsonb
+  active boolean [not null, default: true]
+  Note: 'A business can have several venues. Deals and redemptions point to a location.'
+}
+
+Table terms_acceptances {
+  id uuid [pk, default: `gen_random_uuid()`]
+  document_id uuid [not null, ref: > terms_documents.id]
+  profile_id uuid [ref: > profiles.id]
+  merchant_id uuid [ref: > merchants.id]
+  order_id uuid [ref: > orders.id]
+  accepted_at timestamptz [not null, default: `now()`]
+  ip_hash char(64) [note: 'Salted hash, not the raw address']
+  user_agent varchar(300)
+  Note: 'Proof of consent: which text, who, when. One of profile_id / merchant_id / order_id is set (CHECK).'
+}
+
+// ============================================================================ CATALOG
+
+Table deals {
+  id uuid [pk, default: `gen_random_uuid()`]
+  merchant_id uuid [not null, ref: > merchants.id]
+  category_id uuid [not null, ref: > categories.id]
+  slug varchar(120) [unique, not null]
+  status deal_status [not null, default: 'draft']
+  featured boolean [not null, default: false]
+  current_version_id uuid [ref: > deal_versions.id, note: 'Version customers currently see']
+  sale_starts_at timestamptz
+  sale_ends_at timestamptz
+  max_vouchers int [note: 'Total cap. NULL = unlimited. Enforce atomically at checkout.']
+  max_per_customer smallint [note: 'NULL = unlimited']
+  paused_reason varchar(300)
+  submitted_at timestamptz
+  reviewed_by uuid [ref: > profiles.id]
+  reviewed_at timestamptz
+  review_note varchar(500)
+  published_at timestamptz
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+  indexes {
+    status
+    (merchant_id, status)
+  }
+}
+
+Table deal_versions {
+  id uuid [pk, default: `gen_random_uuid()`]
+  deal_id uuid [not null]
+  version_no int [not null]
+  title jsonb [not null, note: 'LocalizedText']
+  base_title jsonb [note: 'Short title used with an option label']
+  description jsonb [not null]
+  restrictions jsonb [not null, note: 'LocalizedText: short line shown on cards']
+  inclusions jsonb [not null, note: 'LocalizedList']
+  terms jsonb [not null, note: 'LocalizedList']
+  how_to jsonb [not null, note: 'LocalizedList: step 2 is the booking instruction printed on the voucher']
+  vat_rate_id uuid [not null, ref: > vat_rates.id]
+  voucher_validity_months smallint [not null, default: 3]
+  refund_window_days smallint [not null, default: 14]
+  content_hash char(64) [not null]
+  created_by uuid [not null, ref: > profiles.id]
+  created_at timestamptz [not null, default: `now()`]
+  indexes {
+    (deal_id, version_no) [unique]
+  }
+  Note: 'Immutable. Editing a live deal creates a new version for review; buyers keep the exact terms they accepted.'
+}
+
+Table deal_locations {
+  deal_id uuid [not null]
+  location_id uuid [not null, ref: > merchant_locations.id]
+  meeting_point boolean [not null, default: false, note: 'Tour start point rather than a venue']
+  indexes {
+    (deal_id, location_id) [pk]
+  }
+  Note: 'Where the deal can be used. CHECK (trigger): location.merchant_id = deal.merchant_id.'
+}
+
+Table deal_images {
+  id uuid [pk, default: `gen_random_uuid()`]
+  deal_id uuid [not null]
+  url varchar(500) [not null]
+  alt_text jsonb [note: 'LocalizedText for accessibility']
+  sort_order int [not null, default: 0]
+  is_cover boolean [not null, default: false]
+}
+
+Table deal_options {
+  id uuid [pk, default: `gen_random_uuid()`]
+  deal_id uuid [not null]
+  label jsonb [note: 'LocalizedText, NULL when the deal has a single option']
+  currency_code char(3) [not null, ref: > currencies.code]
+  price_minor int [not null, note: 'VAT-inclusive customer price. CHECK >= 1 minimum price']
+  reference_price_minor int [note: 'Optional "was" price. Only shown if price history proves it (see deal_option_price_history).']
+  uses_total smallint [not null, default: 1, note: 'Visits included: 1 = single use, 10 = ten-visit card']
+  sort_order int [not null, default: 0]
+  active boolean [not null, default: true, note: 'Options with sales are deactivated, never deleted']
+}
+
+Table deal_option_price_history {
+  id bigint [pk, increment]
+  option_id uuid [not null]
+  price_minor int [not null]
+  reference_price_minor int
+  valid_from timestamptz [not null]
+  valid_to timestamptz [note: 'NULL = current']
+  indexes {
+    (option_id, valid_from)
+  }
+  Note: 'Needed to prove the lowest price of the last 30 days (EU Omnibus rule) for any reference price.'
+}
+
+Table reviews {
+  id uuid [pk, default: `gen_random_uuid()`]
+  deal_id uuid [not null, ref: > deals.id]
+  voucher_id uuid [unique, not null, ref: - vouchers.id, note: 'One review per redeemed voucher: verified purchase only']
+  profile_id uuid [not null, ref: > profiles.id]
+  rating smallint [not null, note: 'CHECK 1..5']
+  body varchar(2000)
+  status review_status [not null, default: 'pending']
+  created_at timestamptz [not null, default: `now()`]
+  Note: 'No invented ratings: reviews exist only for redeemed vouchers.'
+}
+
+// ============================================================================ ORDERS & PAYMENTS
+
+Table orders {
+  id uuid [pk, default: `gen_random_uuid()`]
+  order_number varchar(24) [unique, not null, note: 'Customer-facing, e.g. VD-482913. Random, not sequential, and a different prefix from voucher codes.']
+  profile_id uuid [note: 'NULL = guest checkout']
+  access_token_hash char(64) [not null, note: 'SHA-256 of the guest confirmation-page token. The token itself is never stored.']
+  status order_status [not null, default: 'pending']
+  country_code char(2) [not null, ref: > countries.code]
+  currency_code char(3) [not null, ref: > currencies.code]
+  total_minor int [not null, note: 'Sum of order_items; verified by a constraint/trigger']
+  locale varchar(5) [not null, default: 'fi', note: 'Language used for emails']
+  idempotency_key varchar(80) [unique, note: 'Safe retries of the checkout request']
+  expires_at timestamptz [note: 'Pending orders are released after this time']
+  created_at timestamptz [not null, default: `now()`]
+  paid_at timestamptz
+  cancelled_at timestamptz
+  indexes {
+    (profile_id, created_at)
+    status
+  }
+}
+
+Table order_contacts {
+  order_id uuid [pk]
+  email varchar(254) [not null]
+  first_name varchar(80) [not null]
+  last_name varchar(80) [not null]
+  phone varchar(30)
+  marketing_opt_in boolean [not null, default: false]
+  anonymized_at timestamptz
+  Note: 'All personal data of an order lives here. Anonymise this row on GDPR erasure; the financial order stays intact.'
+}
+
+Table order_items {
+  id uuid [pk, default: `gen_random_uuid()`]
+  order_id uuid [not null]
+  deal_id uuid [not null, ref: > deals.id]
+  deal_version_id uuid [not null, ref: > deal_versions.id, note: 'Exact terms the customer accepted']
+  option_id uuid [not null, ref: > deal_options.id]
+  qty smallint [not null, note: 'CHECK 1..10']
+  unit_price_minor int [not null, note: 'Price snapshot, VAT-inclusive']
+  vat_rate_bps int [not null, note: 'VAT snapshot for this sale']
+  commission_rate_bps int [not null, note: 'Commission snapshot (from commission_rules at purchase time)']
+  commission_vat_bps int [not null, note: 'VAT-on-commission snapshot']
+  title_snapshot jsonb [not null, note: 'LocalizedText shown on receipts']
+  Note: 'Line total = unit_price_minor * qty (derived, not stored). Voucher money split is recomputed from these snapshots.'
+}
+
+Table payments {
+  id uuid [pk, default: `gen_random_uuid()`]
+  order_id uuid [not null, ref: > orders.id]
+  provider varchar(20) [not null, note: 'stripe | paytrail | mock']
+  provider_payment_id varchar(120) [not null]
+  method payment_method [not null]
+  bank_name varchar(60)
+  status payment_status [not null, default: 'pending']
+  amount_minor int [not null]
+  currency_code char(3) [not null, ref: > currencies.code]
+  processing_fee_minor int [note: 'Fee charged by the provider']
+  fee_borne_by fee_bearer [not null, default: 'platform', note: 'Business decision still open: who pays processing fees']
+  failure_code varchar(60)
+  created_at timestamptz [not null, default: `now()`]
+  succeeded_at timestamptz
+  indexes {
+    (provider, provider_payment_id) [unique]
+    order_id
+  }
+  Note: 'One order can have several payment attempts. Only one may succeed.'
+}
+
+Table payment_webhook_events {
+  id uuid [pk, default: `gen_random_uuid()`]
+  provider varchar(20) [not null]
+  provider_event_id varchar(120) [not null]
+  event_type varchar(80) [not null]
+  payment_id uuid [ref: > payments.id, note: 'Payment this event concerned, once matched']
+  payload jsonb [not null]
+  received_at timestamptz [not null, default: `now()`]
+  processed_at timestamptz
+  processing_error varchar(500)
+  indexes {
+    (provider, provider_event_id) [unique]
+  }
+  Note: 'Idempotency: a duplicate webhook hits the unique key and is ignored, so vouchers are never issued twice.'
+}
+
+Table refunds {
+  id uuid [pk, default: `gen_random_uuid()`]
+  order_id uuid [not null, ref: > orders.id]
+  payment_id uuid [not null, ref: > payments.id]
+  amount_minor int [not null, note: 'Equals the sum of refund_items']
+  currency_code char(3) [not null, ref: > currencies.code]
+  reason refund_reason [not null]
+  status refund_status [not null, default: 'requested']
+  provider_refund_id varchar(120) [unique]
+  requested_by uuid [ref: > profiles.id, note: 'Customer or support agent']
+  approved_by uuid [ref: > profiles.id]
+  internal_note varchar(500)
+  failure_reason varchar(300)
+  created_at timestamptz [not null, default: `now()`]
+  completed_at timestamptz
+  Note: 'Full or partial. A refund creates matching negative ledger entries when it succeeds.'
+}
+
+Table refund_items {
+  refund_id uuid [not null]
+  voucher_id uuid [not null, ref: > vouchers.id]
+  amount_minor int [not null]
+  indexes {
+    (refund_id, voucher_id) [pk]
+  }
+  Note: 'Which vouchers a refund covers. Unique per voucher for refunds that are not failed (partial unique index).'
+}
+
+// ============================================================================ VOUCHERS & REDEMPTION
+
+Table vouchers {
+  id uuid [pk, default: `gen_random_uuid()`]
+  code varchar(14) [unique, not null, note: 'VND-XXXX-XXXX from an alphabet without I, O, 0, 1']
+  order_item_id uuid [not null, ref: > order_items.id]
+  deal_id uuid [not null, ref: > deals.id, note: 'Denormalised for redemption queries. Must match order_item.deal_id (constraint).']
+  merchant_id uuid [not null, ref: > merchants.id, note: 'Denormalised for redemption queries. Must match deal.merchant_id (constraint).']
+  status voucher_status [not null, default: 'active']
+  uses_total smallint [not null, default: 1, note: 'Snapshot of option.uses_total']
+  uses_left smallint [not null, default: 1]
+  recipient_name varchar(120) [note: 'Gift recipient. Gift data is per voucher, so one order can mix gifts and own vouchers.']
+  gift_message varchar(200)
+  issued_at timestamptz [not null, default: `now()`]
+  expires_at timestamptz [not null, note: 'issued_at + validity months snapshot, clamped to month end']
+  refund_deadline timestamptz [not null, note: 'issued_at + refund window days from the deal version snapshot']
+  voided_at timestamptz
+  indexes {
+    (merchant_id, status)
+    order_item_id
+    expires_at
+  }
+  Note: 'Money (price, VAT, commission, payout) is NOT stored here: it is derived from order_items snapshots and recorded in ledger_entries.'
+}
+
+Table redemptions {
+  id uuid [pk, default: `gen_random_uuid()`]
+  voucher_id uuid [not null, ref: > vouchers.id]
+  location_id uuid [ref: > merchant_locations.id]
+  redeemed_by uuid [not null, ref: > profiles.id, note: 'Staff member who accepted the voucher']
+  method redemption_method [not null]
+  redeemed_at timestamptz [not null, default: `now()`]
+  reversed_at timestamptz
+  reversed_by uuid [ref: > profiles.id]
+  reversal_reason varchar(300)
+  indexes {
+    voucher_id
+    (location_id, redeemed_at)
+  }
+  Note: 'One row per use. Gives dispute evidence (who, where, when) and supports multi-visit cards.'
+}
+
+Table redemption_attempts {
+  id bigint [pk, increment]
+  merchant_id uuid [ref: > merchants.id]
+  profile_id uuid [ref: > profiles.id]
+  code_hash char(64) [not null, note: 'Hash of the code typed. The raw guess is not stored.']
+  result redemption_attempt_result [not null]
+  ip_hash char(64)
+  created_at timestamptz [not null, default: `now()`]
+  indexes {
+    (merchant_id, created_at)
+  }
+  Note: 'Fraud and brute-force detection; also drives rate limiting.'
+}
+
+// ============================================================================ FINANCE
+
+Table ledger_entries {
+  id uuid [pk, default: `gen_random_uuid()`]
+  merchant_id uuid [not null, ref: > merchants.id]
+  order_id uuid [ref: > orders.id]
+  voucher_id uuid [ref: > vouchers.id, note: 'NULL for payouts and adjustments']
+  refund_id uuid [ref: > refunds.id]
+  entry_type ledger_entry_type [not null]
+  amount_minor int [not null, note: 'Signed, from the merchant balance point of view']
+  currency_code char(3) [not null, ref: > currencies.code]
+  reverses_entry_id uuid [ref: > ledger_entries.id, note: 'Corrections are new reversing rows']
+  correlation_id uuid [note: 'Groups the entries written by one business event (e.g. the 3 rows of a sale)']
+  memo varchar(200)
+  posted_at timestamptz [not null, default: `now()`]
+  created_by uuid [ref: > profiles.id, note: 'NULL = system']
+  indexes {
+    (merchant_id, posted_at)
+    voucher_id
+    correlation_id
+  }
+  Note: 'APPEND-ONLY. No UPDATE or DELETE (enforce with a trigger or revoked privileges). Settlement is tracked in payout_lines, not by editing rows.'
+}
+
+Table payouts {
+  id uuid [pk, default: `gen_random_uuid()`]
+  merchant_id uuid [not null, ref: > merchants.id]
+  status payout_status [not null, default: 'scheduled']
+  currency_code char(3) [not null, ref: > currencies.code]
+  amount_minor int [not null]
+  period_start timestamptz [not null]
+  period_end timestamptz [not null]
+  scheduled_for date
+  provider_transfer_id varchar(120) [unique]
+  attempt_count smallint [not null, default: 0]
+  failure_reason varchar(300)
+  created_at timestamptz [not null, default: `now()`]
+  paid_at timestamptz
+  indexes {
+    (merchant_id, status)
+  }
+  Note: 'Created by the scheduled batch run only. Failed payouts can be retried; paid amounts are never edited.'
+}
+
+Table payout_lines {
+  payout_id uuid [not null]
+  ledger_entry_id uuid [unique, not null, ref: - ledger_entries.id, note: 'An entry can be settled only once']
+  indexes {
+    (payout_id, ledger_entry_id) [pk]
+  }
+  Note: 'Links a payout to the ledger entries it settles, so the ledger itself never changes.'
+}
+
+Table invoices {
+  id uuid [pk, default: `gen_random_uuid()`]
+  invoice_number varchar(30) [unique, not null, note: 'Gap-free legal numbering per country']
+  invoice_type invoice_type [not null, default: 'commission_invoice']
+  merchant_id uuid [not null, ref: > merchants.id]
+  related_invoice_id uuid [ref: > invoices.id, note: 'Credit note points at the invoice it corrects']
+  payout_id uuid [ref: > payouts.id]
+  period_start date [not null]
+  period_end date [not null]
+  currency_code char(3) [not null, ref: > currencies.code]
+  net_minor int [not null]
+  vat_rate_bps int [not null]
+  vat_minor int [not null]
+  gross_minor int [not null]
+  status invoice_status [not null, default: 'draft']
+  pdf_url varchar(500)
+  issued_at timestamptz
+  due_at date
+  created_at timestamptz [not null, default: `now()`]
+  Note: 'Vendelia invoices merchants for commission plus VAT. Refunds produce credit notes.'
+}
+
+Table invoice_lines {
+  id uuid [pk, default: `gen_random_uuid()`]
+  invoice_id uuid [not null]
+  ledger_entry_id uuid [ref: > ledger_entries.id]
+  description varchar(300) [not null]
+  net_minor int [not null]
+}
+
+Table dac7_reports {
+  id uuid [pk, default: `gen_random_uuid()`]
+  report_year smallint [not null]
+  merchant_id uuid [not null, ref: > merchants.id]
+  country_code char(2) [not null, ref: > countries.code]
+  tax_identification_number varchar(40) [not null]
+  transactions_count int [not null]
+  gross_minor bigint [not null]
+  fees_minor bigint [not null]
+  currency_code char(3) [not null, ref: > currencies.code]
+  details jsonb [note: 'Seller identification and quarterly breakdown required by DAC7']
+  status dac7_status [not null, default: 'draft']
+  submitted_at timestamptz
+  created_at timestamptz [not null, default: `now()`]
+  indexes {
+    (report_year, merchant_id) [unique]
+  }
+  Note: 'Yearly platform report to the tax authority (due 31 January).'
+}
+
+// ============================================================================ SUPPORT & GOVERNANCE
+
+Table support_tickets {
+  id uuid [pk, default: `gen_random_uuid()`]
+  ticket_number varchar(20) [unique, not null]
+  profile_id uuid [ref: > profiles.id]
+  contact_email varchar(254) [not null]
+  merchant_id uuid [ref: > merchants.id]
+  order_id uuid [ref: > orders.id]
+  voucher_id uuid [ref: > vouchers.id]
+  subject varchar(200) [not null]
+  status ticket_status [not null, default: 'open']
+  priority ticket_priority [not null, default: 'normal']
+  assigned_to uuid [ref: > profiles.id]
+  created_at timestamptz [not null, default: `now()`]
+  resolved_at timestamptz
+  indexes {
+    (status, priority)
+  }
+}
+
+Table ticket_messages {
+  id uuid [pk, default: `gen_random_uuid()`]
+  ticket_id uuid [not null]
+  author_id uuid [ref: > profiles.id, note: 'NULL = inbound email from a guest']
+  body text [not null]
+  internal_only boolean [not null, default: false]
+  created_at timestamptz [not null, default: `now()`]
+}
+
+Table audit_log {
+  id bigint [pk, increment]
+  actor_type actor_type [not null]
+  actor_id uuid [ref: > profiles.id]
+  action varchar(80) [not null, note: 'deal.approve, merchant.suspend, voucher.refund, commission.change ...']
+  entity_type varchar(40) [not null]
+  entity_id uuid [not null]
+  before_state jsonb
+  after_state jsonb
+  request_id varchar(60)
+  ip_hash char(64)
+  created_at timestamptz [not null, default: `now()`]
+  indexes {
+    (entity_type, entity_id)
+    (actor_id, created_at)
+  }
+  Note: 'APPEND-ONLY. Records who changed what, with before/after.'
+}
+
+// ============================================================================ INFRASTRUCTURE (not domain model)
+
+Table email_outbox {
+  id uuid [pk, default: `gen_random_uuid()`]
+  template varchar(60) [not null, note: 'order_confirmation, voucher_reminder, refund_ack ...']
+  locale varchar(5) [not null]
+  recipient_email varchar(254) [not null]
+  recipient_profile_id uuid
+  subject varchar(300) [not null]
+  template_data jsonb [not null, note: 'Variables only. HTML is rendered at send time, so no bulky copy of personal data is kept.']
+  status outbox_status [not null, default: 'queued']
+  attempts smallint [not null, default: 0]
+  last_error varchar(500)
+  scheduled_at timestamptz [not null, default: `now()`]
+  sent_at timestamptz
+  related_order_id uuid
+  related_voucher_id uuid
+  delete_after date [not null, note: 'Retention limit; a job purges rows after this date']
+  indexes {
+    (status, scheduled_at)
+  }
+  Note: 'Delivery queue only. Not a business entity, so keep it out of the domain class diagram.'
+}
+
+Table idempotency_keys {
+  idempotency_key varchar(80) [pk]
+  scope varchar(40) [not null, note: 'checkout, refund, payout ...']
+  request_hash char(64) [not null]
+  response_body jsonb
+  created_at timestamptz [not null, default: `now()`]
+  expires_at timestamptz [not null]
+}
+
+// ============================================================================ GROUPS (colour boxes in dbdiagram.io)
+
+TableGroup reference_config {
+  currencies
+  countries
+  cities
+  categories
+  vat_rates
+  commission_rules
+  platform_settings
+  terms_documents
+}
+
+TableGroup identity_merchants {
+  profiles
+  merchants
+  merchant_members
+  merchant_locations
+  terms_acceptances
+}
+
+TableGroup catalog {
+  deals
+  deal_versions
+  deal_locations
+  deal_images
+  deal_options
+  deal_option_price_history
+  reviews
+}
+
+TableGroup orders_payments {
+  orders
+  order_contacts
+  order_items
+  payments
+  payment_webhook_events
+  refunds
+  refund_items
+}
+
+TableGroup vouchers_redemption {
+  vouchers
+  redemptions
+  redemption_attempts
+}
+
+TableGroup finance {
+  ledger_entries
+  payouts
+  payout_lines
+  invoices
+  invoice_lines
+  dac7_reports
+}
+
+TableGroup support_governance {
+  support_tickets
+  ticket_messages
+  audit_log
+}
+
+TableGroup infrastructure {
+  email_outbox
+  idempotency_keys
+}
+
+// ============================================================================ DELETE RULES
+// ON DELETE behaviour. Inline refs cannot carry it in the current DBML syntax, so it is declared here.
+// Plain inline refs elsewhere use the default (restrict / no action).
+Ref: merchant_members.merchant_id > merchants.id [delete: cascade]
+Ref: merchant_members.profile_id > profiles.id [delete: cascade]
+Ref: merchant_locations.merchant_id > merchants.id [delete: cascade]
+Ref: deal_versions.deal_id > deals.id [delete: cascade]
+Ref: deal_locations.deal_id > deals.id [delete: cascade]
+Ref: deal_images.deal_id > deals.id [delete: cascade]
+Ref: deal_options.deal_id > deals.id [delete: cascade]
+Ref: deal_option_price_history.option_id > deal_options.id [delete: cascade]
+Ref: orders.profile_id > profiles.id [delete: set null]
+Ref: order_contacts.order_id - orders.id [delete: cascade]
+Ref: order_items.order_id > orders.id [delete: cascade]
+Ref: refund_items.refund_id > refunds.id [delete: cascade]
+Ref: payout_lines.payout_id > payouts.id [delete: cascade]
+Ref: invoice_lines.invoice_id > invoices.id [delete: cascade]
+Ref: ticket_messages.ticket_id > support_tickets.id [delete: cascade]
+Ref: email_outbox.recipient_profile_id > profiles.id [delete: set null]
+Ref: email_outbox.related_order_id > orders.id [delete: set null]
+Ref: email_outbox.related_voucher_id > vouchers.id [delete: set null]
