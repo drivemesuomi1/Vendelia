@@ -17,6 +17,12 @@ src/
       repository.ts              Parameterized SQL and raw query results
       mapper.ts                  Query rows to public API response objects
       types.ts                   Internal database result types
+    auth/
+      config.ts                  Auth environment and session cookie settings
+      provider.ts                Supabase Auth password verification
+      repository.ts              Profile/session SQL
+      service.ts                 Login, current identity and logout
+      routes.ts                  Auth HTTP handlers
     health/routes.ts             Database health endpoint
     orders/
       routes.ts                  Checkout, guest order/PDF access and voucher lookup
@@ -43,6 +49,9 @@ the same exported `buildApp` function, so deployment setup does not change.
 
 Implemented:
 
+- `POST /api/auth/login`, `POST /api/auth/admin/login`: Auth password verification and profile-gated login.
+- `GET /api/auth/me`, `GET /api/auth/config`, `POST /api/auth/logout`: identity, configuration status and logout.
+- `GET /api/me/vouchers`: purchases belonging to the current confirmed email.
 - `GET /api/health`: runs a database query.
 - `GET /api/meta`: active cities/categories, live counts and server policy settings.
 - `GET /api/deals`: current public deals with city/category/search/featured filters.
@@ -64,7 +73,10 @@ a listener. Source code and business rules remain in this backend workspace.
 
 Set up the three purchase tables using [voucher setup](../docs/voucher-flow.md).
 Follow [database changes and team workflow](../docs/database-changes.md) when changing SQL.
-Sign-in, merchant/admin database writes, real payments, redemption and settlement
+Migration 002 prepares a shared `profiles` table for customers, business users and
+admins, linked to Supabase Auth. Migration 003 adds website sessions.
+See [account setup](../docs/accounts.md) for Auth configuration and testing.
+Public registration, merchant/admin business-data writes, real payments, redemption and settlement
 still need implementations. The broader contract is [API endpoints](../docs/api/endpoints.md);
 it includes planned endpoints, not just implemented ones.
 Shared schemas and response types are in `shared/src`.

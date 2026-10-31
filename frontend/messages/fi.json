@@ -469,12 +469,14 @@
       "invalid": "Väärä käyttäjätunnus tai salasana.",
       "notConfigured": "Ylläpidon kirjautumista ei ole vielä määritetty tähän ympäristöön.",
       "claim": "Diilit, yritykset ja maksut – yhdestä näkymästä.",
-      "user": "Käyttäjätunnus tai sähköposti",
+      "user": "Sähköposti",
       "show": "Näytä",
       "hide": "Piilota",
       "signingIn": "Kirjaudutaan…",
       "note": "Istunto päättyy 8 tunnin kuluttua.",
-      "dev": "Kehitystila: käyttäjätunnus 123, salasana 123"
+      "dev": "Kehitystila: käyttäjätunnus 123, salasana 123",
+      "unavailable": "Kirjautuminen ei ole nyt saatavilla. Tarkista palvelimen asetukset ja yritä uudelleen.",
+      "tooManyAttempts": "Liian monta kirjautumisyritystä. Odota minuutti ja yritä uudelleen."
     },
     "offline": "Taustapalvelua ei ole vielä yhdistetty, joten tiedot näytetään tyhjinä. Toiminnot toimivat, kun API on käytössä.",
     "overview": "Yleiskatsaus",
@@ -789,7 +791,7 @@
     "validation_failed": "Tarkista tiedot ja yritä uudelleen.",
     "invalid_credentials": "Sähköposti tai salasana on väärin.",
     "unauthorized": "Kirjaudu sisään jatkaaksesi.",
-    "forbidden": "Sinulla ei ole oikeutta tähän.",
+    "forbidden": "Sinulla ei ole oikeutta tähän toimintoon.",
     "not_found": "Ei löytynyt.",
     "email_taken": "Sähköpostiosoitteella on jo tili.",
     "business_exists": "Yritys on jo rekisteröity Vendeliaan.",
@@ -817,7 +819,10 @@
     "paymentUnavailable": "Verkkomaksu ei ole juuri nyt käytettävissä, eikä sinulta veloitettu mitään. Yritä hetken kuluttua uudelleen tai kirjoita osoitteeseen tuki@vendelia.fi.",
     "testCheckoutNotAllowed": "Testitilaus ei ole sallittu tälle sähköpostiosoitteelle.",
     "itemsUnavailable": "Osa ostoskorin tuotteista ei ole enää saatavilla. Päivitä ostoskori ja yritä uudelleen.",
-    "redeemUnavailable": "Lunastuksen kirjaaminen vaatii yrityskirjautumisen, joka ei ole vielä käytössä. Koodin tarkistus toimii."
+    "redeemUnavailable": "Lunastuksen kirjaaminen vaatii yrityskirjautumisen, joka ei ole vielä käytössä. Koodin tarkistus toimii.",
+    "authUnavailable": "Kirjautuminen ei ole nyt saatavilla. Tarkista palvelimen asetukset ja yritä uudelleen.",
+    "invalidLogin": "Virheelliset tunnukset tai tilin käyttö ei ole sallittu.",
+    "tooManyAttempts": "Liian monta kirjautumisyritystä. Odota minuutti ja yritä uudelleen."
   },
   "voucherCheck": {
     "title": "Lahjakortin tarkistus",

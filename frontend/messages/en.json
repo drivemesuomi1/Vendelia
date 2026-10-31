@@ -469,12 +469,14 @@
       "invalid": "Wrong username or password.",
       "notConfigured": "Admin sign-in has not been configured for this environment yet.",
       "claim": "Deals, businesses and payments – in one view.",
-      "user": "Username or email",
+      "user": "Email",
       "show": "Show",
       "hide": "Hide",
       "signingIn": "Signing in…",
       "note": "Your session ends after 8 hours.",
-      "dev": "Development mode: username 123, password 123"
+      "dev": "Development mode: username 123, password 123",
+      "unavailable": "Sign-in is temporarily unavailable. Check the server configuration and try again.",
+      "tooManyAttempts": "Too many sign-in attempts. Please wait a minute and try again."
     },
     "offline": "The backend is not connected yet, so data is shown empty. Actions will work once the API is running.",
     "overview": "Overview",
@@ -789,7 +791,7 @@
     "validation_failed": "Please check the details and try again.",
     "invalid_credentials": "Wrong email or password.",
     "unauthorized": "Please sign in to continue.",
-    "forbidden": "You don't have access to this.",
+    "forbidden": "You do not have access to this action.",
     "not_found": "Not found.",
     "email_taken": "An account with this email already exists.",
     "business_exists": "This business is already registered on Vendelia.",
@@ -817,7 +819,10 @@
     "paymentUnavailable": "Online payment isn't available right now and you have not been charged. Please try again shortly or email tuki@vendelia.fi.",
     "testCheckoutNotAllowed": "Test orders aren't allowed for this email address.",
     "itemsUnavailable": "Some items in your cart are no longer available. Update your cart and try again.",
-    "redeemUnavailable": "Recording a redemption needs business sign-in, which isn't available yet. Checking the code works."
+    "redeemUnavailable": "Recording a redemption needs business sign-in, which isn't available yet. Checking the code works.",
+    "authUnavailable": "Sign-in is temporarily unavailable. Check the server configuration and try again.",
+    "invalidLogin": "Invalid credentials or account access is unavailable.",
+    "tooManyAttempts": "Too many sign-in attempts. Please wait a minute and try again."
   },
   "voucherCheck": {
     "title": "Voucher check",

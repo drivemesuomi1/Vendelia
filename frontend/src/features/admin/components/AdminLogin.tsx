@@ -8,7 +8,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { adminLogin, type AdminLoginState } from "../actions";
 
 /** Staff sign-in shown at /admin when there is no admin session: brand panel + a single focused form. */
-export function AdminLogin({ configured, devHint = false }: { configured: boolean; devHint?: boolean }) {
+export function AdminLogin({ configured }: { configured: boolean }) {
   const { t } = useI18n();
   const [state, action, pending] = useActionState<AdminLoginState | null, FormData>(adminLogin, null);
   const [show, setShow] = useState(false);
@@ -40,7 +40,7 @@ export function AdminLogin({ configured, devHint = false }: { configured: boolea
             <span>{t("admin.login.user")}</span>
             <span className="afield-box">
               <Icon name="mail" />
-              <input name="email" type="text" autoComplete="username" autoFocus required disabled={!configured} />
+              <input name="email" type="email" autoComplete="username" autoFocus required disabled={!configured} />
             </span>
           </label>
 
@@ -60,7 +60,6 @@ export function AdminLogin({ configured, devHint = false }: { configured: boolea
           </button>
 
           <p className="alogin-note"><Icon name="lock" />{t("admin.login.note")}</p>
-          {devHint && <p className="alogin-dev">{t("admin.login.dev")}</p>}
         </form>
       </section>
     </main>

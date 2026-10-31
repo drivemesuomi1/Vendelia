@@ -469,12 +469,14 @@
       "invalid": "Fel användarnamn eller lösenord.",
       "notConfigured": "Administratörsinloggningen har inte konfigurerats för den här miljön än.",
       "claim": "Erbjudanden, företag och betalningar – i en vy.",
-      "user": "Användarnamn eller e-post",
+      "user": "E-post",
       "show": "Visa",
       "hide": "Dölj",
       "signingIn": "Loggar in…",
       "note": "Sessionen upphör efter 8 timmar.",
-      "dev": "Utvecklingsläge: användarnamn 123, lösenord 123"
+      "dev": "Utvecklingsläge: användarnamn 123, lösenord 123",
+      "unavailable": "Inloggningen är tillfälligt otillgänglig. Kontrollera serverinställningarna och försök igen.",
+      "tooManyAttempts": "För många inloggningsförsök. Vänta en minut och försök igen."
     },
     "offline": "Bakänden är inte ansluten än, så uppgifterna visas tomma. Funktionerna fungerar när API:et är i drift.",
     "overview": "Översikt",
@@ -789,7 +791,7 @@
     "validation_failed": "Kontrollera uppgifterna och försök igen.",
     "invalid_credentials": "Fel e-postadress eller lösenord.",
     "unauthorized": "Logga in för att fortsätta.",
-    "forbidden": "Du har inte behörighet till detta.",
+    "forbidden": "Du har inte behörighet för denna åtgärd.",
     "not_found": "Hittades inte.",
     "email_taken": "Det finns redan ett konto med den e-postadressen.",
     "business_exists": "Företaget är redan registrerat hos Vendelia.",
@@ -817,7 +819,10 @@
     "paymentUnavailable": "Onlinebetalning är inte tillgänglig just nu och du har inte debiterats. Försök igen om en stund eller skriv till tuki@vendelia.fi.",
     "testCheckoutNotAllowed": "Testbeställningar är inte tillåtna för den här e-postadressen.",
     "itemsUnavailable": "Några produkter i varukorgen finns inte längre. Uppdatera varukorgen och försök igen.",
-    "redeemUnavailable": "Att registrera inlösen kräver företagsinloggning, som ännu inte finns. Kodkontrollen fungerar."
+    "redeemUnavailable": "Att registrera inlösen kräver företagsinloggning, som ännu inte finns. Kodkontrollen fungerar.",
+    "authUnavailable": "Inloggningen är tillfälligt otillgänglig. Kontrollera serverinställningarna och försök igen.",
+    "invalidLogin": "Felaktiga uppgifter eller kontot saknar åtkomst.",
+    "tooManyAttempts": "För många inloggningsförsök. Vänta en minut och försök igen."
   },
   "voucherCheck": {
     "title": "Kontroll av presentkort",

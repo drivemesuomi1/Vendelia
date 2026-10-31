@@ -11,7 +11,7 @@ import { login } from "../api";
 
 /** Only same-site relative paths are accepted as a post-login destination (no open redirects). */
 export function safeNext(next: string | null | undefined, fallback: string) {
-  return next && next.startsWith("/") && !next.startsWith("//") ? next : fallback;
+  return next && next.startsWith("/") && !next.startsWith("//") && !/[\\\x00-\x20]/.test(next) ? next : fallback;
 }
 
 export function LoginForm({ next }: { next?: string }) {

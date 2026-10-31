@@ -1,3 +1,8 @@
+import { authConfig, sessionToken, type AuthConfig } from "./modules/auth/config";
+import { AuthRepository } from "./modules/auth/repository";
+import { AuthService } from "./modules/auth/service";
+import { SupabasePasswordProvider, type PasswordProvider } from "./modules/auth/provider";
+import { authRoutes } from "./modules/auth/routes";
 import cors from "@fastify/cors";
 import Fastify, { type FastifyError } from "fastify";
 import type { Sql } from "postgres";
@@ -13,8 +18,11 @@ import { orderConfig, platformConfig, type OrderConfig, type PlatformConfig } fr
 
 export function buildApp(database: Sql, options: {
   config?: PlatformConfig; orders?: OrderConfig; mailer?: Mailer; logger?: boolean;
+  auth?: AuthConfig; passwordProvider?: PasswordProvider;
 } = {}) {
   const app = Fastify({ logger: options.logger ?? false });
+  const authSettings = options.auth ?? authConfig();
+  const authService = new AuthService(new AuthRepository(database), options.passwordProvider ?? new SupabasePasswordProvider(authSettings));
   const repository = new CatalogueRepository(database);
   const config = options.config ?? platformConfig();
   const ordersConfig = options.orders ?? orderConfig();
@@ -40,6 +48,23 @@ export function buildApp(database: Sql, options: {
   });
   app.setNotFoundHandler((_request, reply) => reply.code(404).send({ error: "not_found", message: "Not found" }));
 
+  // Applies to future admin API modules as well as current routes. Never trust a UI-only gate.
+  app.addHook("preHandler", async request => {
+    const path = request.url.split("?")[0]!;
+    if (path === "/api/admin" || path.startsWith("/api/admin/")) {
+      const user = await authService.current(sessionToken(request.headers.cookie));
+      if (!user) throw new HttpProblem(401, "invalidLogin");
+      if (user.role !== "admin") throw new HttpProblem(403, "forbidden");
+      if (!["GET", "HEAD", "OPTIONS"].includes(request.method) && request.headers.origin
+        && !authSettings.origins.includes(request.headers.origin)) throw new HttpProblem(403, "forbidden");
+    }
+  });
+  app.get("/api/me/vouchers", async request => {
+    const user = await authService.current(sessionToken(request.headers.cookie));
+    if (!user) throw new HttpProblem(401, "invalidLogin");
+    return { vouchers: await orders.forCustomer(user.email) };
+  });
+  app.register(authRoutes, { service: authService, config: authSettings });
   app.register(healthRoutes, { database });
   app.register(catalogueRoutes, { service });
   app.register(orderRoutes, { service: orders });

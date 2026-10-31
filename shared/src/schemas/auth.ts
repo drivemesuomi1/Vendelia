@@ -6,7 +6,7 @@ const password = z.string().min(8, { message: "passwordTooShort" }).max(200);
 
 export const loginSchema = z.object({
   email,
-  password: z.string().min(1, { message: "required" }),
+  password: z.string().min(1, { message: "required" }).max(200),
 });
 export type LoginInput = z.infer<typeof loginSchema>;
 

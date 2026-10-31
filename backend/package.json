@@ -12,7 +12,7 @@
     "start": "tsx src/server.ts",
     "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test tests/catalogue.test.ts tests/vouchers.test.ts",
+    "test": "node --import tsx --test tests/catalogue.test.ts tests/vouchers.test.ts tests/auth.test.ts",
     "db:check": "tsx scripts/check-catalogue.ts",
     "db:migrate": "tsx scripts/migrate.ts"
   },

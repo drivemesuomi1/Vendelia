@@ -89,13 +89,14 @@ Navigation uses database categories, with Cleaning and Chauffeur services groupe
 under the desktop Services dropdown. Labels, icons and availability remain database-backed;
 the grouping is a presentation rule. Mobile keeps the original direct service links.
 
-Price-history writes, merchant submissions/reviews, accounts, real payments and
+Price-history writes, merchant submissions/reviews, public registration, real payments and
 settlement remain separate work. Guest test checkout and voucher issuance are now
 implemented in the orders module; see [voucher flow](voucher-flow.md).
 Business accounts/deal review use localStorage, and admin orders/finance use sample
 data. Existing portal screens do not imply working database write endpoints.
-Do not use the Next admin cookie as backend authorization without implementing
-verification. Images remain files served by the frontend; their paths live in DB.
+General/admin login now uses Supabase Auth and database sessions; see
+[accounts](accounts.md). The old Next admin cookie is retired; protected API routes
+verify the new session and current profile role. Images remain files served by the frontend; their paths live in DB.
 
 ## Tests
 

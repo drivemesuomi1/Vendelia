@@ -1,9 +1,12 @@
+import { adminConfigured, getAdminSession } from "@/lib/admin-auth";
+import { AdminLogin } from "@/features/admin/components/AdminLogin";
 import { getT, resolveLocale } from "@/i18n/server";
 import { adminData } from "@/lib/admin-api";
 import { buildAdminDemo, demoSupport } from "@/features/admin/mock-data";
 import { SupportTools } from "@/features/admin/components/SupportTools";
 
 export default async function AdminSupportPage({ params }: { params: Promise<{ locale: string }> }) {
+  if (!await getAdminSession()) return <AdminLogin configured={await adminConfigured()} />;
   const t = getT(await resolveLocale(params));
   const demo = demoSupport(buildAdminDemo());
   const [{ emails }, { entries }] = await Promise.all([

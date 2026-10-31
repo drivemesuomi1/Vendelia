@@ -21,6 +21,9 @@ See [catalogue setup and verification](docs/database-catalogue.md) and [local de
 After pulling dependency changes, run `npm install` again and restart the development server.
 Database changes are applied separately; pulling code or deploying does not run migrations.
 See [database changes and team workflow](docs/database-changes.md) and [voucher setup](docs/voucher-flow.md).
+For the shared customer/business/admin profile migration and account setup, see
+[user accounts](docs/accounts.md). Login uses Supabase Auth plus profile roles;
+apply migrations 002/003 and configure the Auth variables before testing.
 
 ## Checks
 ```bash
@@ -37,7 +40,8 @@ npm run build
   Checkout requires migration `001_orders_vouchers.sql` and explicit payment bypass configuration;
   real payments and merchant-authorized redemption are not implemented.
   Business accounts/submissions/approvals use a browser demo store; admin orders/finance use sample data.
-  Sign-in and merchant/admin database writes remain separate work.
+  General/admin login and email-owned customer vouchers are implemented. Public registration
+  and merchant/admin business-data writes remain separate work.
   Remaining contract: [docs/api/endpoints.md](docs/api/endpoints.md).
 - **Deploy:** the Vercel project builds `frontend/` (root directory `frontend`, install from the repo root).
   Set server-side `DATABASE_URL` in Vercel and leave `BACKEND_URL` unset: the existing Fastify API runs inside Next.js.

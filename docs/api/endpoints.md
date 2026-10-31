@@ -4,6 +4,19 @@ Base: `http://127.0.0.1:4000` (the frontend proxies `/api/*`). JSON in/out. Erro
 `error` and `fields` values are translation keys (`frontend/messages/*.json` → `errors.*`).
 Auth: httpOnly session cookie `vd_session`. Roles: `customer`, `merchant`, `admin` (admin passes every role check).
 
+## Authentication implementation status
+
+Implemented: `POST /api/auth/login`, `POST /api/auth/admin/login`,
+`GET /api/auth/me`, `GET /api/auth/config`, `POST /api/auth/logout`, and
+`GET /api/me/vouchers`. Login requires Supabase Auth credentials, an active
+confirmed profile and migrations 002/003. Admin login additionally requires the
+admin role. See [account setup](../accounts.md).
+
+The remaining authentication/merchant endpoints below are a planned contract,
+not implemented signup or merchant ownership functionality. Website sessions
+are separate from Supabase Auth tokens, expire after eight hours, and are
+revoked in the database on logout. `/api/admin/*` requires an active admin profile.
+
 ## Public
 | Method | Path | Purpose |
 |---|---|---|

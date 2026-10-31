@@ -8,8 +8,7 @@
     "build": "next build",
     "start": "next start -p 3000",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "admin:hash": "node scripts/hash-admin-password.mjs"
+    "test": "vitest run"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",

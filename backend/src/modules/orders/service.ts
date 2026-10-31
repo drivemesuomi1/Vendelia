@@ -169,6 +169,10 @@ export class OrderService {
   async get(orderId: string, token: string | undefined): Promise<OrderDTO | null> {
     const loaded = await this.authorized(orderId, token);
     if (!loaded) return null;
+    return this.toDto(loaded);
+  }
+
+  private toDto(loaded: NonNullable<Awaited<ReturnType<OrderService["load"]>>>): OrderDTO {
     const { order, rows } = loaded;
     return {
       id: order.id, number: order.number, status: order.status, test: order.is_test, emailStatus: order.email_status,
@@ -184,6 +188,18 @@ export class OrderService {
         orderNumber: order.number, imageUrl: row.image_url, qrPayload: row.qr_payload, test: row.is_test,
       })),
     };
+  }
+
+  /** Confirmed Auth email owns guest purchases made to that exact email. */
+  async forCustomer(email: string): Promise<VoucherDTO[]> {
+    const orders = await this.sql<{ id: string }[]>`
+      SELECT id FROM public.orders WHERE lower(email) = ${email.toLowerCase()} ORDER BY created_at DESC`;
+    const vouchers: VoucherDTO[] = [];
+    for (const order of orders) {
+      const loaded = await this.load(order.id);
+      if (loaded) vouchers.push(...this.toDto(loaded).vouchers);
+    }
+    return vouchers;
   }
 
   /** The same PDF that was emailed, for downloading from the confirmation page. */

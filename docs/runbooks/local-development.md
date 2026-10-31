@@ -14,7 +14,8 @@ The backend now serves the catalogue and cart quotes from Supabase. Run
 `npm run db:check -w backend` to verify current database rows through the API.
 There are no hardcoded deal or reference-data fallbacks; an unreachable backend
 shows a retry screen. Guest test checkout and vouchers are implemented; see
-[voucher setup](../voucher-flow.md). Sign-in, real payments and merchant/admin
+[voucher setup](../voucher-flow.md). Login requires the profile/session migrations and Auth environment settings in
+[account setup](../accounts.md). Public registration, real payments and merchant/admin
 database writes remain separate API work. See [database catalogue setup](../database-catalogue.md).
 
 ## After pulling changes

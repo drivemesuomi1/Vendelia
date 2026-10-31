@@ -14,10 +14,19 @@ The owner's schema exports reviewed on 2026-10-31 contained these seven tables:
 | Migration | Adds | Existing catalogue changes |
 | --- | --- | --- |
 | `backend/sql/migrations/001_orders_vouchers.sql` | `orders`, `order_items`, `vouchers`, constraints, indexes and access restrictions | None |
+| `backend/sql/migrations/002_profiles.sql` | Shared `profiles` for customer/merchant/admin roles, linked to existing Supabase `auth.users`, with RLS and access restrictions | None |
+| `backend/sql/migrations/003_auth_sessions.sql` | Hashed, revocable, eight-hour website sessions referencing profiles | None |
 
 The exports were taken before migration 001. This document records compatibility
 and code requirements, not a live deployment ledger. Verify each target database
 after applying SQL; local, test and production environments can differ.
+
+Shared profile setup and account-provisioning SQL are documented in
+[user accounts](accounts.md). The owner confirmed the earlier admin-only SQL was
+not applied; the unapplied migration was replaced with `002_profiles.sql`. Migration 002 requires Supabase Auth's
+`auth.users` table, which plain local Postgres fixtures do not provide. This is a
+prerequisite for login. Apply 003 as well: the admin and general login forms now
+use Supabase Auth and profile roles, with database-backed website sessions.
 
 ## Purchase relationships
 
@@ -97,7 +106,9 @@ origin as well. Merchant redemption returns 501 until merchant authentication ex
 5. Verify against a dedicated test database before shared deployment. Never point
    fixture-creation tests at the production database.
 
-Profiles/authentication, merchant-authorized redemption and real payments remain
-later work. Business portal localStorage and admin sample data are not Supabase
+Shared profiles now have a migration with `customer`, `merchant` and `admin` roles.
+Login is connected to Supabase Auth and profiles; public registration remains pending.
+Merchant membership, authorized redemption and real payments remain later work.
+Business portal localStorage and admin sample data are not Supabase
 records. The large `docs/domain/database.dbml` is a future design, not a migration
 or a description of every table currently deployed.
