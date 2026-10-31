@@ -182,3 +182,27 @@
 .search-box .input{padding-left:40px;min-height:44px;border-radius:12px}
 .empty-row{padding:var(--s3);text-align:center}
 .adm-kpis.four{margin-bottom:0}
+
+/* ---------- Manage businesses ---------- */
+.mb-new{margin-left:8px;font-size:11px;padding:2px 8px;vertical-align:middle}
+.mb-actions{display:flex;gap:4px;justify-content:flex-end;flex-wrap:wrap}
+.mb-actions .btn-ghost{color:var(--navy-70)}
+.mb-actions .btn-ghost:hover{color:var(--indigo)}
+.mb-form{display:flex;flex-direction:column;height:100%;min-height:0}
+.mb-form .drawer-body{display:flex;flex-direction:column;gap:var(--s3);padding-top:var(--s2);padding-bottom:var(--s3)}
+.mb-form fieldset{display:flex;flex-direction:column;gap:14px}
+.mb-form legend{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--navy-50);margin-bottom:10px}
+.mb-field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.mb-field>label{font-size:14px;font-weight:500}
+.mb-field .input,.mb-field .select{min-height:44px;border-radius:10px}
+.mb-two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mb-pw{display:flex;gap:8px}
+.mb-pw .input{flex:1;min-width:0}
+.mb-pw .btn{flex:none}
+.mb-issued{margin-top:var(--s3);border-color:var(--indigo-100);background:linear-gradient(180deg,var(--indigo-50),#fff 70%)}
+.cred{margin:0;display:flex;flex-direction:column;gap:8px}
+.cred>div{display:grid;grid-template-columns:150px 1fr auto;gap:12px;align-items:center;padding:10px 12px;background:#fff;border:1px solid var(--line);border-radius:10px}
+.cred dt{font-size:13px;color:var(--navy-70)}
+.cred dd{margin:0;font-size:15px;word-break:break-all}
+.cred dd.pw{font-size:17px;font-weight:600;letter-spacing:.04em}
+@media(max-width:600px){.cred>div{grid-template-columns:1fr auto}.cred dt{grid-column:1/-1}.mb-two{grid-template-columns:1fr}}
