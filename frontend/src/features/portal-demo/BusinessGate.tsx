@@ -6,7 +6,7 @@ import { LogoSymbol } from "@/components/ui/Logo";
 import { LangSwitch } from "@/components/layout/LangSwitch";
 import { PortalShell } from "@/components/layout/PortalShell";
 import { useI18n } from "@/i18n/I18nProvider";
-import { changeOwnPassword, signInBusiness, signOutBusiness, useBusinessSession, useHydrated, type DemoBusiness } from "./store";
+import { changeOwnPassword, DEV_BUSINESS_LOGIN, signInBusiness, signOutBusiness, useBusinessSession, useHydrated, type DemoBusiness } from "./store";
 
 /**
  * Business portal entry: sign-in with the details the admin created, a forced password change on first
@@ -86,7 +86,7 @@ function BusinessSignIn() {
           <span>{t("admin.mb.loginEmail")}</span>
           <span className="afield-box">
             <Icon name="mail" />
-            <input type="email" autoComplete="username" autoFocus required value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input type="text" inputMode="email" autoComplete="username" autoFocus required value={email} onChange={(e) => setEmail(e.target.value)} />
           </span>
         </label>
         <label className="afield">
@@ -101,6 +101,7 @@ function BusinessSignIn() {
           {busy ? t("admin.login.signingIn") : t("auth.login")}
         </button>
         <p className="alogin-note"><Icon name="info" />{t("business.login.noAccount")}</p>
+        {DEV_BUSINESS_LOGIN && <p className="alogin-dev">{t("admin.login.dev")}</p>}
       </form>
     </AuthFrame>
   );

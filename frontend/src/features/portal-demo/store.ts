@@ -270,7 +270,23 @@ export function useBusinessSession(): DemoBusiness | null {
   return state.businesses.find((b) => b.id === id) ?? null;
 }
 
+/**
+ * Development-only shortcut: username "123" / password "123" signs in as a ready-made "Demo Business"
+ * (created on first use, already past the first-login password change). Disabled in production builds.
+ */
+export const DEV_BUSINESS_LOGIN = process.env.NODE_ENV !== "production";
+
+async function ensureDevBusiness() {
+  if (read().businesses.some((b) => b.email === "123")) return;
+  const created = await createBusiness(
+    { name: "Demo Business", companyName: "Demo Business Oy", businessId: "2345678-0", email: "123", contactName: "Demo Contact", phone: "+358 40 000 0000", cityId: "helsinki", categoryId: "food", status: "active" },
+    "123",
+  );
+  update((s) => patchBusiness(s, created.id, { mustChangePassword: false }));
+}
+
 export async function signInBusiness(email: string, password: string): Promise<DemoBusiness | null> {
+  if (DEV_BUSINESS_LOGIN && email.trim() === "123" && password === "123") await ensureDevBusiness();
   const business = read().businesses.find((b) => b.email === email.trim().toLowerCase());
   const ok = business ? await verifyPassword(password, business.passwordHash) : await hashPassword(password).then(() => false);
   if (!business || !ok) return null;
