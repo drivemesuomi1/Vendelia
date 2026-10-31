@@ -23,6 +23,12 @@ The import snapshot remains in `backend/sql/seed-catalogue.sql` for reproducibil
 
 ## Mapping
 
+Backend code is organized in `backend/src/modules/catalogue/`: `routes.ts` handles
+HTTP validation and responses, `service.ts` orchestrates reads and cart pricing,
+`repository.ts` owns parameterized SQL, `mapper.ts` builds public DTOs, and `types.ts`
+describes query rows. `backend/src/app.ts` configures the app and registers that
+module plus `modules/health/routes.ts`. See [backend structure](../backend/README.md#structure).
+
 | Database data | API | Frontend consumers |
 | --- | --- | --- |
 | Active cities/categories and live category counts | GET /api/meta | Pickers, filters, navigation, footer city list |
