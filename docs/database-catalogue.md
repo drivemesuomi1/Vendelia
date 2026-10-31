@@ -69,8 +69,10 @@ fall back to browser pricing.
 The health endpoint executes SELECT 1 and reports failure if the database is
 unreachable. It does not verify table shape; db:check exercises the real queries.
 
-No additional table, migration or data update is required by this integration.
-It matches the existing seven-table schema. Backend runtime access continues
+No additional table, migration or data update is required by the catalogue read integration.
+It matches the existing seven-table schema. Guest checkout separately requires the
+three-table voucher migration; see [database changes](database-changes.md).
+Backend runtime access continues
 through DATABASE_URL; no browser Data API grants/policies are required. Direct
 database roles can bypass RLS, so the API explicitly enforces public visibility.
 
@@ -87,9 +89,11 @@ Navigation uses database categories, with Cleaning and Chauffeur services groupe
 under the desktop Services dropdown. Labels, icons and availability remain database-backed;
 the grouping is a presentation rule. Mobile keeps the original direct service links.
 
-Price-history writes, merchant submissions/reviews, accounts, orders, payments,
-voucher issuance and settlement are separate workflows and are not implemented by
-this read integration. Existing portal screens do not imply working write endpoints.
+Price-history writes, merchant submissions/reviews, accounts, real payments and
+settlement remain separate work. Guest test checkout and voucher issuance are now
+implemented in the orders module; see [voucher flow](voucher-flow.md).
+Business accounts/deal review use localStorage, and admin orders/finance use sample
+data. Existing portal screens do not imply working database write endpoints.
 Do not use the Next admin cookie as backend authorization without implementing
 verification. Images remain files served by the frontend; their paths live in DB.
 

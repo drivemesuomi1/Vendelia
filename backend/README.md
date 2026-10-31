@@ -18,12 +18,24 @@ src/
       mapper.ts                  Query rows to public API response objects
       types.ts                   Internal database result types
     health/routes.ts             Database health endpoint
+    orders/
+      routes.ts                  Checkout, guest order/PDF access and voucher lookup
+      service.ts                 Transactional order writes, reads and email orchestration
+    vouchers/
+      pdf.ts                     Voucher PDF rendering
+      email.ts                   Email content
+      mailer.ts                  SMTP or development file outbox
+      text.ts                    Localized voucher wording
+sql/migrations/                  Reviewed SQL schema changes, applied separately
+scripts/migrate.ts               Runs migration files in filename order
 ```
 
-The call path is `routes -> service -> repository -> database`; mappers convert
+The catalogue call path is `routes -> service -> repository -> database`; mappers convert
 query results before services return public DTOs. Routes do not contain SQL, and
 repositories do not calculate cart totals or decide HTTP status codes. Shared
 request validation and public response types remain in `shared/src`.
+The orders module currently keeps its SQL in `service.ts`; it does not yet have a
+separate repository. Voucher rendering and email code are separate from HTTP routes.
 
 Add future implemented features under their own `modules/<feature>/` folders and
 register their routes in `app.ts`. The Next.js/Vercel adapter continues to consume
@@ -36,6 +48,10 @@ Implemented:
 - `GET /api/deals`: current public deals with city/category/search/featured filters.
 - `GET /api/deals/:slug`: localized content, merchant, options, images and service area.
 - `POST /api/cart/quote`: validates IDs/quantities and quotes current database prices.
+- `POST /api/orders`: guest test checkout, enabled only by payment bypass configuration.
+- `GET /api/orders/:id` and `GET /api/orders/:id/pdf`: require `x-order-token`.
+- `GET /api/vouchers/:code` and `POST /api/merchant/vouchers/lookup`: voucher validity lookup.
+- `POST /api/merchant/vouchers/redeem`: returns 501 until merchant authentication exists.
 
 Configure `.env` from `.env.example`, then run `npm run dev -w backend` from the
 repo root. `npm run db:check -w backend` exercises the API against the configured
@@ -46,6 +62,9 @@ The same app can run inside Next.js on Vercel: set DATABASE_URL in Vercel and
 leave BACKEND_URL unset. Next's /api route invokes the Fastify app without starting
 a listener. Source code and business rules remain in this backend workspace.
 
-Sign-in, merchant/admin write routes, orders, payments, vouchers and settlement
-still need implementations. The remaining contract is [API endpoints](../docs/api/endpoints.md).
+Set up the three purchase tables using [voucher setup](../docs/voucher-flow.md).
+Follow [database changes and team workflow](../docs/database-changes.md) when changing SQL.
+Sign-in, merchant/admin database writes, real payments, redemption and settlement
+still need implementations. The broader contract is [API endpoints](../docs/api/endpoints.md);
+it includes planned endpoints, not just implemented ones.
 Shared schemas and response types are in `shared/src`.
