@@ -142,14 +142,17 @@ export function TrendChart({
           </div>
         )}
       </div>
-      <table className="sr-only">
-        <caption>{title}</caption>
-        <tbody>
-          {labels.map((l, i) => (
-            <tr key={i}><th scope="row">{l}</th><td>{format(current[i] ?? 0)}</td>{previous && <td>{format(previous[i] ?? 0)}</td>}</tr>
-          ))}
-        </tbody>
-      </table>
+      {/* A table ignores sr-only sizing and clipping and would stretch the page, so it sits in a clipped div. */}
+      <div className="sr-only">
+        <table>
+          <caption>{title}</caption>
+          <tbody>
+            {labels.map((l, i) => (
+              <tr key={i}><th scope="row">{l}</th><td>{format(current[i] ?? 0)}</td>{previous && <td>{format(previous[i] ?? 0)}</td>}</tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
