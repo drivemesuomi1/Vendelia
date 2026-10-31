@@ -15,8 +15,8 @@ export const metadata = { title: "Admin", robots: { index: false } };
  */
 export default async function AdminLayout({ children, params }: { children: ReactNode; params: Promise<{ locale: string }> }) {
   const locale = await resolveLocale(params);
-  const adminEmail = await getAdminSession();
-  if (!adminEmail) {
+  const admin = await getAdminSession();
+  if (!admin) {
     return (
       <div className={portalClass}>
         <AdminLogin configured={await adminConfigured()} />
@@ -27,7 +27,7 @@ export default async function AdminLayout({ children, params }: { children: Reac
   const t = getT(locale);
   return (
     <div className={portalClass}>
-      <PortalShell kind="admin" adminEmail={adminEmail}>
+      <PortalShell kind="admin" admin={{ name: admin.name, email: admin.email }}>
         <p className="demo-bar"><Icon name="info" />{t("admin.demoHint")}</p>
         {children}
       </PortalShell>

@@ -16,7 +16,7 @@ export interface PortalAccount {
 }
 
 /** Sidebar layout shared by the business portal and the admin area. */
-export function PortalShell({ kind, children, adminEmail, account }: { kind: "business" | "admin"; children: ReactNode; adminEmail?: string; account?: PortalAccount }) {
+export function PortalShell({ kind, children, admin, account }: { kind: "business" | "admin"; children: ReactNode; admin?: { name: string; email: string }; account?: PortalAccount }) {
   const { t, locale } = useI18n();
   const pathname = usePathname();
   const base = `/${locale}/${kind}`;
@@ -47,10 +47,10 @@ export function PortalShell({ kind, children, adminEmail, account }: { kind: "bu
           ))}
           <Link href={`/${locale}`}><Icon name="left" />{t("business.backToSite")}</Link>
         </nav>
-        {kind === "admin" && adminEmail && (
+        {kind === "admin" && admin && (
           <div className="biz">
-            <p style={{ fontWeight: 600 }}>{t("admin.title")}</p>
-            <p className="muted small">{adminEmail}</p>
+            <p style={{ fontWeight: 600 }}>{admin.name}</p>
+            <p className="muted small">{admin.email}</p>
             <form action={adminLogout} style={{ marginTop: 8 }}>
               <button className="btn btn-ghost btn-sm" type="submit"><Icon name="logout" />{t("auth.logout")}</button>
             </form>

@@ -31,8 +31,9 @@ it('rejects bad credentials and outages without creating a cookie', async () => 
 it('checks the current server role rather than accepting the old admin cookie', async () => {
   getSession.mockResolvedValue({ email: 'buyer@example.com', role: 'customer' });
   expect(await getAdminSession()).toBeNull();
-  getSession.mockResolvedValue({ email: 'staff@example.com', role: 'admin' });
-  expect(await getAdminSession()).toBe('staff@example.com');
+  const admin = { email: 'staff@example.com', name: 'Vendelia Admin', role: 'admin' };
+  getSession.mockResolvedValue(admin);
+  expect(await getAdminSession()).toEqual(admin);
   getSession.mockResolvedValue(null); expect(await getAdminSession()).toBeNull();
 });
 it('revokes backend session on logout and clears both current and retired cookies', async () => {

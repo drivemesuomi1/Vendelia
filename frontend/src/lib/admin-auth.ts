@@ -1,4 +1,5 @@
 import "server-only";
+import type { SessionUserDTO } from "@vendelia/shared";
 import { getSession } from "./session";
 import { serverApi } from "./server-api";
 
@@ -8,7 +9,7 @@ export async function adminConfigured(): Promise<boolean> {
 }
 
 /** Rechecks the database-backed session and active admin profile on every call. */
-export async function getAdminSession(): Promise<string | null> {
+export async function getAdminSession(): Promise<SessionUserDTO | null> {
   const user = await getSession();
-  return user?.role === "admin" ? user.email : null;
+  return user?.role === "admin" ? user : null;
 }

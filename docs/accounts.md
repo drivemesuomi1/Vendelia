@@ -15,6 +15,9 @@ migration is still a separate database-owner step.
 Login is now implemented through `backend/src/modules/auth/`. The customer
 `/login` form and staff `/admin` form use Supabase Auth password verification,
 then require an active profile. The admin form additionally requires `role = 'admin'`.
+The admin sidebar displays `profiles.display_name` above the Auth email; the
+portal title remains the translated Admin label. The name is not read from Auth
+user metadata, so an empty display-name field in the Auth dashboard is harmless.
 There is no development admin bypass or environment password login anymore.
 
 Migration `003_auth_sessions.sql` adds a technical session table, **not a second
