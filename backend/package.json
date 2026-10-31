@@ -12,19 +12,25 @@
     "start": "tsx src/server.ts",
     "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx tests/catalogue.test.ts",
-    "db:check": "tsx scripts/check-catalogue.ts"
+    "test": "node --import tsx --test tests/catalogue.test.ts tests/vouchers.test.ts",
+    "db:check": "tsx scripts/check-catalogue.ts",
+    "db:migrate": "tsx scripts/migrate.ts"
   },
   "dependencies": {
-    "@vendelia/shared": "*",
     "@fastify/cors": "^11.3.1",
+    "@vendelia/shared": "*",
     "dotenv": "^18.0.9",
     "drizzle-orm": "^0.45.4",
     "fastify": "^5.12.7",
-    "postgres": "^4.0.0"
+    "nodemailer": "^10.3.1",
+    "pdf-lib": "^1.17.1",
+    "postgres": "^4.0.0",
+    "qrcode": "^1.5.4"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
+    "@types/nodemailer": "^8.0.2",
+    "@types/qrcode": "^1.5.6",
     "drizzle-kit": "^0.31.11",
     "tsx": "^4.23.15"
   }

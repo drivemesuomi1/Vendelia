@@ -31,3 +31,17 @@ export const fetchOrder = (orderId: string) => {
   const token = orderToken(orderId);
   return api<OrderDTO>(`/api/orders/${orderId}`, { headers: token ? { "x-order-token": token } : {} });
 };
+
+/** Downloads the order's voucher PDF; the token goes in a header, not the URL. */
+export async function downloadOrderPdf(orderId: string) {
+  const token = orderToken(orderId);
+  const res = await fetch(`/api/orders/${orderId}/pdf`, { headers: token ? { "x-order-token": token } : {} });
+  if (!res.ok) throw new Error(`pdf_${res.status}`);
+  const name = /filename="([^"]+)"/.exec(res.headers.get("content-disposition") ?? "")?.[1] ?? "Vendelia.pdf";
+  const url = URL.createObjectURL(await res.blob());
+  const a = Object.assign(document.createElement("a"), { href: url, download: name });
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10_000);
+}

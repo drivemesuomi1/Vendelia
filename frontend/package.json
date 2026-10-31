@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "vitest": "^5.0.5"
@@ -20,6 +21,7 @@
   "dependencies": {
     "@vendelia/backend": "*",
     "next": "^16.4.3",
+    "qrcode": "^1.5.4",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "server-only": "^0.0.1"

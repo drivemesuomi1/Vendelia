@@ -23,7 +23,12 @@ export const cartQuoteSchema = z.object({
 });
 
 export const PAYMENT_METHODS = ["bank", "mobilepay", "card"] as const;
-export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
+/**
+ * Temporary: "test" skips payment and issues test/unpaid vouchers. The API accepts it only
+ * while PAYMENT_BYPASS is enabled; remove it once a payment provider is integrated.
+ */
+export const TEST_PAYMENT_METHOD = "test" as const;
+export type PaymentMethod = (typeof PAYMENT_METHODS)[number] | typeof TEST_PAYMENT_METHOD;
 
 export const BANKS = [
   "OP",
@@ -58,7 +63,7 @@ const giftSchema = z
 
 const paymentSchema = z
   .object({
-    method: z.enum(PAYMENT_METHODS),
+    method: z.enum([...PAYMENT_METHODS, TEST_PAYMENT_METHOD]),
     bank: z.string().optional(),
   })
   .superRefine((p, ctx) => {

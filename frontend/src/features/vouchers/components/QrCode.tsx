@@ -1,31 +1,26 @@
-/**
- * Placeholder QR pattern derived from the code (deterministic, NOT scannable).
- * Swap for a real encoder (e.g. the `qrcode` package) before launch.
- */
-export function QrCode({ code, label }: { code: string; label: string }) {
-  const N = 25;
-  let h = 0;
-  for (const ch of code) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-  const rnd = () => {
-    h ^= h << 13; h >>>= 0; h ^= h >> 17; h ^= h << 5; h >>>= 0;
-    return h / 4294967296;
-  };
-  const finder = (x: number, y: number) => (x < 7 && y < 7) || (x >= N - 7 && y < 7) || (x < 7 && y >= N - 7);
-  const cells: [number, number][] = [];
-  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (!finder(x, y) && rnd() > 0.52) cells.push([x, y]);
-  const F = ({ x, y }: { x: number; y: number }) => (
-    <>
-      <rect x={x} y={y} width={7} height={7} />
-      <rect x={x + 1} y={y + 1} width={5} height={5} fill="#fff" />
-      <rect x={x + 2} y={y + 2} width={3} height={3} />
-    </>
-  );
+import QRCode from "qrcode";
+
+/** Scannable QR code for a voucher, drawn as SVG (the same payload as on the PDF). */
+export function QrCode({ value, label }: { value: string; label: string }) {
+  const qr = QRCode.create(value, { errorCorrectionLevel: "M" });
+  const n = qr.modules.size;
+  const quiet = 2;
+  // One path of 1x1 squares, merged into horizontal runs, keeps the DOM small.
+  let d = "";
+  for (let row = 0; row < n; row++) {
+    for (let col = 0; col < n; col++) {
+      if (!qr.modules.get(row, col)) continue;
+      let end = col;
+      while (end + 1 < n && qr.modules.get(row, end + 1)) end++;
+      d += `M${col + quiet} ${row + quiet}h${end - col + 1}v1h-${end - col + 1}z`;
+      col = end;
+    }
+  }
+  const size = n + quiet * 2;
   return (
-    <svg className="qr" viewBox={`0 0 ${N} ${N}`} role="img" aria-label={label} shapeRendering="crispEdges" fill="#17223B">
-      {cells.map(([x, y]) => <rect key={`${x}-${y}`} x={x} y={y} width={1} height={1} />)}
-      <F x={0} y={0} />
-      <F x={N - 7} y={0} />
-      <F x={0} y={N - 7} />
+    <svg className="qr" viewBox={`0 0 ${size} ${size}`} role="img" aria-label={label} shapeRendering="crispEdges">
+      <rect width={size} height={size} fill="#fff" />
+      <path d={d} fill="#17223B" />
     </svg>
   );
 }

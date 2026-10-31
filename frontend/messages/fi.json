@@ -197,7 +197,17 @@
     "orderMeta": "Tilausnumero {number} · yhteensä {total}.",
     "keepBrowsing": "Jatka selaamista",
     "cancelHint": "Muuttuivatko suunnitelmat? Voit perua käyttämättömät lahjakortit {date} asti ja saada rahat takaisin.",
-    "orderNotVisible": "Tilausta ei voi näyttää tässä selaimessa. Lahjakortit on lähetetty sähköpostiisi, ja löydät ne myös Omista lahjakorteista kirjautumalla."
+    "orderNotVisible": "Tilausta ei voi näyttää tässä selaimessa. Lahjakortit on lähetetty sähköpostiisi, ja löydät ne myös Omista lahjakorteista kirjautumalla.",
+    "testMode": "Testitila – maksu ohitetaan",
+    "testModeText": "Maksuja ei ole vielä otettu käyttöön. Tilaus tallennetaan testitilauksena, eikä sinulta veloiteta mitään. Saat lahjakortin PDF-tiedostona sähköpostiisi, ja se on merkitty maksamattomaksi.",
+    "payTest": "Vahvista testitilaus (ei veloitusta)",
+    "creatingVouchers": "Luodaan lahjakortteja ja lähetetään sähköpostia…",
+    "testOrder": "Testitilaus – ei maksettu",
+    "testOrderText": "Tämä tilaus luotiin ilman maksua testausta varten. Lahjakortit eivät kelpaa käytettäväksi.",
+    "emailFailed": "Lahjakortin lähettäminen sähköpostiin ei onnistunut. Voit ladata sen tästä.",
+    "downloadPdf": "Lataa lahjakortti (PDF)",
+    "downloadFailed": "Lataus ei onnistunut. Yritä uudelleen.",
+    "thanksTest": "Kiitos! Testitilaus vastaanotettu."
   },
   "vouchers": {
     "signedInAs": "Kirjautuneena: {email}",
@@ -230,7 +240,8 @@
     "validLabel": "Voimassa",
     "untilDate": "{date} asti",
     "order": "Tilaus",
-    "nextStep": "Seuraava vaihe:"
+    "nextStep": "Seuraava vaihe:",
+    "testUnpaid": "Testi – ei maksettu"
   },
   "auth": {
     "loginTitle": "Kirjaudu sisään",
@@ -473,6 +484,14 @@
     "deal_not_found": "Diiliä ei löytynyt.",
     "order_not_found": "Tilausta ei löytynyt.",
     "api_not_configured": "Palvelu ei ole vielä käytössä.",
-    "paymentUnavailable": "Verkkomaksu ei ole juuri nyt käytettävissä, eikä sinulta veloitettu mitään. Yritä hetken kuluttua uudelleen tai kirjoita osoitteeseen tuki@vendelia.fi."
+    "paymentUnavailable": "Verkkomaksu ei ole juuri nyt käytettävissä, eikä sinulta veloitettu mitään. Yritä hetken kuluttua uudelleen tai kirjoita osoitteeseen tuki@vendelia.fi.",
+    "testCheckoutNotAllowed": "Testitilaus ei ole sallittu tälle sähköpostiosoitteelle.",
+    "itemsUnavailable": "Osa ostoskorin tuotteista ei ole enää saatavilla. Päivitä ostoskori ja yritä uudelleen.",
+    "redeemUnavailable": "Lunastuksen kirjaaminen vaatii yrityskirjautumisen, joka ei ole vielä käytössä. Koodin tarkistus toimii."
+  },
+  "voucherCheck": {
+    "title": "Lahjakortin tarkistus",
+    "merchantNote": "Palveluntarjoaja: kirjaa lahjakortti käytetyksi Vendelian yritysportaalissa.",
+    "openPortal": "Avaa yritysportaali"
   }
 }

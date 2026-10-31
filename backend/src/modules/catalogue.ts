@@ -6,6 +6,7 @@ import type {
 
 interface DealRow {
   id: string;
+  merchant_id: string;
   slug: string;
   title: LocalizedText;
   base_title: LocalizedText | null;
@@ -36,7 +37,7 @@ export class CatalogueRepository {
   private visibleDeals(filter: ReturnType<Sql>) {
     const sql = this.sql;
     return sql<DealRow[]>`
-      SELECT d.id, d.slug, d.title, d.base_title, d.description, d.restrictions,
+      SELECT d.id, d.merchant_id, d.slug, d.title, d.base_title, d.description, d.restrictions,
         d.inclusions, d.terms, d.how_to, d.category_id, d.city_id, d.area,
         d.service_area, d.street, d.zip, d.meeting_point, d.image_url,
         d.gallery_urls, d.vat_bps, d.reference_price_cents, purchasable.options,
@@ -121,6 +122,14 @@ export class CatalogueRepository {
     const sql = this.sql;
     const [row] = await this.visibleDeals(sql`d.slug = ${slug}`);
     return row ? detail(row) : null;
+  }
+
+  /** Purchasable deals for an order, under the same visibility rule as quotes. */
+  async forOrder(ids: string[]): Promise<{ deal: DealDetailDTO; merchantId: string }[]> {
+    if (!ids.length) return [];
+    const sql = this.sql;
+    const rows = await this.visibleDeals(sql`d.id IN ${sql(ids)}`);
+    return rows.map((row) => ({ deal: detail(row), merchantId: row.merchant_id }));
   }
 
   async quote(items: CartItemInput[]): Promise<CartQuoteDTO> {
