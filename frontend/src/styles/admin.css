@@ -80,8 +80,15 @@
 .adm-head p{margin-top:4px;font-size:13.5px}
 .demo-pill{display:inline-flex;align-items:center;gap:4px;color:var(--warn-tx);font-weight:600}
 .demo-pill .icon{width:13px;height:13px}
-.seg{display:inline-flex;flex-wrap:wrap;gap:2px;padding:3px;background:var(--hover);border-radius:9px}
-.seg button,.seg a{border:0;background:none;min-height:30px;padding:0 12px;border-radius:7px;font-size:13px;font-weight:500;color:var(--navy-70);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:background .12s,color .12s}
+/* .seg and .lang also exist on the customer site (checkout options, header pill); these reset them for admin. */
+.admin-font .seg{display:inline-flex;flex-wrap:wrap;align-items:center;gap:2px;padding:3px;margin:0;border:0;background:var(--hover);border-radius:9px;box-sizing:border-box}
+.admin-font .seg button{flex:none;font:500 13px/1 inherit;font-family:inherit;box-shadow:none}
+.admin-font .lang{min-height:32px;height:32px;border-radius:8px;border-color:var(--line-strong);padding:0 26px 0 10px;font-size:12.5px;background-color:#fff;background-position:right 8px center}
+.admin-font .lang:hover{border-color:#BDBDB5}
+.portal-admin .side>.row{align-items:center}
+.admin-font .seg [aria-pressed="true"],.admin-font .seg [aria-pressed="true"]:hover{color:var(--navy);background:#fff;box-shadow:0 1px 2px rgba(20,20,25,.08),0 0 0 1px var(--line)}
+.toolbar .btn,.adm-head .btn{height:36px;min-height:36px}
+.seg button,.seg a{border:0;background:none;height:30px;min-height:30px;margin:0;padding:0 12px;border-radius:7px;font-size:13px;font-weight:500;color:var(--navy-70);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:background .12s,color .12s}
 .seg button:hover,.seg a:hover{color:var(--navy)}
 .seg [aria-pressed="true"],.seg [aria-pressed="true"]:hover{background:#fff;color:var(--navy);box-shadow:0 1px 2px rgba(20,20,25,.08),0 0 0 1px var(--line)}
 .seg small{font-size:11.5px;color:var(--navy-50);font-variant-numeric:tabular-nums}
