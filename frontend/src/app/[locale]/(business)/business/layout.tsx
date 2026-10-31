@@ -1,13 +1,18 @@
 import type { ReactNode } from "react";
-import { PortalShell } from "@/components/layout/PortalShell";
-import { resolveLocale } from "@/i18n/server";
-import { requireSession } from "@/lib/session";
+import { BusinessGate } from "@/features/portal-demo/BusinessGate";
+import { portalClass } from "@/lib/portal-fonts";
+import "@/styles/portal.css";
 
-export const metadata = { robots: { index: false } };
+export const metadata = { title: "Yritysportaali", robots: { index: false } };
 
-/** Business portal: merchants only (admins can look too). The API enforces the same rule. */
-export default async function BusinessLayout({ children, params }: { children: ReactNode; params: Promise<{ locale: string }> }) {
-  const locale = await resolveLocale(params);
-  await requireSession(locale, `/${locale}/business`, ["merchant"]);
-  return <PortalShell kind="business">{children}</PortalShell>;
+/**
+ * Business portal: a business signs in with the details the admin created, then creates deals for review.
+ * Demo mode: accounts and deals live in the browser (features/portal-demo/store.ts) until the API exists.
+ */
+export default function BusinessLayout({ children }: { children: ReactNode }) {
+  return (
+    <div className={portalClass}>
+      <BusinessGate>{children}</BusinessGate>
+    </div>
+  );
 }

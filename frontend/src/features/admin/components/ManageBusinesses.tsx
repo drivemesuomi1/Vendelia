@@ -1,51 +1,35 @@
 "use client";
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
-import type { AdminMerchantRowDTO } from "@vendelia/shared";
+import Link from "next/link";
+import { useState, type FormEvent, type InputHTMLAttributes, type ReactNode } from "react";
 import { Dialog } from "@/components/ui/Dialog";
 import { Icon } from "@/components/ui/Icon";
 import { useI18n } from "@/i18n/I18nProvider";
 import { formatDate, loc } from "@/lib/format";
+import { ago } from "../format";
 import { useAppData } from "@/lib/meta-context";
+import {
+  createBusiness,
+  removeBusiness,
+  resetBusinessPassword,
+  setBusinessStatus,
+  useDemoStore,
+  useHydrated,
+  type BusinessStatus,
+  type DemoBusiness,
+} from "@/features/portal-demo/store";
 
 /**
- * Admin "Manage businesses": add a business with its sign-in details, search/filter, activate/suspend and
- * reset passwords. DEMO ONLY until POST /api/admin/merchants exists: new businesses are kept in this browser's
- * localStorage (without any password), and generated passwords are shown once and never stored.
+ * Admin "Manage businesses": create a business with its sign-in details, search/filter, activate/suspend,
+ * reset passwords. Uses the shared demo store until POST /api/admin/merchants exists.
+ * Generated passwords are shown once; only their hash is kept.
  */
 
-type Status = "active" | "pending" | "suspended";
-interface Row extends AdminMerchantRowDTO {
-  isNew?: boolean;
-  contactName?: string;
-  phone?: string;
-  cityId?: string;
-  categoryId?: string;
-}
 interface Issued {
   name: string;
   email: string;
   password: string;
   reset?: boolean;
-}
-
-const STORE = "vd_demo_businesses";
-const STATUS_STORE = "vd_demo_business_status";
-
-function readJson<T>(key: string, fallback: T): T {
-  try {
-    const v = localStorage.getItem(key);
-    return v ? (JSON.parse(v) as T) : fallback;
-  } catch {
-    return fallback;
-  }
-}
-function writeJson(key: string, value: unknown) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    /* private mode: keep in memory only */
-  }
 }
 
 /** 14-character password from the browser's secure random source, avoiding look-alike characters. */
@@ -54,7 +38,10 @@ export function generatePassword(length = 14) {
   const all = sets.join("");
   const rnd = new Uint32Array(length);
   crypto.getRandomValues(rnd);
-  const chars = Array.from(rnd, (n, i) => (i < sets.length ? sets[i]! : all)[n % (i < sets.length ? sets[i]! : all).length]!);
+  const chars = Array.from(rnd, (n, i) => {
+    const pool = i < sets.length ? sets[i]! : all;
+    return pool[n % pool.length]!;
+  });
   // Shuffle so the guaranteed character types are not always first.
   const order = new Uint32Array(length);
   crypto.getRandomValues(order);
@@ -72,37 +59,31 @@ export function validBusinessId(id: string) {
   return (r === 0 ? 0 : 11 - r) === Number(m[2]);
 }
 
-const EMPTY = { name: "", companyName: "", businessId: "", contactName: "", email: "", phone: "", cityId: "", categoryId: "", status: "active" as Status, password: "" };
+const EMPTY = { name: "", companyName: "", businessId: "", contactName: "", email: "", phone: "", cityId: "", categoryId: "", status: "active" as BusinessStatus, password: "" };
+type FormKey = keyof typeof EMPTY;
 
-export function ManageBusinesses({ merchants }: { merchants: AdminMerchantRowDTO[] }) {
+export function ManageBusinesses() {
   const { t, locale } = useI18n();
   const { meta } = useAppData();
-  const [created, setCreated] = useState<Row[]>([]);
-  const [statusOverride, setStatusOverride] = useState<Record<string, Status>>({});
+  const { businesses, deals } = useDemoStore();
+  const hydrated = useHydrated();
   const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
   const [form, setForm] = useState(EMPTY);
-  const [errors, setErrors] = useState<Partial<Record<keyof typeof EMPTY, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<FormKey, string>>>({});
   const [issued, setIssued] = useState<Issued | null>(null);
   const [copied, setCopied] = useState("");
   const [q, setQ] = useState("");
-  const [filter, setFilter] = useState<"" | Status>("");
+  const [filter, setFilter] = useState<"" | BusinessStatus>("");
 
-  useEffect(() => {
-    setCreated(readJson<Row[]>(STORE, []));
-    setStatusOverride(readJson<Record<string, Status>>(STATUS_STORE, {}));
-  }, []);
-
-  const rows: Row[] = useMemo(
-    () => [...created, ...merchants].map((m) => ({ ...m, status: statusOverride[m.id] ?? m.status })),
-    [created, merchants, statusOverride],
-  );
-  const shown = rows.filter((m) => {
+  const dealCount = (id: string, status?: string) => deals.filter((d) => d.businessId === id && (!status || d.status === status)).length;
+  const shown = businesses.filter((m) => {
     const n = q.trim().toLowerCase();
     return (!filter || m.status === filter) && (!n || [m.name, m.companyName, m.businessId, m.email].some((v) => v.toLowerCase().includes(n)));
   });
-  const count = (s: Status) => rows.filter((m) => m.status === s).length;
+  const count = (s: BusinessStatus) => businesses.filter((m) => m.status === s).length;
 
-  const set = (k: keyof typeof EMPTY, v: string) => {
+  const set = (k: FormKey, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
     setErrors((e) => ({ ...e, [k]: undefined }));
   };
@@ -113,17 +94,17 @@ export function ManageBusinesses({ merchants }: { merchants: AdminMerchantRowDTO
     setOpen(true);
   };
 
-  const submit = (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
     const err: typeof errors = {};
     const email = form.email.trim().toLowerCase();
     if (!form.name.trim()) err.name = t("admin.mb.errRequired");
     if (!form.companyName.trim()) err.companyName = t("admin.mb.errRequired");
     if (!validBusinessId(form.businessId)) err.businessId = t("admin.mb.errBusinessId");
-    else if (rows.some((m) => m.businessId === form.businessId.trim())) err.businessId = t("admin.mb.errDuplicateId");
+    else if (businesses.some((m) => m.businessId === form.businessId.trim())) err.businessId = t("admin.mb.errDuplicateId");
     if (!form.contactName.trim()) err.contactName = t("admin.mb.errRequired");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) err.email = t("admin.mb.errEmail");
-    else if (rows.some((m) => m.email.toLowerCase() === email)) err.email = t("admin.mb.errDuplicateEmail");
+    else if (businesses.some((m) => m.email === email)) err.email = t("admin.mb.errDuplicateEmail");
     if (!form.cityId) err.cityId = t("admin.mb.errRequired");
     if (!form.categoryId) err.categoryId = t("admin.mb.errRequired");
     if (form.password.length < 12) err.password = t("admin.mb.errPassword");
@@ -132,44 +113,36 @@ export function ManageBusinesses({ merchants }: { merchants: AdminMerchantRowDTO
       document.getElementById(`mb-${Object.keys(err)[0]}`)?.focus();
       return;
     }
-    const row: Row = {
-      id: `new-${Date.now().toString(36)}`,
-      name: form.name.trim(),
-      companyName: form.companyName.trim(),
-      businessId: form.businessId.trim(),
-      email,
-      status: form.status,
-      liveDeals: 0,
-      createdAt: new Date().toISOString(),
-      isNew: true,
-      contactName: form.contactName.trim(),
-      phone: form.phone.trim(),
-      cityId: form.cityId,
-      categoryId: form.categoryId,
-    };
-    const next = [row, ...created];
-    setCreated(next);
-    writeJson(STORE, next); // the password is deliberately not saved
-    setIssued({ name: row.name, email, password: form.password });
+    setBusy(true);
+    const business = await createBusiness(
+      {
+        name: form.name.trim(),
+        companyName: form.companyName.trim(),
+        businessId: form.businessId.trim(),
+        email,
+        contactName: form.contactName.trim(),
+        phone: form.phone.trim(),
+        cityId: form.cityId,
+        categoryId: form.categoryId,
+        status: form.status,
+      },
+      form.password,
+    );
+    setBusy(false);
+    setIssued({ name: business.name, email, password: form.password });
     setOpen(false);
   };
 
-  const changeStatus = (id: string, status: Status) => {
-    const next = { ...statusOverride, [id]: status };
-    setStatusOverride(next);
-    writeJson(STATUS_STORE, next);
-  };
-
-  const resetPassword = (m: Row) => {
+  const resetPassword = async (m: DemoBusiness) => {
     if (!confirm(t("admin.mb.confirmReset", { name: m.name }))) return;
-    setIssued({ name: m.name, email: m.email, password: generatePassword(), reset: true });
+    const password = generatePassword();
+    await resetBusinessPassword(m.id, password);
+    setIssued({ name: m.name, email: m.email, password, reset: true });
   };
 
-  const remove = (m: Row) => {
+  const remove = (m: DemoBusiness) => {
     if (!confirm(t("admin.mb.confirmRemove", { name: m.name }))) return;
-    const next = created.filter((c) => c.id !== m.id);
-    setCreated(next);
-    writeJson(STORE, next);
+    removeBusiness(m.id);
   };
 
   const copy = async (text: string, what: string) => {
@@ -182,29 +155,31 @@ export function ManageBusinesses({ merchants }: { merchants: AdminMerchantRowDTO
     }
   };
 
-  const field = (k: keyof typeof EMPTY, label: string, input: React.ReactNode, hint?: string) => (
+  const loginUrl = typeof window === "undefined" ? "" : `${window.location.origin}/${locale}/business`;
+
+  const field = (k: FormKey, label: string, input: ReactNode, hint?: string) => (
     <div className="mb-field">
       <label htmlFor={`mb-${k}`}>{label}</label>
       {input}
       {errors[k] ? <p className="err-msg" id={`mb-${k}-err`}><Icon name="xc" />{errors[k]}</p> : hint ? <p className="hint">{hint}</p> : null}
     </div>
   );
-  const text = (k: keyof typeof EMPTY, props: React.InputHTMLAttributes<HTMLInputElement> = {}) => (
+  const text = (k: FormKey, props: InputHTMLAttributes<HTMLInputElement> = {}) => (
     <input id={`mb-${k}`} className="input" value={form[k]} onChange={(e) => set(k, e.target.value)} aria-invalid={!!errors[k] || undefined} aria-describedby={errors[k] ? `mb-${k}-err` : undefined} {...props} />
   );
 
   return (
     <>
-      <section className="adm-kpis four">
+      <section className="adm-kpis">
         {(
           [
-            ["admin.mb.total", rows.length],
+            ["admin.mb.total", businesses.length],
             ["admin.active", count("active")],
             ["admin.pending", count("pending")],
             ["admin.suspended", count("suspended")],
           ] as const
         ).map(([k, v]) => (
-          <div className="kpi-tile" key={k}><p className="kt-label">{t(k)}</p><p className="kt-value">{v}</p></div>
+          <div className="kpi-tile" key={k}><p className="kt-label">{t(k)}</p><p className="kt-value">{hydrated ? v : "–"}</p></div>
         ))}
       </section>
 
@@ -221,28 +196,28 @@ export function ManageBusinesses({ merchants }: { merchants: AdminMerchantRowDTO
             <button className="btn btn-ghost btn-sm" onClick={() => setIssued(null)} aria-label={t("admin.mb.close")}><Icon name="x" /></button>
           </div>
           <dl className="cred">
-            <div><dt>{t("admin.mb.loginUrl")}</dt><dd className="mono">{`${typeof window === "undefined" ? "" : window.location.origin}/${locale}/login`}</dd></div>
+            <div><dt>{t("admin.mb.loginUrl")}</dt><dd className="mono">{loginUrl}</dd><button className="btn btn-secondary btn-sm" onClick={() => copy(loginUrl, "url")}>{copied === "url" ? t("admin.mb.copied") : t("admin.mb.copy")}</button></div>
             <div><dt>{t("admin.mb.loginEmail")}</dt><dd className="mono">{issued.email}</dd><button className="btn btn-secondary btn-sm" onClick={() => copy(issued.email, "email")}>{copied === "email" ? t("admin.mb.copied") : t("admin.mb.copy")}</button></div>
             <div><dt>{t("admin.mb.tempPassword")}</dt><dd className="mono pw">{issued.password}</dd><button className="btn btn-secondary btn-sm" onClick={() => copy(issued.password, "pw")}>{copied === "pw" ? t("admin.mb.copied") : t("admin.mb.copy")}</button></div>
           </dl>
           <div className="row wrap-row" style={{ marginTop: 12 }}>
-            <button className="btn btn-primary btn-sm" onClick={() => copy(`${t("admin.mb.loginEmail")}: ${issued.email}\n${t("admin.mb.tempPassword")}: ${issued.password}`, "all")}>
+            <button className="btn btn-primary btn-sm" onClick={() => copy(`${t("admin.mb.loginUrl")}: ${loginUrl}\n${t("admin.mb.loginEmail")}: ${issued.email}\n${t("admin.mb.tempPassword")}: ${issued.password}`, "all")}>
               <Icon name="doc" />{copied === "all" ? t("admin.mb.copied") : t("admin.mb.copyAll")}
             </button>
-            <p className="hint">{t("admin.mb.demoNote")}</p>
+            <p className="hint">{t("admin.mb.firstLoginNote")}</p>
           </div>
         </section>
       )}
 
-      <section className="panel" style={{ marginTop: "var(--s3)" }}>
+      <section className="panel" style={{ marginTop: 20 }}>
         <div className="toolbar">
           <label className="search-box">
             <Icon name="search" />
             <span className="sr-only">{t("admin.mb.search")}</span>
             <input className="input" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("admin.mb.search")} />
           </label>
-          <div className="row wrap-row" style={{ gap: 12 }}>
-            <div className="seg" role="group" aria-label={t("admin.order.status")}>
+          <div className="row" style={{ gap: 12 }}>
+            <div className="seg" role="group" aria-label={t("admin.mb.statusFilter")}>
               <button type="button" aria-pressed={filter === ""} onClick={() => setFilter("")}>{t("admin.tab.all")}</button>
               {(["active", "pending", "suspended"] as const).map((s) => (
                 <button key={s} type="button" aria-pressed={filter === s} onClick={() => setFilter(s)}>{t(`admin.${s}`)} <small>{count(s)}</small></button>
@@ -252,50 +227,67 @@ export function ManageBusinesses({ merchants }: { merchants: AdminMerchantRowDTO
           </div>
         </div>
 
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>{t("admin.merchant")}</th>
-                <th>{t("common.businessId")}</th>
-                <th>{t("admin.mb.loginEmail")}</th>
-                <th>{t("business.colStatus")}</th>
-                <th className="num">{t("admin.liveDeals")}</th>
-                <th>{t("admin.created")}</th>
-                <th><span className="sr-only">{t("admin.actions")}</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              {shown.map((m) => (
-                <tr key={m.id}>
-                  <td>
-                    <b>{m.name}</b>{m.isNew && <span className="chip indigo mb-new">{t("admin.mb.new")}</span>}
-                    <small className="muted block">{m.companyName}</small>
-                  </td>
-                  <td className="mono">{m.businessId}</td>
-                  <td>{m.email}</td>
-                  <td>
-                    {m.status === "active" ? <span className="chip teal"><Icon name="checkc" />{t("admin.active")}</span>
-                      : m.status === "pending" ? <span className="chip warn"><Icon name="clock" />{t("admin.pending")}</span>
-                      : <span className="chip danger"><Icon name="xc" />{t("admin.suspended")}</span>}
-                  </td>
-                  <td className="num">{m.liveDeals}</td>
-                  <td>{formatDate(m.createdAt, locale)}</td>
-                  <td>
-                    <div className="mb-actions">
-                      {m.status !== "active"
-                        ? <button className="btn btn-secondary btn-sm" onClick={() => changeStatus(m.id, "active")}>{t("admin.activate")}</button>
-                        : <button className="btn btn-danger btn-sm" onClick={() => changeStatus(m.id, "suspended")}>{t("admin.suspend")}</button>}
-                      <button className="btn btn-ghost btn-sm" onClick={() => resetPassword(m)}><Icon name="lock" />{t("admin.mb.reset")}</button>
-                      {m.isNew && <button className="btn btn-ghost btn-sm" onClick={() => remove(m)} aria-label={t("admin.mb.remove", { name: m.name })}><Icon name="trash" /></button>}
-                    </div>
-                  </td>
+        {hydrated && businesses.length === 0 ? (
+          <div className="empty-state">
+            <span className="attn-ic indigo"><Icon name="store" /></span>
+            <h3>{t("admin.mb.emptyTitle")}</h3>
+            <p className="muted small">{t("admin.mb.emptyText")}</p>
+            <button className="btn btn-primary btn-sm" onClick={openForm}><Icon name="plus" />{t("admin.mb.add")}</button>
+          </div>
+        ) : (
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>{t("admin.merchant")}</th>
+                  <th>{t("common.businessId")}</th>
+                  <th>{t("admin.mb.loginEmail")}</th>
+                  <th>{t("admin.bd.account.lastSignIn")}</th>
+                  <th>{t("business.colStatus")}</th>
+                  <th className="num">{t("admin.mb.deals")}</th>
+                  <th>{t("admin.created")}</th>
+                  <th><span className="sr-only">{t("admin.actions")}</span></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          {shown.length === 0 && <p className="muted empty-row">{t("admin.mb.none")}</p>}
-        </div>
+              </thead>
+              <tbody>
+                {shown.map((m) => (
+                  <tr key={m.id}>
+                    <td>
+                      <Link className="row-link" href={`/${locale}/admin/businesses/${m.id}`}><b>{m.name}</b></Link>
+                      <small className="muted block">{m.companyName} · {loc(meta.cities.find((c) => c.id === m.cityId)?.name, locale)}</small>
+                    </td>
+                    <td className="mono">{m.businessId}</td>
+                    <td>
+                      {m.email}
+                      {m.mustChangePassword && <small className="muted block">{t("admin.mb.awaitingFirstLogin")}</small>}
+                    </td>
+                    <td>{m.lastSignInAt ? ago((Date.now() - Date.parse(m.lastSignInAt)) / 6e4, locale) : <span className="muted">{t("admin.bd.never")}</span>}</td>
+                    <td>
+                      {m.status === "active" ? <span className="chip teal"><Icon name="checkc" />{t("admin.active")}</span>
+                        : m.status === "pending" ? <span className="chip warn"><Icon name="clock" />{t("admin.pending")}</span>
+                        : <span className="chip danger"><Icon name="xc" />{t("admin.suspended")}</span>}
+                    </td>
+                    <td className="num">
+                      {dealCount(m.id, "live")} <span className="muted">/ {dealCount(m.id)}</span>
+                    </td>
+                    <td>{formatDate(m.createdAt, locale)}</td>
+                    <td>
+                      <div className="mb-actions">
+                        {m.status !== "active"
+                          ? <button className="btn btn-secondary btn-sm" onClick={() => setBusinessStatus(m.id, "active")}>{t("admin.activate")}</button>
+                          : <button className="btn btn-danger btn-sm" onClick={() => setBusinessStatus(m.id, "suspended")}>{t("admin.suspend")}</button>}
+                        <Link className="btn btn-secondary btn-sm" href={`/${locale}/admin/businesses/${m.id}`}>{t("admin.bd.open")}</Link>
+                        <button className="btn btn-ghost btn-sm" onClick={() => resetPassword(m)}><Icon name="lock" />{t("admin.mb.reset")}</button>
+                        <button className="btn btn-ghost btn-sm" onClick={() => remove(m)} aria-label={t("admin.mb.remove", { name: m.name })}><Icon name="trash" /></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {hydrated && shown.length === 0 && <p className="muted empty-row">{t("admin.mb.none")}</p>}
+          </div>
+        )}
       </section>
 
       <Dialog open={open} onClose={() => setOpen(false)} className="drawer" labelledBy="mb-title">
@@ -354,7 +346,7 @@ export function ManageBusinesses({ merchants }: { merchants: AdminMerchantRowDTO
             </fieldset>
           </div>
           <div className="drawer-foot">
-            <button className="btn btn-primary btn-block" type="submit"><Icon name="check" />{t("admin.mb.create")}</button>
+            <button className="btn btn-primary btn-block" type="submit" disabled={busy}><Icon name="check" />{t("admin.mb.create")}</button>
             <button className="btn btn-secondary btn-block" type="button" onClick={() => setOpen(false)}>{t("admin.mb.cancel")}</button>
           </div>
         </form>

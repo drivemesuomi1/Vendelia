@@ -1,10 +1,13 @@
-import { resolveLocale } from "@/i18n/server";
-import { AdminDashboard } from "@/features/admin/components/AdminDashboard";
-import { buildAdminDemo } from "@/features/admin/mock-data";
+import { getT, resolveLocale } from "@/i18n/server";
+import { ManageBusinesses } from "@/features/admin/components/ManageBusinesses";
 
-/** Admin overview: KPIs, charts and work queues. Uses demo data until the admin API exists. */
-export default async function AdminOverviewPage({ params }: { params: Promise<{ locale: string }> }) {
-  const locale = await resolveLocale(params);
-  const today = new Intl.DateTimeFormat(`${locale}-FI`, { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Helsinki" }).format(new Date());
-  return <AdminDashboard data={buildAdminDemo()} today={today} />;
+/** Admin home: businesses and their sign-in details. */
+export default async function AdminBusinessesPage({ params }: { params: Promise<{ locale: string }> }) {
+  const t = getT(await resolveLocale(params));
+  return (
+    <div className="adm">
+      <header className="adm-head"><div><h1>{t("admin.mb.title")}</h1><p className="muted small">{t("admin.mb.sub")}</p></div></header>
+      <ManageBusinesses />
+    </div>
+  );
 }

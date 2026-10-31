@@ -6,33 +6,27 @@ import type { ReactNode } from "react";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { Logo } from "@/components/ui/Logo";
 import { useI18n } from "@/i18n/I18nProvider";
-import { useAppData } from "@/lib/meta-context";
 import { adminLogout } from "@/features/admin/actions";
-import { LogoutButton } from "@/features/auth/components/LogoutButton";
 import { LangSwitch } from "./LangSwitch";
 
+export interface PortalAccount {
+  title: string;
+  lines: string[];
+  onSignOut: () => void;
+}
+
 /** Sidebar layout shared by the business portal and the admin area. */
-export function PortalShell({ kind, children, adminEmail }: { kind: "business" | "admin"; children: ReactNode; adminEmail?: string }) {
+export function PortalShell({ kind, children, adminEmail, account }: { kind: "business" | "admin"; children: ReactNode; adminEmail?: string; account?: PortalAccount }) {
   const { t, locale } = useI18n();
-  const { user } = useAppData();
   const pathname = usePathname();
   const base = `/${locale}/${kind}`;
   const items: [string, string, IconName][] =
     kind === "business"
-      ? [[base, t("business.overview"), "grid"], [`${base}/deals/new`, t("business.createDeal"), "plus"], [`${base}/redeem`, t("business.redeem"), "scan"], [`${base}/payouts`, t("business.payouts"), "bank"]]
-      : [
-          [base, t("admin.overview"), "grid"],
-          [`${base}/deals`, t("admin.deals"), "doc"],
-          [`${base}/merchants`, t("admin.merchants"), "store"],
-          [`${base}/orders`, t("admin.orders"), "cart"],
-          [`${base}/finance`, t("admin.finance.title"), "bank"],
-          [`${base}/refunds`, t("admin.refunds"), "refund"],
-          [`${base}/commission`, t("admin.commission"), "card"],
-          [`${base}/support`, t("admin.support"), "help"],
-        ];
+      ? [[base, t("business.myDeals"), "grid"], [`${base}/deals/new`, t("business.createDeal"), "plus"]]
+      : [[base, t("admin.overview"), "grid"], [`${base}/businesses`, t("admin.merchants"), "store"], [`${base}/deals`, t("admin.deals"), "doc"]];
 
   return (
-    <div className={`portal portal-${kind}`}>
+    <div className={`portal portal-${kind} portal-ui`}>
       <aside className="side">
         <div className="row between" style={{ gap: 8 }}>
           <Logo href={base} label={t("nav.homeLabel")} sub={kind === "business" ? t("business.portal") : t("admin.title")} />
@@ -40,7 +34,7 @@ export function PortalShell({ kind, children, adminEmail }: { kind: "business" |
         </div>
         <nav aria-label={kind === "business" ? t("business.portal") : t("admin.title")}>
           {items.map(([href, label, icon]) => (
-            <Link key={href} href={href} aria-current={pathname === href ? "page" : undefined}><Icon name={icon} />{label}</Link>
+            <Link key={href} href={href} aria-current={pathname === href || pathname === href.replace(`/${locale}`, "") ? "page" : undefined}><Icon name={icon} />{label}</Link>
           ))}
           <Link href={`/${locale}`}><Icon name="left" />{t("business.backToSite")}</Link>
         </nav>
@@ -53,12 +47,11 @@ export function PortalShell({ kind, children, adminEmail }: { kind: "business" |
             </form>
           </div>
         )}
-        {kind === "business" && user && (
+        {account && (
           <div className="biz">
-            <p style={{ fontWeight: 600 }}>{user.merchant?.companyName ?? user.name}</p>
-            {user.merchant && <p className="muted">{t("common.businessId")} {user.merchant.businessId}</p>}
-            <p className="muted small">{user.email}</p>
-            <div style={{ marginTop: 8 }}><LogoutButton /></div>
+            <p style={{ fontWeight: 600 }}>{account.title}</p>
+            {account.lines.map((l) => <p className="muted small" key={l}>{l}</p>)}
+            <button className="btn btn-ghost btn-sm" type="button" style={{ marginTop: 8 }} onClick={account.onSignOut}><Icon name="logout" />{t("auth.logout")}</button>
           </div>
         )}
       </aside>
