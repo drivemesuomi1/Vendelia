@@ -8,7 +8,7 @@ import { Notice } from "@/components/ui/Notice";
 import { useI18n } from "@/i18n/I18nProvider";
 import { formatDate, formatMoney } from "@/lib/format";
 import { VoucherCard } from "@/features/vouchers/components/VoucherCard";
-import { fetchOrder } from "../api";
+import { downloadOrderPdf, fetchOrder } from "../api";
 import { CheckoutSteps } from "./CheckoutSteps";
 
 /** Thank-you page with every voucher from the order. */
@@ -16,6 +16,8 @@ export function SuccessView({ orderId }: { orderId: string }) {
   const { t, locale } = useI18n();
   const [order, setOrder] = useState<OrderDTO | null>(null);
   const [failed, setFailed] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [downloadFailed, setDownloadFailed] = useState(false);
 
   useEffect(() => {
     fetchOrder(orderId).then(setOrder).catch(() => setFailed(true));
@@ -33,17 +35,39 @@ export function SuccessView({ orderId }: { orderId: string }) {
 
   const n = order.vouchers.length;
   const cancelUntil = order.vouchers[0]?.cancellableUntil;
+  const emailed = order.emailStatus === "sent";
+  async function download() {
+    setDownloading(true);
+    setDownloadFailed(false);
+    try {
+      await downloadOrderPdf(order!.id);
+    } catch {
+      setDownloadFailed(true);
+    } finally {
+      setDownloading(false);
+    }
+  }
   return (
     <main className="wrap" style={{ paddingTop: "var(--s4)", maxWidth: 900 }}>
       <CheckoutSteps current={3} />
       <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "var(--s2)" }}>
         <div className="success-ic"><Icon name="check" /></div>
-        <h1 style={{ fontSize: "clamp(26px,4vw,34px)" }}>{t("checkout.thanks")}</h1>
+        <h1 style={{ fontSize: "clamp(26px,4vw,34px)" }}>{t(order.test ? "checkout.thanksTest" : "checkout.thanks")}</h1>
         <p className="muted">
-          {t(n === 1 ? "checkout.sentOne" : "checkout.sentMany", { n, email: order.email })}{" "}
+          {emailed && <>{t(n === 1 ? "checkout.sentOne" : "checkout.sentMany", { n, email: order.email })}{" "}</>}
           {t("checkout.orderMeta", { number: order.number, total: formatMoney(order.totalCents, locale) })}
         </p>
+        <button className="btn btn-secondary" type="button" onClick={download} disabled={downloading}>
+          <Icon name="doc" />{t("checkout.downloadPdf")}
+        </button>
+        {downloadFailed && <p className="err-msg" role="alert">{t("checkout.downloadFailed")}</p>}
       </div>
+      {order.test && (
+        <Notice className="mt" tone="danger" icon="info">
+          <p><b>{t("checkout.testOrder")}</b> {t("checkout.testOrderText")}</p>
+        </Notice>
+      )}
+      {!emailed && <Notice className="mt" tone="warn" icon="info">{t("checkout.emailFailed")}</Notice>}
       <div className="stack" style={{ marginTop: "var(--s4)" }}>
         {order.vouchers.map((v) => <VoucherCard key={v.code} v={v} />)}
       </div>

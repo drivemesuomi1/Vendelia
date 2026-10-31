@@ -22,7 +22,7 @@ export function PortalShell({ kind, children, adminEmail, account }: { kind: "bu
   const base = `/${locale}/${kind}`;
   const items: [string, string, IconName][] =
     kind === "business"
-      ? [[base, t("business.myDeals"), "grid"], [`${base}/deals/new`, t("business.createDeal"), "plus"]]
+      ? [[base, t("business.myDeals"), "grid"], [`${base}/deals/new`, t("business.createDeal"), "plus"], [`${base}/redeem`, t("business.redeem"), "scan"]]
       : [
           [base, t("admin.overview"), "grid"],
           [`${base}/businesses`, t("admin.merchants"), "store"],

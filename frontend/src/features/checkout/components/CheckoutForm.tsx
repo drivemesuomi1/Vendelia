@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { BANKS, checkoutSchema, type PaymentMethod } from "@vendelia/shared";
+import { BANKS, checkoutSchema, TEST_PAYMENT_METHOD, type PaymentMethod } from "@vendelia/shared";
 import { Dialog } from "@/components/ui/Dialog";
 import { Field, TextArea, TextInput } from "@/components/ui/Field";
 import { Icon } from "@/components/ui/Icon";
+import { Notice } from "@/components/ui/Notice";
 import { useI18n } from "@/i18n/I18nProvider";
 import { ApiError } from "@/lib/api-client";
 import { formatDate, formatMoney, itemTitle, expiryFromToday } from "@/lib/format";
@@ -43,6 +44,8 @@ export function CheckoutForm() {
   const [paying, setPaying] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const summaryRef = useRef<HTMLDivElement>(null);
+  // Temporary: while payments aren't integrated, the API may allow test orders that skip payment.
+  const testMode = !!meta.paymentBypass;
 
   useEffect(() => {
     if (cart.ready && !cart.items.length && !paying) router.replace(`/${locale}/cart`);
@@ -58,7 +61,9 @@ export function CheckoutForm() {
       items: cart.items,
       contact: { email: form.email, firstName: form.firstName, lastName: form.lastName, phone: form.phone },
       gift: { enabled: form.gift, recipientName: form.recipientName, message: form.message },
-      payment: { method: form.method, bank: form.method === "bank" ? form.bank : undefined },
+      payment: testMode
+        ? { method: TEST_PAYMENT_METHOD }
+        : { method: form.method, bank: form.method === "bank" ? form.bank : undefined },
       acceptTerms: form.acceptTerms,
       newsletter: form.newsletter,
     };
@@ -73,10 +78,16 @@ export function CheckoutForm() {
     }
     setErrors({});
     const methodName = form.method === "bank" ? form.bank : form.method === "mobilepay" ? "MobilePay" : t("checkout.cardPayment");
-    setPaying(methodName);
+    setPaying(testMode ? TEST_PAYMENT_METHOD : methodName);
     try {
       const order = await createOrder(parsed.data, locale);
       rememberOrderToken(order.orderId, order.accessToken);
+      if (order.payment.action === "none") {
+        // Test order: vouchers are issued and emailed already, nothing to pay.
+        cart.clear();
+        router.push(`/${locale}/checkout/success?order=${order.orderId}`);
+        return;
+      }
       if (order.payment.action === "redirect" && order.payment.redirectUrl) {
         window.location.href = order.payment.redirectUrl;
         return;
@@ -170,42 +181,49 @@ export function CheckoutForm() {
             )}
           </fieldset>
 
-          <fieldset className="card pad stack">
-            <legend className="sr-only">{t("checkout.paymentMethod")}</legend>
-            <h2 style={{ fontSize: 20 }} aria-hidden="true">{t("checkout.paymentMethod")}</h2>
-            <div className="pay-opts" role="radiogroup" aria-label={t("checkout.paymentMethod")}>
-              <label className="pay-opt">
-                <input type="radio" name="pm" checked={form.method === "bank"} onChange={() => set("method", "bank")} />
-                <Icon name="bank" />
-                <span>{t("checkout.bank")}<span className="d">{t("checkout.bankHint")}</span></span>
-              </label>
-              {form.method === "bank" && (
-                <div>
-                  <p className="label" id="bank-l" style={{ margin: "4px 0" }}>{t("checkout.chooseBank")}</p>
-                  <div className="banks" role="radiogroup" aria-labelledby="bank-l">
-                    {BANKS.map((b) => (
-                      <label className="bank" key={b}>
-                        <input type="radio" name="bank" id={`bank-${b}`} checked={form.bank === b} onChange={() => set("bank", b)} />
-                        {b}
-                      </label>
-                    ))}
+          {testMode ? (
+            <Notice tone="warn" icon="info">
+              <p><b>{t("checkout.testMode")}</b></p>
+              <p style={{ marginTop: 4 }}>{t("checkout.testModeText")}</p>
+            </Notice>
+          ) : (
+            <fieldset className="card pad stack">
+              <legend className="sr-only">{t("checkout.paymentMethod")}</legend>
+              <h2 style={{ fontSize: 20 }} aria-hidden="true">{t("checkout.paymentMethod")}</h2>
+              <div className="pay-opts" role="radiogroup" aria-label={t("checkout.paymentMethod")}>
+                <label className="pay-opt">
+                  <input type="radio" name="pm" checked={form.method === "bank"} onChange={() => set("method", "bank")} />
+                  <Icon name="bank" />
+                  <span>{t("checkout.bank")}<span className="d">{t("checkout.bankHint")}</span></span>
+                </label>
+                {form.method === "bank" && (
+                  <div>
+                    <p className="label" id="bank-l" style={{ margin: "4px 0" }}>{t("checkout.chooseBank")}</p>
+                    <div className="banks" role="radiogroup" aria-labelledby="bank-l">
+                      {BANKS.map((b) => (
+                        <label className="bank" key={b}>
+                          <input type="radio" name="bank" id={`bank-${b}`} checked={form.bank === b} onChange={() => set("bank", b)} />
+                          {b}
+                        </label>
+                      ))}
+                    </div>
+                    {err("payment.bank") && <span className="err-msg"><Icon name="xc" />{err("payment.bank")}</span>}
                   </div>
-                  {err("payment.bank") && <span className="err-msg"><Icon name="xc" />{err("payment.bank")}</span>}
-                </div>
-              )}
-              <label className="pay-opt">
-                <input type="radio" name="pm" checked={form.method === "mobilepay"} onChange={() => set("method", "mobilepay")} />
-                <Icon name="phone" />
-                <span>MobilePay<span className="d">{t("checkout.mobilepayHint")}</span></span>
-              </label>
-              <label className="pay-opt">
-                <input type="radio" name="pm" checked={form.method === "card"} onChange={() => set("method", "card")} />
-                <Icon name="card" />
-                <span>{t("checkout.card")}<span className="d">{t("checkout.cardHint")}</span></span>
-                <span className="brand">VISA · MC</span>
-              </label>
-            </div>
-          </fieldset>
+                )}
+                <label className="pay-opt">
+                  <input type="radio" name="pm" checked={form.method === "mobilepay"} onChange={() => set("method", "mobilepay")} />
+                  <Icon name="phone" />
+                  <span>MobilePay<span className="d">{t("checkout.mobilepayHint")}</span></span>
+                </label>
+                <label className="pay-opt">
+                  <input type="radio" name="pm" checked={form.method === "card"} onChange={() => set("method", "card")} />
+                  <Icon name="card" />
+                  <span>{t("checkout.card")}<span className="d">{t("checkout.cardHint")}</span></span>
+                  <span className="brand">VISA · MC</span>
+                </label>
+              </div>
+            </fieldset>
+          )}
 
           <fieldset className="card pad stack">
             <legend className="sr-only">{t("checkout.consent")}</legend>
@@ -242,22 +260,24 @@ export function CheckoutForm() {
               </div>
               <CartTotals quote={quote} totalLabel={t("checkout.totalToPay")} />
               <button className="btn btn-primary btn-block" type="submit" disabled={!!paying}>
-                <Icon name="lock" />
-                {t("checkout.pay", { amount: formatMoney(quote.totalCents, locale) })}
+                <Icon name={testMode ? "check" : "lock"} />
+                {testMode ? t("checkout.payTest") : t("checkout.pay", { amount: formatMoney(quote.totalCents, locale) })}
               </button>
             </>
           ) : (
             <div className="empty"><div className="spin" aria-hidden="true" /></div>
           )}
-          <p className="hint" style={{ textAlign: "center" }}>{t("checkout.redirectNote")}</p>
+          {!testMode && <p className="hint" style={{ textAlign: "center" }}>{t("checkout.redirectNote")}</p>}
         </aside>
       </form>
 
       <Dialog open={!!paying} onClose={() => {}}>
         <div className="pad stack" style={{ textAlign: "center", padding: "40px 24px" }}>
           <div className="spin" aria-hidden="true" />
-          <p style={{ fontWeight: 600 }} role="status">{t("checkout.redirecting", { method: paying ?? "" })}</p>
-          <p className="hint">{t("checkout.mockNote")}</p>
+          <p style={{ fontWeight: 600 }} role="status">
+            {paying === TEST_PAYMENT_METHOD ? t("checkout.creatingVouchers") : t("checkout.redirecting", { method: paying ?? "" })}
+          </p>
+          {paying !== TEST_PAYMENT_METHOD && <p className="hint">{t("checkout.mockNote")}</p>}
         </div>
       </Dialog>
     </main>

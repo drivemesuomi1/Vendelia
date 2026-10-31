@@ -197,7 +197,17 @@
     "orderMeta": "Order number {number} · total {total}.",
     "keepBrowsing": "Keep browsing",
     "cancelHint": "Changed your plans? You can cancel unused vouchers until {date} for a full refund.",
-    "orderNotVisible": "This order can't be shown in this browser. Your vouchers were emailed to you and are in My vouchers when you sign in."
+    "orderNotVisible": "This order can't be shown in this browser. Your vouchers were emailed to you and are in My vouchers when you sign in.",
+    "testMode": "Test mode – payment is skipped",
+    "testModeText": "Payments aren't live yet. The order is saved as a test order and you won't be charged. You'll receive the voucher as a PDF by email, marked as unpaid.",
+    "payTest": "Confirm test order (no charge)",
+    "creatingVouchers": "Creating your vouchers and sending the email…",
+    "testOrder": "Test order – not paid",
+    "testOrderText": "This order was created without payment for testing. The vouchers can't be used.",
+    "emailFailed": "We couldn't email your voucher. You can download it here.",
+    "downloadPdf": "Download voucher (PDF)",
+    "downloadFailed": "The download didn't work. Please try again.",
+    "thanksTest": "Thank you! Test order received."
   },
   "vouchers": {
     "signedInAs": "Signed in as {email}",
@@ -230,7 +240,8 @@
     "validLabel": "Valid",
     "untilDate": "until {date}",
     "order": "Order",
-    "nextStep": "Next step:"
+    "nextStep": "Next step:",
+    "testUnpaid": "Test – not paid"
   },
   "auth": {
     "loginTitle": "Sign in",
@@ -803,6 +814,14 @@
     "deal_not_found": "Deal not found.",
     "order_not_found": "Order not found.",
     "api_not_configured": "This service is not available yet.",
-    "paymentUnavailable": "Online payment isn't available right now and you have not been charged. Please try again shortly or email tuki@vendelia.fi."
+    "paymentUnavailable": "Online payment isn't available right now and you have not been charged. Please try again shortly or email tuki@vendelia.fi.",
+    "testCheckoutNotAllowed": "Test orders aren't allowed for this email address.",
+    "itemsUnavailable": "Some items in your cart are no longer available. Update your cart and try again.",
+    "redeemUnavailable": "Recording a redemption needs business sign-in, which isn't available yet. Checking the code works."
+  },
+  "voucherCheck": {
+    "title": "Voucher check",
+    "merchantNote": "Service provider: mark the voucher as used in Vendelia's business portal.",
+    "openPortal": "Open the business portal"
   }
 }

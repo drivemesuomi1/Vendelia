@@ -38,7 +38,7 @@ export function Footer() {
           </div>
         </div>
         <div className="legal">
-          <span>© {new Date().getFullYear()} Mansio Group Oy · {t("common.businessId")} 3631044-9</span>
+          <span>© {new Date().getFullYear()} Vendelia Oy · {t("common.businessId")} 3666248-7</span>
         </div>
       </div>
     </footer>

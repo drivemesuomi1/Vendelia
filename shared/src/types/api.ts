@@ -25,6 +25,8 @@ export interface MetaDTO {
   commissionVatBps: number;
   voucherValidityMonths: number;
   refundWindowDays: number;
+  /** Temporary test checkout: payment is skipped and vouchers are marked test/unpaid. */
+  paymentBypass?: boolean;
 }
 
 export interface DealOptionDTO {
@@ -133,7 +135,12 @@ export interface CreateOrderResponse {
   number: string;
   accessToken: string;
   totalCents: number;
-  payment: { provider: string; action: "confirm_mock" | "redirect"; redirectUrl?: string };
+  /** "none": nothing to pay (test checkout); vouchers are already issued. */
+  payment: { provider: string; action: "confirm_mock" | "redirect" | "none"; redirectUrl?: string };
+  /** Test/unpaid order created through the payment bypass. */
+  test: boolean;
+  /** Whether the voucher email (with the PDF) was sent. */
+  emailSent: boolean;
 }
 
 export interface VoucherDTO {
@@ -158,12 +165,18 @@ export interface VoucherDTO {
   recipientName: string | null;
   orderNumber: string;
   imageUrl: string;
+  /** What the voucher's QR code encodes: the redemption URL carrying the code. */
+  qrPayload: string;
+  /** Issued by a test/unpaid order. */
+  test: boolean;
 }
 
 export interface OrderDTO {
   id: string;
   number: string;
-  status: "pending" | "paid" | "failed";
+  status: "pending" | "paid" | "failed" | "test_unpaid";
+  test: boolean;
+  emailStatus: "pending" | "sent" | "failed";
   email: string;
   totalCents: number;
   paymentMethod: PaymentMethod;
@@ -192,6 +205,8 @@ export interface MerchantOverviewDTO {
 
 export interface RedeemLookupDTO {
   code: string;
+  /** Issued by a test/unpaid order. */
+  test?: boolean;
   result: "valid" | "not_found" | "other_merchant" | "redeemed" | "refunded" | "expired";
   title?: LocalizedText;
   optionLabel?: LocalizedText | null;

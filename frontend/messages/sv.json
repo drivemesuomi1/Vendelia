@@ -197,7 +197,17 @@
     "orderMeta": "Ordernummer {number} · totalt {total}.",
     "keepBrowsing": "Fortsätt bläddra",
     "cancelHint": "Ändrade planer? Du kan avbeställa oanvända presentkort till och med {date} och få pengarna tillbaka.",
-    "orderNotVisible": "Beställningen kan inte visas i den här webbläsaren. Presentkorten har skickats till din e-post och finns i Mina presentkort när du loggar in."
+    "orderNotVisible": "Beställningen kan inte visas i den här webbläsaren. Presentkorten har skickats till din e-post och finns i Mina presentkort när du loggar in.",
+    "testMode": "Testläge – betalningen hoppas över",
+    "testModeText": "Betalningar är ännu inte i bruk. Beställningen sparas som en testbeställning och du debiteras ingenting. Du får presentkortet som PDF per e-post, och det är märkt som obetalt.",
+    "payTest": "Bekräfta testbeställningen (ingen debitering)",
+    "creatingVouchers": "Presentkorten skapas och e-post skickas…",
+    "testOrder": "Testbeställning – ej betald",
+    "testOrderText": "Beställningen skapades utan betalning för testning. Presentkorten kan inte användas.",
+    "emailFailed": "Det gick inte att skicka presentkortet per e-post. Du kan ladda ner det här.",
+    "downloadPdf": "Ladda ner presentkortet (PDF)",
+    "downloadFailed": "Nedladdningen misslyckades. Försök igen.",
+    "thanksTest": "Tack! Testbeställningen har tagits emot."
   },
   "vouchers": {
     "signedInAs": "Inloggad: {email}",
@@ -230,7 +240,8 @@
     "validLabel": "Giltigt",
     "untilDate": "till {date}",
     "order": "Beställning",
-    "nextStep": "Nästa steg:"
+    "nextStep": "Nästa steg:",
+    "testUnpaid": "Test – ej betald"
   },
   "auth": {
     "loginTitle": "Logga in",
@@ -803,6 +814,14 @@
     "deal_not_found": "Erbjudandet hittades inte.",
     "order_not_found": "Beställningen hittades inte.",
     "api_not_configured": "Tjänsten är inte tillgänglig ännu.",
-    "paymentUnavailable": "Onlinebetalning är inte tillgänglig just nu och du har inte debiterats. Försök igen om en stund eller skriv till tuki@vendelia.fi."
+    "paymentUnavailable": "Onlinebetalning är inte tillgänglig just nu och du har inte debiterats. Försök igen om en stund eller skriv till tuki@vendelia.fi.",
+    "testCheckoutNotAllowed": "Testbeställningar är inte tillåtna för den här e-postadressen.",
+    "itemsUnavailable": "Några produkter i varukorgen finns inte längre. Uppdatera varukorgen och försök igen.",
+    "redeemUnavailable": "Att registrera inlösen kräver företagsinloggning, som ännu inte finns. Kodkontrollen fungerar."
+  },
+  "voucherCheck": {
+    "title": "Kontroll av presentkort",
+    "merchantNote": "Tjänsteleverantör: registrera presentkortet som använt i Vendelias företagsportal.",
+    "openPortal": "Öppna företagsportalen"
   }
 }

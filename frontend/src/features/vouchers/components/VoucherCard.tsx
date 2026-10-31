@@ -18,12 +18,14 @@ export function VoucherCard({ v }: { v: VoucherDTO }) {
   return (
     <div className="card pad voucher">
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-        <QrCode code={v.code} label={t("vouchers.qrLabel", { code: v.code })} />
+        <QrCode value={v.qrPayload} label={t("vouchers.qrLabel", { code: v.code })} />
         <span className="code">{v.code}</span>
       </div>
       <div className="stack">
         <div className="row between wrap-row">
-          <span className="chip teal"><Icon name="checkc" />{t("vouchers.validUnused")}</span>
+          {v.test
+            ? <span className="chip danger"><Icon name="info" />{t("vouchers.testUnpaid")}</span>
+            : <span className="chip teal"><Icon name="checkc" />{t("vouchers.validUnused")}</span>}
           <LogoSymbol height={28} />
         </div>
         <h2 style={{ fontSize: 20 }}>{itemTitle(v.title, null, v.optionLabel, locale)}</h2>
@@ -35,7 +37,8 @@ export function VoucherCard({ v }: { v: VoucherDTO }) {
         )}
         <dl className="kv">
           <dt>{t("vouchers.business")}</dt><dd>{v.merchantName}</dd>
-          <dt>{t("vouchers.address")}</dt><dd>{address}</dd>
+          {/* Services done at the customer's place (e.g. cleaning) have no street address. */}
+          {v.street && <><dt>{t("vouchers.address")}</dt><dd>{address}</dd></>}
           <dt>{t("vouchers.purchased")}</dt><dd>{formatDate(v.issuedAt, locale)}</dd>
           <dt>{t("vouchers.validLabel")}</dt><dd><b>{t("vouchers.untilDate", { date: formatDate(v.expiresAt, locale) })}</b></dd>
           <dt>{t("vouchers.order")}</dt><dd>{v.orderNumber}</dd>
