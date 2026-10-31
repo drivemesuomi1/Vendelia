@@ -1,34 +1,6 @@
 import type { Sql } from "postgres";
-import type {
-  CartItemInput, CartQuoteDTO, CityDTO, CategoryDTO,
-  DealDetailDTO, DealOptionDTO, DealQuery, DealSummaryDTO, LocalizedList, LocalizedText,
-} from "@vendelia/shared";
-
-interface DealRow {
-  id: string;
-  merchant_id: string;
-  slug: string;
-  title: LocalizedText;
-  base_title: LocalizedText | null;
-  description: LocalizedText;
-  restrictions: LocalizedText;
-  inclusions: LocalizedList;
-  terms: LocalizedList;
-  how_to: LocalizedList;
-  category_id: string;
-  city_id: string;
-  area: LocalizedText;
-  service_area: LocalizedText | null;
-  street: string | null;
-  zip: string | null;
-  meeting_point: boolean;
-  image_url: string;
-  gallery_urls: string[];
-  vat_bps: number;
-  reference_price_cents: number | null;
-  options: DealOptionDTO[];
-  merchant: DealDetailDTO["merchant"];
-}
+import type { CityDTO, CategoryDTO, DealQuery } from "@vendelia/shared";
+import type { DealRow } from "./types";
 
 export class CatalogueRepository {
   constructor(private readonly sql: Sql) {}
@@ -98,7 +70,7 @@ export class CatalogueRepository {
     return row!;
   }
 
-  async list(query: DealQuery = {}): Promise<DealSummaryDTO[]> {
+  async list(query: DealQuery = {}): Promise<DealRow[]> {
     const sql = this.sql;
     const rows = await this.visibleDeals(sql`
       ${query.category ? sql`d.category_id = ${query.category}` : sql`true`}
@@ -115,76 +87,18 @@ export class CatalogueRepository {
         m.display_name, m.company_name
       ))) > 0` : sql`true`}
     `);
-    return rows.map(summary);
+    return rows;
   }
 
-  async detail(slug: string): Promise<DealDetailDTO | null> {
+  async detail(slug: string): Promise<DealRow | null> {
     const sql = this.sql;
     const [row] = await this.visibleDeals(sql`d.slug = ${slug}`);
-    return row ? detail(row) : null;
+    return row ?? null;
   }
 
-  /** Purchasable deals for an order, under the same visibility rule as quotes. */
-  async forOrder(ids: string[]): Promise<{ deal: DealDetailDTO; merchantId: string }[]> {
+  async findByIds(ids: string[]): Promise<DealRow[]> {
     if (!ids.length) return [];
     const sql = this.sql;
-    const rows = await this.visibleDeals(sql`d.id IN ${sql(ids)}`);
-    return rows.map((row) => ({ deal: detail(row), merchantId: row.merchant_id }));
+    return this.visibleDeals(sql`d.id IN ${sql(ids)}`);
   }
-
-  async quote(items: CartItemInput[]): Promise<CartQuoteDTO> {
-    if (!items.length) return { lines: [], totalCents: 0, vatByRate: {}, unavailable: [] };
-    const sql = this.sql;
-    const ids = [...new Set(items.map((item) => item.dealId))];
-    const rows = await this.visibleDeals(sql`d.id IN ${sql(ids)}`);
-    return quote(items, rows.map(detail));
-  }
-}
-
-function summary(row: DealRow): DealSummaryDTO {
-  const cheapest = row.options.reduce((best, option) => option.priceCents < best.priceCents ? option : best);
-  return {
-    id: row.id, slug: row.slug, title: row.title, restrictions: row.restrictions,
-    categoryId: row.category_id, cityId: row.city_id, area: row.area,
-    imageUrl: row.image_url, vatBps: row.vat_bps,
-    fromPriceCents: cheapest.priceCents,
-    referencePriceCents: cheapest.referencePriceCents ?? null,
-    optionCount: row.options.length,
-    defaultOptionId: row.options.length === 1 ? row.options[0]!.id : null,
-    merchantName: row.merchant.name,
-  };
-}
-
-function detail(row: DealRow): DealDetailDTO {
-  return {
-    ...summary(row), referencePriceCents: row.reference_price_cents,
-    baseTitle: row.base_title, description: row.description,
-    inclusions: row.inclusions, terms: row.terms, howTo: row.how_to,
-    street: row.street ?? "", zip: row.zip ?? "", meetingPoint: row.meeting_point,
-    options: row.options.map((option) => ({ ...option, shortLabel: option.shortLabel ?? undefined })),
-    merchant: row.merchant, status: "live", gallery: row.gallery_urls,
-    serviceArea: row.service_area ?? undefined,
-  };
-}
-
-/** Uses current database prices; client-supplied prices are never inputs. */
-export function quote(items: CartItemInput[], deals: DealDetailDTO[]): CartQuoteDTO {
-  const result: CartQuoteDTO = { lines: [], totalCents: 0, vatByRate: {}, unavailable: [] };
-  const byId = new Map(deals.map((deal) => [deal.id, deal]));
-  for (const item of items) {
-    const deal = byId.get(item.dealId);
-    const option = deal?.options.find((option) => option.id === item.optionId);
-    if (!deal || !option) { result.unavailable.push(item); continue; }
-    const totalCents = option.priceCents * item.qty;
-    result.lines.push({
-      dealId: deal.id, optionId: option.id, qty: item.qty,
-      unitPriceCents: option.priceCents, totalCents, vatBps: deal.vatBps,
-      title: deal.title, baseTitle: deal.baseTitle, optionLabel: option.label,
-      merchantName: deal.merchantName, slug: deal.slug, imageUrl: deal.imageUrl,
-    });
-    result.totalCents += totalCents;
-    result.vatByRate[deal.vatBps] = (result.vatByRate[deal.vatBps] ?? 0)
-      + Math.round(totalCents * deal.vatBps / (10000 + deal.vatBps));
-  }
-  return result;
 }

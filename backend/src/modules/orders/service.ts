@@ -5,17 +5,13 @@ import {
   type CheckoutInput, type CreateOrderResponse, type Locale, type LocalizedList, type LocalizedText,
   type OrderDTO, type PaymentMethod, type RedeemLookupDTO, type VoucherDTO, type VoucherStatus,
 } from "@vendelia/shared";
-import type { OrderConfig, PlatformConfig } from "../config";
-import { quote, type CatalogueRepository } from "./catalogue";
-import { buildVoucherEmail } from "./vouchers/email";
-import type { Mailer } from "./vouchers/mailer";
-import { renderVoucherPdf, type VoucherDocument } from "./vouchers/pdf";
-import { pick, voucherText } from "./vouchers/text";
-
-/** An expected failure with a client-facing error code (translated by the frontend). */
-export class HttpProblem extends Error {
-  constructor(public readonly statusCode: number, public readonly code: string) { super(code); }
-}
+import type { OrderConfig, PlatformConfig } from "../../config";
+import { HttpProblem } from "../../errors";
+import type { CatalogueService } from "../catalogue/service";
+import { buildVoucherEmail } from "../vouchers/email";
+import type { Mailer } from "../vouchers/mailer";
+import { renderVoucherPdf, type VoucherDocument } from "../vouchers/pdf";
+import { pick, voucherText } from "../vouchers/text";
 
 // No 0/O or 1/I/L, so codes read back unambiguously; a subset of VOUCHER_CODE_RE.
 const ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
@@ -72,7 +68,7 @@ interface VoucherRow {
 export class OrderService {
   constructor(
     private readonly sql: Sql,
-    private readonly catalogue: CatalogueRepository,
+    private readonly catalogue: CatalogueService,
     private readonly policy: PlatformConfig,
     private readonly config: OrderConfig,
     private readonly mailer: Mailer,
@@ -92,11 +88,9 @@ export class OrderService {
       throw new HttpProblem(403, "testCheckoutNotAllowed");
     }
 
-    // Prices come from the database, never from the browser.
-    const deals = await this.catalogue.forOrder([...new Set(input.items.map((item) => item.dealId))]);
-    const priced = quote(input.items, deals.map((d) => d.deal));
+    // Prices come from the database, never from the browser (same rules as cart quotes).
+    const { quote: priced, merchantOf } = await this.catalogue.priceOrder(input.items);
     if (priced.unavailable.length || !priced.lines.length) throw new HttpProblem(409, "itemsUnavailable");
-    const merchantOf = new Map(deals.map((d) => [d.deal.id, d.merchantId]));
 
     const accessToken = randomBytes(32).toString("base64url");
     // Timestamps go in as ISO text too: the shared client is wrapped by Drizzle, which turns off

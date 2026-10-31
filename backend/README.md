@@ -2,6 +2,33 @@
 
 Fastify API backed by the existing Supabase Postgres catalogue tables.
 
+## Structure
+
+```text
+src/
+  app.ts                         App setup, dependencies, shared hooks and module registration
+  server.ts                      Optional standalone HTTP listener
+  config.ts                      Platform configuration
+  db/index.ts                    Database connection pool
+  modules/
+    catalogue/
+      routes.ts                  GET/POST handlers, validation and HTTP responses
+      service.ts                 Catalogue use cases and cart pricing rules
+      repository.ts              Parameterized SQL and raw query results
+      mapper.ts                  Query rows to public API response objects
+      types.ts                   Internal database result types
+    health/routes.ts             Database health endpoint
+```
+
+The call path is `routes -> service -> repository -> database`; mappers convert
+query results before services return public DTOs. Routes do not contain SQL, and
+repositories do not calculate cart totals or decide HTTP status codes. Shared
+request validation and public response types remain in `shared/src`.
+
+Add future implemented features under their own `modules/<feature>/` folders and
+register their routes in `app.ts`. The Next.js/Vercel adapter continues to consume
+the same exported `buildApp` function, so deployment setup does not change.
+
 Implemented:
 
 - `GET /api/health`: runs a database query.

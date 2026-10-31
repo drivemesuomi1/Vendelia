@@ -5,7 +5,7 @@ import { PDFDocument } from "pdf-lib";
 import { VOUCHER_CODE_RE, voucherQrPayload } from "@vendelia/shared";
 import { buildApp } from "../src/app.js";
 import { orderConfig } from "../src/config.js";
-import { newOrderNumber, newVoucherCode, voucherExpiry } from "../src/modules/orders.js";
+import { newOrderNumber, newVoucherCode, voucherExpiry } from "../src/modules/orders/service.js";
 import { buildVoucherEmail } from "../src/modules/vouchers/email.js";
 import { renderVoucherPdf, type VoucherDocument } from "../src/modules/vouchers/pdf.js";
 

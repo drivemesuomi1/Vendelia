@@ -37,7 +37,7 @@ Payments are not integrated yet. With `PAYMENT_BYPASS=true`:
 **To disable:** set `PAYMENT_BYPASS=false` (or remove it) and redeploy. Checkout then answers
 `503 paymentUnavailable` until a provider is added. When integrating payments, remove
 `TEST_PAYMENT_METHOD` from `shared/src/schemas/order.ts` and the bypass branch in
-`OrderService.create` (`backend/src/modules/orders.ts`).
+`OrderService.create` (`backend/src/modules/orders/service.ts`).
 
 ## Setup
 
