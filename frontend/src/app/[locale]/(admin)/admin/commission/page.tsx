@@ -8,9 +8,9 @@ export default async function AdminCommissionPage({ params }: { params: Promise<
   const meta = await getMeta();
   const { rateBps } = await adminData<{ rateBps: number }>("/api/admin/settings/commission", { rateBps: meta.commissionBps });
   return (
-    <>
-      <h1 style={{ fontSize: 28, marginBottom: "var(--s3)" }}>{t("admin.commission")}</h1>
+    <div className="adm">
+      <header className="adm-head"><div><h1>{t("admin.commission")}</h1></div></header>
       <CommissionForm rateBps={rateBps} />
-    </>
+    </div>
   );
 }

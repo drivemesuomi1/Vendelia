@@ -12,6 +12,7 @@ import { ApiError } from "@/lib/api-client";
 import { formatMoney, formatPct, loc } from "@/lib/format";
 import { useAppData } from "@/lib/meta-context";
 import { createDeal, previewCommission, updateDeal, uploadImage } from "../api";
+import { splitPrice } from "@/features/portal-demo/money";
 
 const toCents = (euros: string) => Math.round(parseFloat(euros.replace(",", ".")) * 100);
 const toEuros = (cents: number | null | undefined) => (cents ? (cents / 100).toFixed(2) : "");
@@ -20,32 +21,63 @@ const VAT_KEYS: Record<number, string> = { 2550: "business.vatGeneral", 1350: "b
 
 interface OptionRow { id?: string; label: string; price: string }
 
-/** Create or edit a deal. Shows what the merchant receives per voucher as they type. */
-export function DealForm({ deal }: { deal?: DealDetailDTO & { merchantId: string } }) {
+/** Shrinks a photo to at most 1200px JPEG so it fits in browser storage (demo mode). */
+function resizeImage(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, 1200 / Math.max(img.width, img.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(img.src);
+      resolve(canvas.toDataURL("image/jpeg", 0.82));
+    };
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+/**
+ * Create or edit a deal. Shows what the merchant receives per voucher as they type.
+ * With `onSave` (demo mode, no API) the deal is handed to the caller, the split is computed locally
+ * and photos are kept as resized data URLs.
+ */
+export function DealForm({
+  deal,
+  initial,
+  onSave,
+}: {
+  deal?: DealDetailDTO & { merchantId: string };
+  initial?: DealInput;
+  onSave?: (input: DealInput) => void | Promise<void>;
+}) {
   const { t, locale } = useI18n();
   const { meta } = useAppData();
   const router = useRouter();
   const toast = useToast();
+  const src = deal ?? initial;
   const [f, setF] = useState({
-    titleFi: deal?.title.fi ?? "",
-    titleSv: deal?.title.sv ?? "",
-    titleEn: deal?.title.en ?? "",
-    descFi: deal?.description.fi ?? "",
-    restrictions: deal?.restrictions.fi ?? "",
-    inclusions: deal?.inclusions.fi.join("\n") ?? "",
-    terms: deal?.terms.fi.join("\n") ?? "",
-    howTo: deal?.howTo.fi.join("\n") ?? "",
-    categoryId: deal?.categoryId ?? meta.categories[0]?.id ?? "",
-    cityId: deal?.cityId ?? meta.cities[0]?.id ?? "",
-    area: deal?.area.fi ?? "",
-    street: deal?.street ?? "",
-    zip: deal?.zip ?? "",
-    vatBps: deal?.vatBps ?? 2550,
-    reference: toEuros(deal?.referencePriceCents),
-    imageUrl: deal?.imageUrl ?? "",
+    titleFi: src?.title.fi ?? "",
+    titleSv: src?.title.sv ?? "",
+    titleEn: src?.title.en ?? "",
+    descFi: src?.description.fi ?? "",
+    restrictions: src?.restrictions.fi ?? "",
+    inclusions: src?.inclusions.fi.join("\n") ?? "",
+    terms: src?.terms.fi.join("\n") ?? "",
+    howTo: src?.howTo.fi.join("\n") ?? "",
+    categoryId: src?.categoryId ?? meta.categories[0]?.id ?? "",
+    cityId: src?.cityId ?? meta.cities[0]?.id ?? "",
+    area: deal?.area.fi ?? initial?.area ?? "",
+    street: src?.street ?? "",
+    zip: src?.zip ?? "",
+    vatBps: src?.vatBps ?? 2550,
+    reference: toEuros(src?.referencePriceCents),
+    imageUrl: src?.imageUrl ?? "",
   });
   const [options, setOptions] = useState<OptionRow[]>(
-    deal?.options.map((o) => ({ id: o.id, label: o.label?.fi ?? "", price: toEuros(o.priceCents) })) ?? [{ label: "", price: "" }],
+    src?.options.map((o) => ({ id: o.id, label: o.label?.fi ?? "", price: toEuros(o.priceCents) })) ?? [{ label: "", price: "" }],
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [split, setSplit] = useState<SplitDTO | null>(null);
@@ -57,9 +89,10 @@ export function DealForm({ deal }: { deal?: DealDetailDTO & { merchantId: string
   const firstPrice = toCents(options[0]?.price ?? "");
   useEffect(() => {
     if (!Number.isFinite(firstPrice) || firstPrice <= 0) return setSplit(null);
+    if (onSave) return setSplit(splitPrice(firstPrice, f.vatBps, meta.commissionBps, meta.commissionVatBps));
     const timer = setTimeout(() => previewCommission(firstPrice, f.vatBps).then((r) => setSplit(r.split)).catch(() => setSplit(null)), 250);
     return () => clearTimeout(timer);
-  }, [firstPrice, f.vatBps]);
+  }, [firstPrice, f.vatBps, onSave, meta.commissionBps, meta.commissionVatBps]);
 
   function build(): DealInput | null {
     const ref = f.reference ? toCents(f.reference) : null;
@@ -97,7 +130,8 @@ export function DealForm({ deal }: { deal?: DealDetailDTO & { merchantId: string
     if (!input) return;
     setBusy(true);
     try {
-      if (deal) await updateDeal(deal.id, input);
+      if (onSave) await onSave(input);
+      else if (deal) await updateDeal(deal.id, input);
       else await createDeal(input);
       toast(t("business.submitted"));
       router.push(`/${locale}/business`);
@@ -112,7 +146,7 @@ export function DealForm({ deal }: { deal?: DealDetailDTO & { merchantId: string
     if (!file) return;
     setUploading(true);
     try {
-      set("imageUrl", (await uploadImage(file)).url);
+      set("imageUrl", onSave ? await resizeImage(file) : (await uploadImage(file)).url);
     } catch (e2) {
       setErrors((p) => ({ ...p, imageUrl: e2 instanceof ApiError ? e2.code : "network" }));
     } finally {

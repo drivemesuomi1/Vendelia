@@ -31,7 +31,7 @@ export function SupportTools({ emails, audit }: { emails: Email[]; audit: Audit[
       <div className="card">
         <div className="pad"><h2 style={{ fontSize: 18 }}>{t("admin.outbox")}</h2><p className="hint">{t("admin.outboxHint")}</p></div>
         <div className="table-wrap">
-          <table>
+          <table className="tbl-compact">
             <thead><tr><th>{t("admin.sentAt")}</th><th>{t("admin.to")}</th><th>{t("admin.subject")}</th></tr></thead>
             <tbody>
               {emails.map((e) => (
@@ -47,7 +47,7 @@ export function SupportTools({ emails, audit }: { emails: Email[]; audit: Audit[
       <div className="card">
         <div className="pad"><h2 style={{ fontSize: 18 }}>{t("admin.audit")}</h2></div>
         <div className="table-wrap">
-          <table>
+          <table className="tbl-compact">
             <tbody>
               {audit.map((a) => (
                 <tr key={a.id}><td>{formatDate(a.createdAt, locale)}</td><td className="mono small">{a.action}</td><td className="small">{a.entity} {a.entityId.slice(0, 8)}</td></tr>

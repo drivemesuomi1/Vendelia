@@ -30,7 +30,7 @@ export function Footer() {
           <div>
             <h4>{t("nav.forBusinesses")}</h4>
             <Link href={l("/register/business")}>{t("footer.sellOn")}</Link>
-            <Link href={l("/business/payouts")}>{t("footer.pricing")}</Link>
+            <Link href={l("/business")}>{t("footer.pricing")}</Link>
           </div>
           <div>
             <h4>{t("footer.help")}</h4>
