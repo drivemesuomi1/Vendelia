@@ -69,7 +69,7 @@ it("marks test orders in the email subject and body", () => {
     locale: "fi", firstName: "Testi", orderNumber: "VD-7H3KQP", test: true, vouchers: [voucher],
     supportEmail: "info@vendelia.fi", siteUrl: "https://www.vendelia.fi",
   });
-  assert.match(mail.subject, /^\[TESTI\] Vendelia-lahjakorttisi: Kotisiivous 3–8 h$/);
+  assert.match(mail.subject, /^Testi – Lahjakorttisi: Kotisiivous 3–8 h$/);
   assert.match(mail.text, /VND-7KQ2-M9XA/);
   assert.match(mail.html, /testitilaus/i);
   assert.doesNotMatch(buildVoucherEmail({ ...{ locale: "en", firstName: "<b>x</b>", orderNumber: "VD-1", test: false, vouchers: [voucher], supportEmail: "a@b.fi", siteUrl: "https://v.fi" } }).html, /<b>x<\/b>/);
