@@ -47,5 +47,6 @@ export function expiryFromToday(months: number, today = new Date()): Date {
   const target = new Date(today.getFullYear(), today.getMonth() + months, 1);
   const last = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
   target.setDate(Math.min(today.getDate(), last));
-  return target;
+  // Midday UTC, so formatDate (Helsinki time) shows this same calendar day in any browser time zone.
+  return new Date(Date.UTC(target.getFullYear(), target.getMonth(), target.getDate(), 12));
 }

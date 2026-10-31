@@ -7,7 +7,8 @@ import { mapDealDetail, mapDealSummary } from "./mapper";
 export class CatalogueService {
   constructor(
     private readonly repository: CatalogueRepository,
-    private readonly config: PlatformConfig,
+    /** Policy plus flags the site needs from /api/meta (e.g. the temporary test checkout). */
+    private readonly config: PlatformConfig & Pick<MetaDTO, "paymentBypass">,
   ) {}
 
   async meta(): Promise<MetaDTO> {
@@ -28,6 +29,12 @@ export class CatalogueService {
     const ids = [...new Set(items.map((item) => item.dealId))];
     const rows = await this.repository.findByIds(ids);
     return calculateQuote(items, rows.map(mapDealDetail));
+  }
+
+  /** Prices an order exactly like a quote and returns each deal's merchant, for the vouchers. */
+  async priceOrder(items: CartItemInput[]): Promise<{ quote: CartQuoteDTO; merchantOf: Map<string, string> }> {
+    const rows = await this.repository.findByIds([...new Set(items.map((item) => item.dealId))]);
+    return { quote: calculateQuote(items, rows.map(mapDealDetail)), merchantOf: new Map(rows.map((row) => [row.id, row.merchant_id])) };
   }
 }
 

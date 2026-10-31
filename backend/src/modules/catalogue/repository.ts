@@ -9,7 +9,7 @@ export class CatalogueRepository {
   private visibleDeals(filter: ReturnType<Sql>) {
     const sql = this.sql;
     return sql<DealRow[]>`
-      SELECT d.id, d.slug, d.title, d.base_title, d.description, d.restrictions,
+      SELECT d.id, d.merchant_id, d.slug, d.title, d.base_title, d.description, d.restrictions,
         d.inclusions, d.terms, d.how_to, d.category_id, d.city_id, d.area,
         d.service_area, d.street, d.zip, d.meeting_point, d.image_url,
         d.gallery_urls, d.vat_bps, d.reference_price_cents, purchasable.options,

@@ -3,6 +3,7 @@ import type { DealDetailDTO, DealOptionDTO, LocalizedList, LocalizedText } from 
 /** Database query result before conversion to public API responses. */
 export interface DealRow {
   id: string;
+  merchant_id: string;
   slug: string;
   title: LocalizedText;
   base_title: LocalizedText | null;

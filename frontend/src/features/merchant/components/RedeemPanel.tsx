@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { VOUCHER_CODE_RE, type RedeemLookupDTO } from "@vendelia/shared";
 import { Field, TextInput } from "@/components/ui/Field";
 import { Icon } from "@/components/ui/Icon";
@@ -23,9 +23,23 @@ export function RedeemPanel() {
 
   async function check(e: FormEvent) {
     e.preventDefault();
+    await lookup(code);
+  }
+
+  // Arriving from a voucher's check page (?code=…) fills in and checks that code.
+  useEffect(() => {
+    const fromLink = new URLSearchParams(window.location.search).get("code");
+    if (fromLink) {
+      setCode(fromLink);
+      void lookup(fromLink);
+    }
+    // Runs once, on arrival from the link.
+  }, []);
+
+  async function lookup(value: string) {
     setRedeemed(null);
     setError(null);
-    const c = code.trim().toUpperCase();
+    const c = value.trim().toUpperCase();
     if (!VOUCHER_CODE_RE.test(c)) return setError(t("errors.invalidVoucherCode"));
     setBusy(true);
     try {
@@ -74,7 +88,10 @@ export function RedeemPanel() {
       <div aria-live="polite">
         {result?.result === "valid" && (
           <div className="card pad stack" style={{ boxShadow: "none" }}>
-            <span className="chip teal" style={{ alignSelf: "flex-start" }}><Icon name="checkc" />{t("vouchers.validUnused")}</span>
+            <div className="row wrap-row">
+              <span className="chip teal"><Icon name="checkc" />{t("vouchers.validUnused")}</span>
+              {result.test && <span className="chip danger"><Icon name="info" />{t("vouchers.testUnpaid")}</span>}
+            </div>
             <p style={{ fontWeight: 600 }}>{itemTitle(result.title!, null, result.optionLabel ?? null, locale)}</p>
             <p className="muted small">
               {t("vouchers.validUntil", { date: formatDate(result.expiresAt!, locale) })}
