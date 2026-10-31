@@ -1,4 +1,4 @@
-import type { Locale } from "@/i18n/config";
+import { LOCALE_LABELS, type Locale } from "@/i18n/config";
 
 /**
  * Display helpers for admin charts and tables. Client components are rendered on the server too, and Node's
@@ -21,8 +21,9 @@ export function moneyCompact(cents: number, locale: Locale) {
   return locale === "en" ? `€${num}${suffix}` : `${num}${suffix} €`;
 }
 
+/** Whole numbers grouped the same way as formatMoney ("1 089" in fi/sv, "1,089" in en). */
 export function int(n: number, locale: Locale) {
-  return new Intl.NumberFormat(tag(locale)).format(n);
+  return new Intl.NumberFormat(LOCALE_LABELS[locale].intl).format(n);
 }
 
 /** Percentage from a 0–1 ratio. */
