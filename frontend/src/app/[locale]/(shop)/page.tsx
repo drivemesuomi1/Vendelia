@@ -17,7 +17,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   return (
     <main className="home">
       <h1 className="sr-only">{t("home.title")}</h1>
-      <PromoBanner locale={locale} meta={meta} />
+      <PromoBanner deals={deals.filter((d) => d.imageUrl)} />
       <div className="wrap">
         <CategoryBar />
 
