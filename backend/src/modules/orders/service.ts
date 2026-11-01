@@ -148,7 +148,7 @@ export class OrderService {
     try {
       const pdf = await this.pdfFor(loaded);
       const message = buildVoucherEmail({
-        locale: order.locale, firstName: order.first_name, orderNumber: order.number, test: order.is_test,
+        locale: order.locale, firstName: order.first_name, orderNumber: order.number,
         vouchers: loaded.documents, supportEmail: this.config.mail.replyTo, siteUrl: this.config.siteUrl,
       });
       await this.mailer.send({
@@ -263,7 +263,7 @@ export class OrderService {
       ORDER BY oi.line_no, v.code`;
     const L = order.locale;
     const documents = rows.map((row): VoucherDocument => ({
-      code: row.code, qrPayload: row.qr_payload, test: row.is_test, title: row.title, optionLabel: row.option_label,
+      code: row.code, qrPayload: row.qr_payload, title: row.title, optionLabel: row.option_label,
       merchant: {
         name: row.merchant_name, companyName: row.company_name, businessId: row.business_id,
         phone: row.public_phone ?? "", email: row.public_email ?? undefined, website: row.website ?? undefined,
@@ -284,8 +284,7 @@ export class OrderService {
       locale: loaded.order.locale, validityMonths: this.policy.voucherValidityMonths,
       refundWindowDays: this.policy.refundWindowDays, supportEmail: this.config.mail.replyTo, siteUrl: this.config.siteUrl,
     });
-    const prefix = loaded.order.is_test ? "TEST-" : "";
-    return { bytes, filename: `${prefix}${voucherText(loaded.order.locale).fileName}-${loaded.order.number}.pdf` };
+    return { bytes, filename: `${voucherText(loaded.order.locale).fileName}-${loaded.order.number}.pdf` };
   }
 
   /** Order numbers and voucher codes are random; on the rare clash the whole order is retried. */

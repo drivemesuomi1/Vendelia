@@ -52,7 +52,7 @@ export function SuccessView({ orderId }: { orderId: string }) {
       <CheckoutSteps current={3} />
       <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "var(--s2)" }}>
         <div className="success-ic"><Icon name="check" /></div>
-        <h1 style={{ fontSize: "clamp(26px,4vw,34px)" }}>{t(order.test ? "checkout.thanksTest" : "checkout.thanks")}</h1>
+        <h1 style={{ fontSize: "clamp(26px,4vw,34px)" }}>{t(order.test ? "checkout.thanksOrder" : "checkout.thanks")}</h1>
         <p className="muted">
           {emailed && <>{t(n === 1 ? "checkout.sentOne" : "checkout.sentMany", { n, email: order.email })}{" "}</>}
           {t("checkout.orderMeta", { number: order.number, total: formatMoney(order.totalCents, locale) })}
@@ -62,11 +62,6 @@ export function SuccessView({ orderId }: { orderId: string }) {
         </button>
         {downloadFailed && <p className="err-msg" role="alert">{t("checkout.downloadFailed")}</p>}
       </div>
-      {order.test && (
-        <Notice className="mt" tone="danger" icon="info">
-          <p><b>{t("checkout.testOrder")}</b> {t("checkout.testOrderText")}</p>
-        </Notice>
-      )}
       {!emailed && <Notice className="mt" tone="warn" icon="info">{t("checkout.emailFailed")}</Notice>}
       <div className="stack" style={{ marginTop: "var(--s4)" }}>
         {order.vouchers.map((v) => <VoucherCard key={v.code} v={v} />)}

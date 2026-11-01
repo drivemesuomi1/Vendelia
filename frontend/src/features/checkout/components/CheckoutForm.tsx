@@ -181,12 +181,7 @@ export function CheckoutForm() {
             )}
           </fieldset>
 
-          {testMode ? (
-            <Notice tone="warn" icon="info">
-              <p><b>{t("checkout.testMode")}</b></p>
-              <p style={{ marginTop: 4 }}>{t("checkout.testModeText")}</p>
-            </Notice>
-          ) : (
+          {!testMode && (
             <fieldset className="card pad stack">
               <legend className="sr-only">{t("checkout.paymentMethod")}</legend>
               <h2 style={{ fontSize: 20 }} aria-hidden="true">{t("checkout.paymentMethod")}</h2>
@@ -261,7 +256,7 @@ export function CheckoutForm() {
               <CartTotals quote={quote} totalLabel={t("checkout.totalToPay")} />
               <button className="btn btn-primary btn-block" type="submit" disabled={!!paying}>
                 <Icon name={testMode ? "check" : "lock"} />
-                {testMode ? t("checkout.payTest") : t("checkout.pay", { amount: formatMoney(quote.totalCents, locale) })}
+                {testMode ? t("checkout.confirmOrder") : t("checkout.pay", { amount: formatMoney(quote.totalCents, locale) })}
               </button>
             </>
           ) : (

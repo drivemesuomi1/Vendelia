@@ -198,16 +198,12 @@
     "keepBrowsing": "Jatka selaamista",
     "cancelHint": "Muuttuivatko suunnitelmat? Voit perua käyttämättömät lahjakortit {date} asti ja saada rahat takaisin.",
     "orderNotVisible": "Tilausta ei voi näyttää tässä selaimessa. Lahjakortit on lähetetty sähköpostiisi, ja löydät ne myös Omista lahjakorteista kirjautumalla.",
-    "testMode": "Testitila – maksu ohitetaan",
-    "testModeText": "Maksuja ei ole vielä otettu käyttöön. Tilaus tallennetaan testitilauksena, eikä sinulta veloiteta mitään. Saat lahjakortin PDF-tiedostona sähköpostiisi, ja se on merkitty maksamattomaksi.",
-    "payTest": "Vahvista testitilaus (ei veloitusta)",
+    "confirmOrder": "Vahvista tilaus",
     "creatingVouchers": "Luodaan lahjakortteja ja lähetetään sähköpostia…",
-    "testOrder": "Testitilaus – ei maksettu",
-    "testOrderText": "Tämä tilaus luotiin ilman maksua testausta varten. Lahjakortit eivät kelpaa käytettäväksi.",
     "emailFailed": "Lahjakortin lähettäminen sähköpostiin ei onnistunut. Voit ladata sen tästä.",
     "downloadPdf": "Lataa lahjakortti (PDF)",
     "downloadFailed": "Lataus ei onnistunut. Yritä uudelleen.",
-    "thanksTest": "Kiitos! Testitilaus vastaanotettu."
+    "thanksOrder": "Kiitos tilauksestasi!"
   },
   "vouchers": {
     "signedInAs": "Kirjautuneena: {email}",
@@ -240,8 +236,7 @@
     "validLabel": "Voimassa",
     "untilDate": "{date} asti",
     "order": "Tilaus",
-    "nextStep": "Seuraava vaihe:",
-    "testUnpaid": "Testi – ei maksettu"
+    "nextStep": "Seuraava vaihe:"
   },
   "auth": {
     "loginTitle": "Kirjaudu sisään",

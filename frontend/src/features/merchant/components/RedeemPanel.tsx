@@ -90,7 +90,6 @@ export function RedeemPanel() {
           <div className="card pad stack" style={{ boxShadow: "none" }}>
             <div className="row wrap-row">
               <span className="chip teal"><Icon name="checkc" />{t("vouchers.validUnused")}</span>
-              {result.test && <span className="chip danger"><Icon name="info" />{t("vouchers.testUnpaid")}</span>}
             </div>
             <p style={{ fontWeight: 600 }}>{itemTitle(result.title!, null, result.optionLabel ?? null, locale)}</p>
             <p className="muted small">

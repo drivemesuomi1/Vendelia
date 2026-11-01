@@ -10,7 +10,7 @@ import { buildVoucherEmail } from "../src/modules/vouchers/email.js";
 import { renderVoucherPdf, type VoucherDocument } from "../src/modules/vouchers/pdf.js";
 
 const voucher: VoucherDocument = {
-  code: "VND-7KQ2-M9XA", qrPayload: voucherQrPayload("https://www.vendelia.fi/", "VND-7KQ2-M9XA"), test: true,
+  code: "VND-7KQ2-M9XA", qrPayload: voucherQrPayload("https://www.vendelia.fi/", "VND-7KQ2-M9XA"),
   title: { fi: "Kotisiivous 3–8 h", sv: "Hemstädning 3–8 h", en: "Home cleaning 3–8 h" },
   optionLabel: { fi: "3 h kotisiivous", sv: "", en: "3 h home cleaning" },
   merchant: { name: "Cleava Siivouspalvelut", companyName: "Cleava Oy", businessId: "3631044-9", phone: "045 187 8083" },
@@ -56,7 +56,7 @@ it("reads the payment bypass and mail settings from the environment", () => {
 
 it("renders one PDF page per voucher, in every language, including characters standard fonts lack", async () => {
   for (const locale of ["fi", "sv", "en"] as const) {
-    const bytes = await renderVoucherPdf([voucher, { ...voucher, code: "VND-P4ZT-8WRB", test: false, recipientName: null }], {
+    const bytes = await renderVoucherPdf([voucher, { ...voucher, code: "VND-P4ZT-8WRB", recipientName: null }], {
       locale, validityMonths: 3, refundWindowDays: 14, supportEmail: "info@vendelia.fi", siteUrl: "https://www.vendelia.fi",
     });
     assert.equal(Buffer.from(bytes.slice(0, 5)).toString(), "%PDF-");
@@ -64,15 +64,15 @@ it("renders one PDF page per voucher, in every language, including characters st
   }
 });
 
-it("marks test orders in the email subject and body", () => {
+it("builds a short voucher email with the code and no test marking", () => {
   const mail = buildVoucherEmail({
-    locale: "fi", firstName: "Testi", orderNumber: "VD-7H3KQP", test: true, vouchers: [voucher],
+    locale: "fi", firstName: "Maija", orderNumber: "VD-7H3KQP", vouchers: [voucher],
     supportEmail: "info@vendelia.fi", siteUrl: "https://www.vendelia.fi",
   });
-  assert.match(mail.subject, /^Testi – Lahjakorttisi: Kotisiivous 3–8 h$/);
+  assert.match(mail.subject, /^Lahjakorttisi: Kotisiivous 3–8 h$/);
   assert.match(mail.text, /VND-7KQ2-M9XA/);
-  assert.match(mail.html, /testitilaus/i);
-  assert.doesNotMatch(buildVoucherEmail({ ...{ locale: "en", firstName: "<b>x</b>", orderNumber: "VD-1", test: false, vouchers: [voucher], supportEmail: "a@b.fi", siteUrl: "https://v.fi" } }).html, /<b>x<\/b>/);
+  assert.doesNotMatch(`${mail.subject} ${mail.text} ${mail.html}`, /testi/i);
+  assert.doesNotMatch(buildVoucherEmail({ ...{ locale: "en", firstName: "<b>x</b>", orderNumber: "VD-1", vouchers: [voucher], supportEmail: "a@b.fi", siteUrl: "https://v.fi" } }).html, /<b>x<\/b>/);
 });
 
 it("refuses checkout without touching the database while the payment bypass is off", async () => {

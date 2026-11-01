@@ -23,9 +23,7 @@ export function VoucherCard({ v }: { v: VoucherDTO }) {
       </div>
       <div className="stack">
         <div className="row between wrap-row">
-          {v.test
-            ? <span className="chip danger"><Icon name="info" />{t("vouchers.testUnpaid")}</span>
-            : <span className="chip teal"><Icon name="checkc" />{t("vouchers.validUnused")}</span>}
+          <span className="chip teal"><Icon name="checkc" />{t("vouchers.validUnused")}</span>
           <LogoSymbol height={28} />
         </div>
         <h2 style={{ fontSize: 20 }}>{itemTitle(v.title, null, v.optionLabel, locale)}</h2>

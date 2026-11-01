@@ -36,7 +36,6 @@ export default async function VoucherCheckPage({ params }: { params: Promise<{ l
           <>
             <div className="row wrap-row" style={{ justifyContent: "center" }}>
               <span className="chip teal"><Icon name="checkc" />{t("vouchers.validUnused")}</span>
-              {r.test && <span className="chip danger"><Icon name="info" />{t("vouchers.testUnpaid")}</span>}
             </div>
             <p style={{ fontWeight: 600, fontSize: 18 }}>{itemTitle(r.title!, null, r.optionLabel ?? null, locale)}</p>
             <p className="muted">{t("vouchers.validUntil", { date: formatDate(r.expiresAt!, locale) })}</p>
@@ -44,7 +43,6 @@ export default async function VoucherCheckPage({ params }: { params: Promise<{ l
         ) : (
           <Notice tone="warn" icon="xc"><p>{reason}</p></Notice>
         )}
-        {r.test && r.result === "valid" && <Notice tone="danger" icon="info"><p>{t("checkout.testOrderText")}</p></Notice>}
         <p className="hint">{t("voucherCheck.merchantNote")}</p>
         <Link className="btn btn-secondary" href={`/${locale}/business/redeem?code=${encodeURIComponent(r.code)}`}>
           {t("voucherCheck.openPortal")}
