@@ -485,7 +485,7 @@
     "financeSub": "Myynti, provisiot, ALV ja tilitykset yrityksille",
     "dealsSub": "Yritysten lähettämät diilit. Hyväksy julkaistavaksi tai hylkää perustellen.",
     "demo": "Esimerkkidata",
-    "demoHint": "Esittelytila: yritykset ja diilit tallennetaan vain tähän selaimeen, kunnes taustajärjestelmä on valmis.",
+    "demoHint": "Yritystiedot tallennetaan tietokantaan. Tarjousten tarkistus- ja talousnäkymissä on vielä esimerkkitietoja.",
     "range": "{n} pv",
     "rangeLabel": "Aikajakso",
     "kpiTitle": "Avainluvut",
@@ -599,10 +599,10 @@
     },
     "mb": {
       "title": "Yritysten hallinta",
-      "sub": "Lisää yrityksiä, luo kirjautumistunnukset ja hallitse niiden tilaa",
+      "sub": "Lisää yrityksiä ja hallitse niiden yhteystietoja ja tilaa",
       "total": "Yrityksiä yhteensä",
       "add": "Lisää yritys",
-      "addHint": "Yritys kirjautuu yritysportaaliin näillä tunnuksilla.",
+      "addHint": "Tallenna yrityksen tiedot. Kirjautumistiliä ei luoda.",
       "secCompany": "Yritys",
       "secContact": "Yhteyshenkilö",
       "secLogin": "Kirjautuminen",
@@ -618,9 +618,9 @@
       "passwordHint": "Vähintään 12 merkkiä. Yritystä pyydetään vaihtamaan se ensimmäisellä kirjautumisella.",
       "generate": "Luo uusi",
       "initialStatus": "Tila luotaessa",
-      "activeHint": "Yritys voi kirjautua ja lähettää diilejä heti.",
-      "pendingHint": "Yritys voi kirjautua, mutta diilejä ei voi julkaista ennen aktivointia.",
-      "create": "Luo yritys ja tunnukset",
+      "activeHint": "Aktiivisen yrityksen tarjoukset voidaan julkaista.",
+      "pendingHint": "Odottavat yritykset eivät näy julkisessa tarjousluettelossa.",
+      "create": "Luo yritys",
       "cancel": "Peruuta",
       "close": "Sulje",
       "issuedTitle": "Tunnukset luotu: {name}",
@@ -647,9 +647,12 @@
       "firstLoginNote": "Yritys valitsee oman salasanansa ensimmäisellä kirjautumisella.",
       "statusFilter": "Suodata tilan mukaan",
       "emptyTitle": "Ei vielä yrityksiä",
-      "emptyText": "Lisää ensimmäinen yritys. Se saa tunnukset, joilla se voi kirjautua yritysportaaliin ja luoda diilejä.",
+      "emptyText": "Lisää ensimmäinen yritys ja sen yhteystiedot.",
       "deals": "Diilit (myynnissä / kaikki)",
-      "awaitingFirstLogin": "Ei vielä kirjautunut"
+      "awaitingFirstLogin": "Ei vielä kirjautunut",
+      "contactEmail": "Yhteyssähköposti",
+      "contactEmailHint": "Valinnainen. Julkinen yhteyssähköposti näkyy yrityksen tarjouksissa.",
+      "signInPreviewHint": "Valinnainen esikatselu. Näitä kenttiä ei tallenneta eikä yrityksen kirjautumistiliä vielä luoda."
     },
     "dr": {
       "live": "Myynnissä",
@@ -696,7 +699,7 @@
       "queue": "Tarkistusjono",
       "noActivity": "Ei vielä tapahtumia.",
       "startTitle": "Aloita lisäämällä yritys",
-      "startText": "Luo yritykselle tunnukset. Kun se lähettää diilejä, näet ne täällä ja tarkistusjonossa.",
+      "startText": "Lisää yritys ja sen yhteystiedot.",
       "evBusiness": "Yritys {name} lisättiin",
       "evSubmitted": "{name} lähetti diilin {deal}",
       "evResubmitted": "{name} lähetti korjatun diilin {deal}",
@@ -822,7 +825,8 @@
     "redeemUnavailable": "Lunastuksen kirjaaminen vaatii yrityskirjautumisen, joka ei ole vielä käytössä. Koodin tarkistus toimii.",
     "authUnavailable": "Kirjautuminen ei ole nyt saatavilla. Tarkista palvelimen asetukset ja yritä uudelleen.",
     "invalidLogin": "Virheelliset tunnukset tai tilin käyttö ei ole sallittu.",
-    "tooManyAttempts": "Liian monta kirjautumisyritystä. Odota minuutti ja yritä uudelleen."
+    "tooManyAttempts": "Liian monta kirjautumisyritystä. Odota minuutti ja yritä uudelleen.",
+    "invalidMerchantReference": "Valitse aktiivinen kaupunki ja kategoria ja yritä uudelleen."
   },
   "voucherCheck": {
     "title": "Lahjakortin tarkistus",

@@ -485,7 +485,7 @@
     "financeSub": "Försäljning, provisioner, moms och utbetalningar till företag",
     "dealsSub": "Erbjudanden från företagen. Godkänn för publicering eller avvisa med motivering.",
     "demo": "Exempeldata",
-    "demoHint": "Demoläge: företag och erbjudanden sparas bara i den här webbläsaren tills backend är klar.",
+    "demoHint": "Företagsuppgifter sparas i databasen. Granskning och ekonomi innehåller fortfarande exempeldata.",
     "range": "{n} d",
     "rangeLabel": "Period",
     "kpiTitle": "Nyckeltal",
@@ -599,10 +599,10 @@
     },
     "mb": {
       "title": "Hantera företag",
-      "sub": "Lägg till företag, skapa inloggningsuppgifter och hantera status",
+      "sub": "Lägg till företag och hantera kontaktuppgifter och status",
       "total": "Företag totalt",
       "add": "Lägg till företag",
-      "addHint": "Företaget loggar in i företagsportalen med dessa uppgifter.",
+      "addHint": "Spara företagets uppgifter. Inget inloggningskonto skapas.",
       "secCompany": "Företag",
       "secContact": "Kontaktperson",
       "secLogin": "Inloggning",
@@ -618,9 +618,9 @@
       "passwordHint": "Minst 12 tecken. Företaget ombeds byta det vid första inloggningen.",
       "generate": "Skapa nytt",
       "initialStatus": "Status vid skapande",
-      "activeHint": "Företaget kan logga in och skicka erbjudanden direkt.",
-      "pendingHint": "Företaget kan logga in men inte publicera erbjudanden före aktivering.",
-      "create": "Skapa företag och inloggning",
+      "activeHint": "Aktiva företag kan ha publicerade erbjudanden.",
+      "pendingHint": "Väntande företag visas inte i den offentliga katalogen.",
+      "create": "Skapa företag",
       "cancel": "Avbryt",
       "close": "Stäng",
       "issuedTitle": "Inloggning skapad: {name}",
@@ -647,9 +647,12 @@
       "firstLoginNote": "Företaget väljer sitt eget lösenord vid första inloggningen.",
       "statusFilter": "Filtrera efter status",
       "emptyTitle": "Inga företag ännu",
-      "emptyText": "Lägg till det första företaget. Det får inloggningsuppgifter för företagsportalen och kan skapa erbjudanden.",
+      "emptyText": "Lägg till det första företaget med företags- och kontaktuppgifter.",
       "deals": "Erbjudanden (live / alla)",
-      "awaitingFirstLogin": "Har inte loggat in ännu"
+      "awaitingFirstLogin": "Har inte loggat in ännu",
+      "contactEmail": "Kontaktens e-post",
+      "contactEmailHint": "Valfritt. Offentlig kontaktadress som visas med företagets erbjudanden.",
+      "signInPreviewHint": "Valfri förhandsvisning. Dessa fält sparas inte och skapar ännu inget inloggningskonto för företaget."
     },
     "dr": {
       "live": "Live",
@@ -696,7 +699,7 @@
       "queue": "Granskningskö",
       "noActivity": "Inga händelser ännu.",
       "startTitle": "Börja med att lägga till ett företag",
-      "startText": "Skapa inloggning åt ett företag. När det skickar erbjudanden visas de här och i granskningskön.",
+      "startText": "Lägg till ett företag med företags- och kontaktuppgifter.",
       "evBusiness": "Företaget {name} lades till",
       "evSubmitted": "{name} skickade erbjudandet {deal}",
       "evResubmitted": "{name} skickade om {deal}",
@@ -822,7 +825,8 @@
     "redeemUnavailable": "Att registrera inlösen kräver företagsinloggning, som ännu inte finns. Kodkontrollen fungerar.",
     "authUnavailable": "Inloggningen är tillfälligt otillgänglig. Kontrollera serverinställningarna och försök igen.",
     "invalidLogin": "Felaktiga uppgifter eller kontot saknar åtkomst.",
-    "tooManyAttempts": "För många inloggningsförsök. Vänta en minut och försök igen."
+    "tooManyAttempts": "För många inloggningsförsök. Vänta en minut och försök igen.",
+    "invalidMerchantReference": "Välj en aktiv stad och kategori och försök igen."
   },
   "voucherCheck": {
     "title": "Kontroll av presentkort",

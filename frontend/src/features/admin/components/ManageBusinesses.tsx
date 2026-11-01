@@ -1,161 +1,86 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { adminMerchantSchema, type AdminMerchantDTO, type MerchantStatus } from "@vendelia/shared";
+import { ApiError } from "@/lib/api-client";
+import { createMerchant, setMerchantStatus } from "../api";
 import { useState, type FormEvent, type InputHTMLAttributes, type ReactNode } from "react";
 import { Dialog } from "@/components/ui/Dialog";
 import { Icon } from "@/components/ui/Icon";
 import { useI18n } from "@/i18n/I18nProvider";
 import { formatDate, loc } from "@/lib/format";
-import { ago } from "../format";
 import { useAppData } from "@/lib/meta-context";
-import {
-  createBusiness,
-  removeBusiness,
-  resetBusinessPassword,
-  setBusinessStatus,
-  useDemoStore,
-  useHydrated,
-  type BusinessStatus,
-  type DemoBusiness,
-} from "@/features/portal-demo/store";
-
-/**
- * Admin "Manage businesses": create a business with its sign-in details, search/filter, activate/suspend,
- * reset passwords. Uses the shared demo store until POST /api/admin/merchants exists.
- * Generated passwords are shown once; only their hash is kept.
- */
-
-interface Issued {
-  name: string;
-  email: string;
-  password: string;
-  reset?: boolean;
-}
-
-/** 14-character password from the browser's secure random source, avoiding look-alike characters. */
-export function generatePassword(length = 14) {
-  const sets = ["ABCDEFGHJKLMNPQRSTUVWXYZ", "abcdefghijkmnpqrstuvwxyz", "23456789", "!#%+?@"];
-  const all = sets.join("");
-  const rnd = new Uint32Array(length);
-  crypto.getRandomValues(rnd);
-  const chars = Array.from(rnd, (n, i) => {
-    const pool = i < sets.length ? sets[i]! : all;
-    return pool[n % pool.length]!;
-  });
-  // Shuffle so the guaranteed character types are not always first.
-  const order = new Uint32Array(length);
-  crypto.getRandomValues(order);
-  return chars.map((c, i) => [order[i]!, c] as const).sort((a, b) => a[0] - b[0]).map(([, c]) => c).join("");
-}
-
-/** Finnish business ID (Y-tunnus) with its check digit. */
-export function validBusinessId(id: string) {
-  const m = /^(\d{7})-(\d)$/.exec(id.trim());
-  if (!m) return false;
-  const w = [7, 9, 10, 5, 8, 4, 2];
-  const sum = m[1]!.split("").reduce((a, d, i) => a + Number(d) * w[i]!, 0);
-  const r = sum % 11;
-  if (r === 1) return false;
-  return (r === 0 ? 0 : 11 - r) === Number(m[2]);
-}
-
-const EMPTY = { name: "", companyName: "", businessId: "", contactName: "", email: "", phone: "", cityId: "", categoryId: "", status: "active" as BusinessStatus, password: "" };
+import { generatePassword } from "@/features/portal-demo/password";
+/** Admin business records come from Supabase; this screen does not provision login accounts. */
+const EMPTY = { name: "", companyName: "", businessId: "", contactName: "", publicEmail: "", phone: "", cityId: "", categoryId: "", status: "active" as MerchantStatus };
 type FormKey = keyof typeof EMPTY;
 
-export function ManageBusinesses() {
+export function ManageBusinesses({ businesses }: { businesses: AdminMerchantDTO[] }) {
   const { t, locale } = useI18n();
   const { meta } = useAppData();
-  const { businesses, deals } = useDemoStore();
-  const hydrated = useHydrated();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [changing, setChanging] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY);
+  // Presentation only: never include these values in validation, API payloads or storage.
+  const [signInEmail, setSignInEmail] = useState("");
+  const [temporaryPassword, setTemporaryPassword] = useState("");
   const [errors, setErrors] = useState<Partial<Record<FormKey, string>>>({});
-  const [issued, setIssued] = useState<Issued | null>(null);
-  const [copied, setCopied] = useState("");
+  const [failure, setFailure] = useState<string | null>(null);
   const [q, setQ] = useState("");
-  const [filter, setFilter] = useState<"" | BusinessStatus>("");
-
-  const dealCount = (id: string, status?: string) => deals.filter((d) => d.businessId === id && (!status || d.status === status)).length;
-  const shown = businesses.filter((m) => {
+  const [filter, setFilter] = useState<"" | MerchantStatus>("");
+  const shown = businesses.filter(m => {
     const n = q.trim().toLowerCase();
-    return (!filter || m.status === filter) && (!n || [m.name, m.companyName, m.businessId, m.email].some((v) => v.toLowerCase().includes(n)));
+    return (!filter || m.status === filter) && (!n || [m.name, m.companyName, m.businessId, m.publicEmail ?? ""]
+      .some(v => v.toLowerCase().includes(n)));
   });
-  const count = (s: BusinessStatus) => businesses.filter((m) => m.status === s).length;
-
-  const set = (k: FormKey, v: string) => {
-    setForm((f) => ({ ...f, [k]: v }));
-    setErrors((e) => ({ ...e, [k]: undefined }));
+  const count = (status: MerchantStatus) => businesses.filter(m => m.status === status).length;
+  const set = (key: FormKey, value: string) => {
+    setForm(f => ({ ...f, [key]: value }));
+    setErrors(e => ({ ...e, [key]: undefined }));
   };
-
   const openForm = () => {
-    setForm({ ...EMPTY, password: generatePassword() });
-    setErrors({});
-    setOpen(true);
+    setForm(EMPTY); setErrors({}); setFailure(null);
+    setSignInEmail(""); setTemporaryPassword(generatePassword()); setOpen(true);
   };
-
-  const submit = async (e: FormEvent) => {
-    e.preventDefault();
-    const err: typeof errors = {};
-    const email = form.email.trim().toLowerCase();
-    if (!form.name.trim()) err.name = t("admin.mb.errRequired");
-    if (!form.companyName.trim()) err.companyName = t("admin.mb.errRequired");
-    if (!validBusinessId(form.businessId)) err.businessId = t("admin.mb.errBusinessId");
-    else if (businesses.some((m) => m.businessId === form.businessId.trim())) err.businessId = t("admin.mb.errDuplicateId");
-    if (!form.contactName.trim()) err.contactName = t("admin.mb.errRequired");
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) err.email = t("admin.mb.errEmail");
-    else if (businesses.some((m) => m.email === email)) err.email = t("admin.mb.errDuplicateEmail");
-    if (!form.cityId) err.cityId = t("admin.mb.errRequired");
-    if (!form.categoryId) err.categoryId = t("admin.mb.errRequired");
-    if (form.password.length < 12) err.password = t("admin.mb.errPassword");
-    setErrors(err);
-    if (Object.keys(err).length) {
-      document.getElementById(`mb-${Object.keys(err)[0]}`)?.focus();
+  const closeForm = () => {
+    if (busy) return;
+    setOpen(false); setSignInEmail(""); setTemporaryPassword("");
+  };
+  const submit = async (event: FormEvent) => {
+    event.preventDefault();
+    const parsed = adminMerchantSchema.safeParse(form);
+    if (!parsed.success) {
+      const fields: typeof errors = {};
+      for (const issue of parsed.error.issues) fields[issue.path[0] as FormKey] ??= t(`errors.${issue.message}`);
+      setErrors(fields);
+      document.getElementById(`mb-${Object.keys(fields)[0]}`)?.focus();
       return;
     }
-    setBusy(true);
-    const business = await createBusiness(
-      {
-        name: form.name.trim(),
-        companyName: form.companyName.trim(),
-        businessId: form.businessId.trim(),
-        email,
-        contactName: form.contactName.trim(),
-        phone: form.phone.trim(),
-        cityId: form.cityId,
-        categoryId: form.categoryId,
-        status: form.status,
-      },
-      form.password,
-    );
-    setBusy(false);
-    setIssued({ name: business.name, email, password: form.password });
-    setOpen(false);
-  };
-
-  const resetPassword = async (m: DemoBusiness) => {
-    if (!confirm(t("admin.mb.confirmReset", { name: m.name }))) return;
-    const password = generatePassword();
-    await resetBusinessPassword(m.id, password);
-    setIssued({ name: m.name, email: m.email, password, reset: true });
-  };
-
-  const remove = (m: DemoBusiness) => {
-    if (!confirm(t("admin.mb.confirmRemove", { name: m.name }))) return;
-    removeBusiness(m.id);
-  };
-
-  const copy = async (text: string, what: string) => {
+    setBusy(true); setFailure(null); setErrors({});
     try {
-      await navigator.clipboard.writeText(text);
-      setCopied(what);
-      setTimeout(() => setCopied(""), 1800);
-    } catch {
-      /* clipboard blocked: the text stays selectable */
-    }
+      await createMerchant(parsed.data);
+      setOpen(false); setSignInEmail(""); setTemporaryPassword(""); router.refresh();
+    } catch (error) {
+      if (error instanceof ApiError) {
+        const fields: typeof errors = {};
+        for (const [key, value] of Object.entries(error.fields)) fields[key as FormKey] = t(`errors.${value}`);
+        if (error.code === "business_exists") fields.businessId = t("admin.mb.errDuplicateId");
+        setErrors(fields);
+        setFailure(t(`errors.${error.code}`));
+      } else setFailure(t("errors.network"));
+    } finally { setBusy(false); }
   };
-
-  const loginUrl = typeof window === "undefined" ? "" : `${window.location.origin}/${locale}/business`;
+  const changeStatus = async (merchant: AdminMerchantDTO) => {
+    setChanging(merchant.id); setFailure(null);
+    try {
+      await setMerchantStatus(merchant.id, merchant.status === "active" ? "suspended" : "active");
+      router.refresh();
+    } catch (error) { setFailure(t(`errors.${error instanceof ApiError ? error.code : "network"}`)); }
+    finally { setChanging(null); }
+  };
 
   const field = (k: FormKey, label: string, input: ReactNode, hint?: string) => (
     <div className="mb-field">
@@ -179,35 +104,11 @@ export function ManageBusinesses() {
             ["admin.suspended", count("suspended")],
           ] as const
         ).map(([k, v]) => (
-          <div className="kpi-tile" key={k}><p className="kt-label">{t(k)}</p><p className="kt-value">{hydrated ? v : "–"}</p></div>
+          <div className="kpi-tile" key={k}><p className="kt-label">{t(k)}</p><p className="kt-value">{v}</p></div>
         ))}
       </section>
 
-      {issued && (
-        <section className="panel mb-issued" aria-live="polite">
-          <div className="panel-h">
-            <div className="row" style={{ gap: 12 }}>
-              <span className="attn-ic indigo"><Icon name="lock" /></span>
-              <div>
-                <h2>{t(issued.reset ? "admin.mb.resetTitle" : "admin.mb.issuedTitle", { name: issued.name })}</h2>
-                <p className="muted small">{t("admin.mb.issuedHint")}</p>
-              </div>
-            </div>
-            <button className="btn btn-ghost btn-sm" onClick={() => setIssued(null)} aria-label={t("admin.mb.close")}><Icon name="x" /></button>
-          </div>
-          <dl className="cred">
-            <div><dt>{t("admin.mb.loginUrl")}</dt><dd className="mono">{loginUrl}</dd><button className="btn btn-secondary btn-sm" onClick={() => copy(loginUrl, "url")}>{copied === "url" ? t("admin.mb.copied") : t("admin.mb.copy")}</button></div>
-            <div><dt>{t("admin.mb.loginEmail")}</dt><dd className="mono">{issued.email}</dd><button className="btn btn-secondary btn-sm" onClick={() => copy(issued.email, "email")}>{copied === "email" ? t("admin.mb.copied") : t("admin.mb.copy")}</button></div>
-            <div><dt>{t("admin.mb.tempPassword")}</dt><dd className="mono pw">{issued.password}</dd><button className="btn btn-secondary btn-sm" onClick={() => copy(issued.password, "pw")}>{copied === "pw" ? t("admin.mb.copied") : t("admin.mb.copy")}</button></div>
-          </dl>
-          <div className="row wrap-row" style={{ marginTop: 12 }}>
-            <button className="btn btn-primary btn-sm" onClick={() => copy(`${t("admin.mb.loginUrl")}: ${loginUrl}\n${t("admin.mb.loginEmail")}: ${issued.email}\n${t("admin.mb.tempPassword")}: ${issued.password}`, "all")}>
-              <Icon name="doc" />{copied === "all" ? t("admin.mb.copied") : t("admin.mb.copyAll")}
-            </button>
-            <p className="hint">{t("admin.mb.firstLoginNote")}</p>
-          </div>
-        </section>
-      )}
+      {failure && !open && <p className="err-msg" role="alert">{failure}</p>}
 
       <section className="panel" style={{ marginTop: 20 }}>
         <div className="toolbar">
@@ -227,7 +128,7 @@ export function ManageBusinesses() {
           </div>
         </div>
 
-        {hydrated && businesses.length === 0 ? (
+        {businesses.length === 0 ? (
           <div className="empty-state">
             <span className="attn-ic indigo"><Icon name="store" /></span>
             <h3>{t("admin.mb.emptyTitle")}</h3>
@@ -241,8 +142,7 @@ export function ManageBusinesses() {
                 <tr>
                   <th>{t("admin.merchant")}</th>
                   <th>{t("common.businessId")}</th>
-                  <th>{t("admin.mb.loginEmail")}</th>
-                  <th>{t("admin.bd.account.lastSignIn")}</th>
+                  <th>{t("admin.mb.contactEmail")}</th>
                   <th>{t("business.colStatus")}</th>
                   <th className="num">{t("admin.mb.deals")}</th>
                   <th>{t("admin.created")}</th>
@@ -254,50 +154,44 @@ export function ManageBusinesses() {
                   <tr key={m.id}>
                     <td>
                       <Link className="row-link" href={`/${locale}/admin/businesses/${m.id}`}><b>{m.name}</b></Link>
-                      <small className="muted block">{m.companyName} · {loc(meta.cities.find((c) => c.id === m.cityId)?.name, locale)}</small>
+                      <small className="muted block">{m.companyName} · {(m.cityId ? loc(meta.cities.find((c) => c.id === m.cityId)?.name, locale) : "–")}</small>
                     </td>
                     <td className="mono">{m.businessId}</td>
-                    <td>
-                      {m.email}
-                      {m.mustChangePassword && <small className="muted block">{t("admin.mb.awaitingFirstLogin")}</small>}
-                    </td>
-                    <td>{m.lastSignInAt ? ago((Date.now() - Date.parse(m.lastSignInAt)) / 6e4, locale) : <span className="muted">{t("admin.bd.never")}</span>}</td>
+                    <td>{m.publicEmail || "–"}</td>
                     <td>
                       {m.status === "active" ? <span className="chip teal"><Icon name="checkc" />{t("admin.active")}</span>
                         : m.status === "pending" ? <span className="chip warn"><Icon name="clock" />{t("admin.pending")}</span>
                         : <span className="chip danger"><Icon name="xc" />{t("admin.suspended")}</span>}
                     </td>
                     <td className="num">
-                      {dealCount(m.id, "live")} <span className="muted">/ {dealCount(m.id)}</span>
+                      {m.liveDealCount} <span className="muted">/ {m.dealCount}</span>
                     </td>
                     <td>{formatDate(m.createdAt, locale)}</td>
                     <td>
                       <div className="mb-actions">
                         {m.status !== "active"
-                          ? <button className="btn btn-secondary btn-sm" onClick={() => setBusinessStatus(m.id, "active")}>{t("admin.activate")}</button>
-                          : <button className="btn btn-danger btn-sm" onClick={() => setBusinessStatus(m.id, "suspended")}>{t("admin.suspend")}</button>}
+                          ? <button className="btn btn-secondary btn-sm" disabled={changing !== null} onClick={() => changeStatus(m)}>{t("admin.activate")}</button>
+                          : <button className="btn btn-danger btn-sm" disabled={changing !== null} onClick={() => changeStatus(m)}>{t("admin.suspend")}</button>}
                         <Link className="btn btn-secondary btn-sm" href={`/${locale}/admin/businesses/${m.id}`}>{t("admin.bd.open")}</Link>
-                        <button className="btn btn-ghost btn-sm" onClick={() => resetPassword(m)}><Icon name="lock" />{t("admin.mb.reset")}</button>
-                        <button className="btn btn-ghost btn-sm" onClick={() => remove(m)} aria-label={t("admin.mb.remove", { name: m.name })}><Icon name="trash" /></button>
                       </div>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            {hydrated && shown.length === 0 && <p className="muted empty-row">{t("admin.mb.none")}</p>}
+            {shown.length === 0 && <p className="muted empty-row">{t("admin.mb.none")}</p>}
           </div>
         )}
       </section>
 
-      <Dialog open={open} onClose={() => setOpen(false)} className="drawer" labelledBy="mb-title">
+      <Dialog open={open} onClose={closeForm} className="drawer" labelledBy="mb-title">
         <form className="mb-form" onSubmit={submit} noValidate>
           <div className="drawer-head">
             <div>
               <h2 id="mb-title" style={{ fontSize: 20 }}>{t("admin.mb.add")}</h2>
               <p className="muted small">{t("admin.mb.addHint")}</p>
             </div>
-            <button type="button" className="btn btn-ghost btn-sm" onClick={() => setOpen(false)} aria-label={t("admin.mb.close")}><Icon name="x" /></button>
+            <button type="button" disabled={busy} className="btn btn-ghost btn-sm" onClick={closeForm} aria-label={t("admin.mb.close")}><Icon name="x" /></button>
           </div>
           <div className="drawer-body">
             <fieldset>
@@ -324,18 +218,32 @@ export function ManageBusinesses() {
             <fieldset>
               <legend>{t("admin.mb.secContact")}</legend>
               {field("contactName", t("auth.contactName"), text("contactName", { autoComplete: "name" }))}
+              {field("publicEmail", t("admin.mb.contactEmail"), text("publicEmail", { type: "email", autoComplete: "email" }), t("admin.mb.contactEmailHint"))}
               {field("phone", t("admin.mb.phone"), text("phone", { type: "tel", autoComplete: "tel", placeholder: "+358 40 123 4567" }), t("admin.mb.optional"))}
             </fieldset>
 
             <fieldset>
               <legend>{t("admin.mb.secLogin")}</legend>
-              {field("email", t("admin.mb.loginEmail"), text("email", { type: "email", autoComplete: "off" }), t("admin.mb.emailHint"))}
-              {field("password", t("admin.mb.tempPassword"), (
+              <p className="hint" id="mb-signin-preview">{t("admin.mb.signInPreviewHint")}</p>
+              <div className="mb-field">
+                <label htmlFor="mb-signInEmail">{t("admin.mb.loginEmail")}</label>
+                <input id="mb-signInEmail" className="input" type="text" inputMode="email" autoComplete="off"
+                  value={signInEmail} onChange={event => setSignInEmail(event.target.value)} aria-describedby="mb-signin-preview" />
+              </div>
+              <div className="mb-field">
+                <label htmlFor="mb-temporaryPassword">{t("admin.mb.tempPassword")}</label>
                 <div className="mb-pw">
-                  {text("password", { className: "input mono", autoComplete: "new-password", spellCheck: false })}
-                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => set("password", generatePassword())}><Icon name="refund" />{t("admin.mb.generate")}</button>
+                  <input id="mb-temporaryPassword" className="input mono" type="text" autoComplete="off" spellCheck={false}
+                    value={temporaryPassword} onChange={event => setTemporaryPassword(event.target.value)} aria-describedby="mb-signin-preview" />
+                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => setTemporaryPassword(generatePassword())}>
+                    <Icon name="refund" />{t("admin.mb.generate")}
+                  </button>
                 </div>
-              ), t("admin.mb.passwordHint"))}
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>{t("admin.mb.initialStatus")}</legend>
               {field("status", t("admin.mb.initialStatus"), (
                 <div className="seg" role="radiogroup" id="mb-status">
                   {(["active", "pending"] as const).map((s) => (
@@ -346,8 +254,9 @@ export function ManageBusinesses() {
             </fieldset>
           </div>
           <div className="drawer-foot">
+            {failure && <p className="err-msg" role="alert">{failure}</p>}
             <button className="btn btn-primary btn-block" type="submit" disabled={busy}><Icon name="check" />{t("admin.mb.create")}</button>
-            <button className="btn btn-secondary btn-block" type="button" onClick={() => setOpen(false)}>{t("admin.mb.cancel")}</button>
+            <button className="btn btn-secondary btn-block" type="button" disabled={busy} onClick={closeForm}>{t("admin.mb.cancel")}</button>
           </div>
         </form>
       </Dialog>

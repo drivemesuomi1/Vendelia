@@ -179,8 +179,10 @@ and purchase tables; the current privileged Supabase connection supports this.
 
 Business portal localStorage login/workflows remain a separate demo. A merchant
 profile can authenticate through `/login`, but merchant membership/ownership
-links and replacing the business demo are still pending. Admin sample data and
-localStorage writes are not converted to database operations by authentication.
+links and replacing the business demo are still pending. Admin business creation,
+list/detail and status now use `merchants` (migration 004), without creating Auth
+accounts; see [business setup](admin-businesses.md). Other admin demo workflows
+and sample financial data remain separate from authentication.
 
 The future `docs/domain/database.dbml` differs from these minimal migrations:
 its `profiles.id`, `auth_subject` and `platform_role` are not columns created here.

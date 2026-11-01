@@ -1,10 +1,14 @@
+import { notFound } from "next/navigation";
+import type { AdminMerchantDTO } from "@vendelia/shared";
 import { adminConfigured, getAdminSession } from "@/lib/admin-auth";
+import { serverApiOrNull } from "@/lib/server-api";
 import { AdminLogin } from "@/features/admin/components/AdminLogin";
-import { BusinessDetail } from "@/features/admin/components/BusinessDetail";
+import { StoredBusinessDetail } from "@/features/admin/components/StoredBusinessDetail";
 
-/** One business in full: profile, sign-in details, deals, activity log and admin notes. */
 export default async function AdminBusinessPage({ params }: { params: Promise<{ id: string }> }) {
   if (!await getAdminSession()) return <AdminLogin configured={await adminConfigured()} />;
   const { id } = await params;
-  return <BusinessDetail id={id} />;
+  const result = await serverApiOrNull<{ merchant: AdminMerchantDTO }>(`/api/admin/merchants/${encodeURIComponent(id)}`);
+  if (!result) notFound();
+  return <StoredBusinessDetail merchant={result.merchant} />;
 }

@@ -41,7 +41,8 @@ npm run build
   real payments and merchant-authorized redemption are not implemented.
   Business accounts/submissions/approvals use a browser demo store; admin orders/finance use sample data.
   General/admin login and email-owned customer vouchers are implemented. Public registration
-  and merchant/admin business-data writes remain separate work.
+  remains separate work. Admin business creation/list/detail/status are database-backed;
+  apply migration 004. See [admin business setup](docs/admin-businesses.md).
   Remaining contract: [docs/api/endpoints.md](docs/api/endpoints.md).
 - **Deploy:** the Vercel project builds `frontend/` (root directory `frontend`, install from the repo root).
   Set server-side `DATABASE_URL` in Vercel and leave `BACKEND_URL` unset: the existing Fastify API runs inside Next.js.

@@ -485,7 +485,7 @@
     "financeSub": "Sales, commission, VAT and payouts to businesses",
     "dealsSub": "Deals submitted by businesses. Approve to publish or reject with a reason.",
     "demo": "Demo data",
-    "demoHint": "Demo mode: businesses and deals are stored in this browser only until the backend is ready.",
+    "demoHint": "Business records are stored in the database. Deal review and finance screens still include demo data.",
     "range": "{n} days",
     "rangeLabel": "Period",
     "kpiTitle": "Key figures",
@@ -599,10 +599,10 @@
     },
     "mb": {
       "title": "Manage businesses",
-      "sub": "Add businesses, create sign-in details and manage their status",
+      "sub": "Add businesses and manage their contact details and status",
       "total": "Total businesses",
       "add": "Add business",
-      "addHint": "The business signs in to the business portal with these details.",
+      "addHint": "Save the business details. No sign-in account is created.",
       "secCompany": "Company",
       "secContact": "Contact",
       "secLogin": "Sign-in",
@@ -618,9 +618,9 @@
       "passwordHint": "At least 12 characters. The business is asked to change it on first sign-in.",
       "generate": "Generate",
       "initialStatus": "Initial status",
-      "activeHint": "The business can sign in and submit deals straight away.",
-      "pendingHint": "The business can sign in but cannot publish deals until activated.",
-      "create": "Create business and sign-in",
+      "activeHint": "Active businesses can have published deals.",
+      "pendingHint": "Pending businesses remain hidden from the public catalogue.",
+      "create": "Create business",
       "cancel": "Cancel",
       "close": "Close",
       "issuedTitle": "Sign-in created for {name}",
@@ -647,9 +647,12 @@
       "firstLoginNote": "The business chooses its own password on first sign-in.",
       "statusFilter": "Filter by status",
       "emptyTitle": "No businesses yet",
-      "emptyText": "Add the first business. It gets sign-in details for the business portal and can start creating deals.",
+      "emptyText": "Add the first business with its company and contact details.",
       "deals": "Deals (live / all)",
-      "awaitingFirstLogin": "Not signed in yet"
+      "awaitingFirstLogin": "Not signed in yet",
+      "contactEmail": "Contact email",
+      "contactEmailHint": "Optional. Public contact email shown with the business’s deals.",
+      "signInPreviewHint": "Optional preview only. These fields are not saved and do not create a business sign-in yet."
     },
     "dr": {
       "live": "Live",
@@ -696,7 +699,7 @@
       "queue": "Review queue",
       "noActivity": "No activity yet.",
       "startTitle": "Start by adding a business",
-      "startText": "Create sign-in details for a business. When it submits deals, they appear here and in the review queue.",
+      "startText": "Add a business with its company and contact details.",
       "evBusiness": "Business {name} was added",
       "evSubmitted": "{name} submitted {deal}",
       "evResubmitted": "{name} resubmitted {deal}",
@@ -822,7 +825,8 @@
     "redeemUnavailable": "Recording a redemption needs business sign-in, which isn't available yet. Checking the code works.",
     "authUnavailable": "Sign-in is temporarily unavailable. Check the server configuration and try again.",
     "invalidLogin": "Invalid credentials or account access is unavailable.",
-    "tooManyAttempts": "Too many sign-in attempts. Please wait a minute and try again."
+    "tooManyAttempts": "Too many sign-in attempts. Please wait a minute and try again.",
+    "invalidMerchantReference": "Choose an active city and category, then try again."
   },
   "voucherCheck": {
     "title": "Voucher check",

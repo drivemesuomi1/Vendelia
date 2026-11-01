@@ -23,6 +23,10 @@ src/
       repository.ts              Profile/session SQL
       service.ts                 Login, current identity and logout
       routes.ts                  Auth HTTP handlers
+    merchants/
+      routes.ts                  Admin business list/detail/create/status handlers
+      service.ts                 Business use cases and duplicate handling
+      repository.ts              Merchant SQL and reference validation
     health/routes.ts             Database health endpoint
     orders/
       routes.ts                  Checkout, guest order/PDF access and voucher lookup
@@ -56,6 +60,7 @@ Implemented:
 - `GET /api/meta`: active cities/categories, live counts and server policy settings.
 - `GET /api/deals`: current public deals with city/category/search/featured filters.
 - `GET /api/deals/:slug`: localized content, merchant, options, images and service area.
+- `GET/POST /api/admin/merchants`, `GET /api/admin/merchants/:id`, `POST /api/admin/merchants/:id/status`: admin-only persisted businesses, without account creation.
 - `POST /api/cart/quote`: validates IDs/quantities and quotes current database prices.
 - `POST /api/orders`: guest test checkout, enabled only by payment bypass configuration.
 - `GET /api/orders/:id` and `GET /api/orders/:id/pdf`: require `x-order-token`.
@@ -76,7 +81,8 @@ Follow [database changes and team workflow](../docs/database-changes.md) when ch
 Migration 002 prepares a shared `profiles` table for customers, business users and
 admins, linked to Supabase Auth. Migration 003 adds website sessions.
 See [account setup](../docs/accounts.md) for Auth configuration and testing.
-Public registration, merchant/admin business-data writes, real payments, redemption and settlement
+Admin business records require migration 004; see [business setup](../docs/admin-businesses.md).
+Public registration, merchant ownership/login, deal review writes, real payments, redemption and settlement
 still need implementations. The broader contract is [API endpoints](../docs/api/endpoints.md);
 it includes planned endpoints, not just implemented ones.
 Shared schemas and response types are in `shared/src`.

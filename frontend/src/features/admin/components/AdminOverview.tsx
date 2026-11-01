@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { AdminMerchantDTO } from "@vendelia/shared";
 import { useMemo, useState } from "react";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -17,12 +18,12 @@ const isoDay = (t: number) => new Date(t).toISOString().slice(0, 10);
 
 /**
  * Admin home for the business -> deal -> review flow: what needs attention, how businesses and deals
- * are progressing, and recent activity. Reads the shared demo store (same data as the other admin screens).
+ * are progressing, and recent activity. Business rows are persisted; review data is still a demo.
  */
-export function AdminOverview() {
+export function AdminOverview({ businesses }: { businesses: AdminMerchantDTO[] }) {
   const { t, locale } = useI18n();
   const { meta } = useAppData();
-  const { businesses, deals } = useDemoStore();
+  const { deals } = useDemoStore();
   const hydrated = useHydrated();
   const [range, setRange] = useState<Range>(30);
   const base = `/${locale}/admin`;
@@ -50,7 +51,6 @@ export function AdminOverview() {
   const pending = deals.filter((d) => d.status === "pending");
   const live = deals.filter((d) => d.status === "live");
   const rejected = deals.filter((d) => d.status === "rejected");
-  const notSignedIn = businesses.filter((b) => b.mustChangePassword);
   const pendingBiz = businesses.filter((b) => b.status === "pending");
   const bizName = (id: string) => businesses.find((b) => b.id === id)?.name ?? "–";
   const dash = (v: string) => (hydrated ? v : "–");
@@ -58,7 +58,6 @@ export function AdminOverview() {
   const tiles: { label: string; hint?: string; value: string }[] = [
     { label: t("admin.ov.businesses"), hint: t("admin.ov.newIn", { n: s.newBusinesses }), value: int(businesses.length, locale) },
     { label: t("admin.active"), value: int(businesses.filter((b) => b.status === "active").length, locale) },
-    { label: t("admin.ov.awaitingLogin"), value: int(notSignedIn.length, locale) },
     { label: t("admin.ov.dealsSubmitted"), value: int(s.submittedInRange, locale) },
     { label: t("admin.dr.pending"), value: int(pending.length, locale) },
     { label: t("admin.dr.live"), value: int(live.length, locale) },
@@ -83,7 +82,6 @@ export function AdminOverview() {
   const attention: { n: number; label: string; href: string; icon: IconName; tone: "warn" | "danger" | "indigo" }[] = [
     { n: pending.length, label: t("admin.attn.deals"), href: `${base}/deals`, icon: "doc", tone: "warn" },
     { n: pendingBiz.length, label: t("admin.attn.merchants"), href: `${base}/businesses`, icon: "store", tone: "warn" },
-    { n: notSignedIn.length, label: t("admin.ov.attnLogin"), href: `${base}/businesses`, icon: "lock", tone: "indigo" },
   ];
 
   type Event = { at: string; text: string; icon: IconName };

@@ -25,7 +25,7 @@ import {
 import { ago, dateTime, dayLabel, int, ratio } from "../format";
 import { DealReviewDrawer } from "./DealReviewDrawer";
 import { TrendChart } from "./charts";
-import { generatePassword } from "./ManageBusinesses";
+import { generatePassword } from "@/features/portal-demo/password";
 
 const RANGES = [30, 90] as const;
 const DAY = 864e5;

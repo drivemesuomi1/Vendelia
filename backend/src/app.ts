@@ -1,3 +1,6 @@
+import { MerchantRepository } from "./modules/merchants/repository";
+import { MerchantService } from "./modules/merchants/service";
+import { merchantRoutes } from "./modules/merchants/routes";
 import { authConfig, sessionToken, type AuthConfig } from "./modules/auth/config";
 import { AuthRepository } from "./modules/auth/repository";
 import { AuthService } from "./modules/auth/service";
@@ -64,6 +67,7 @@ export function buildApp(database: Sql, options: {
     if (!user) throw new HttpProblem(401, "invalidLogin");
     return { vouchers: await orders.forCustomer(user.email) };
   });
+  app.register(merchantRoutes, { service: new MerchantService(new MerchantRepository(database)) });
   app.register(authRoutes, { service: authService, config: authSettings });
   app.register(healthRoutes, { database });
   app.register(catalogueRoutes, { service });

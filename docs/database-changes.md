@@ -16,6 +16,7 @@ The owner's schema exports reviewed on 2026-10-31 contained these seven tables:
 | `backend/sql/migrations/001_orders_vouchers.sql` | `orders`, `order_items`, `vouchers`, constraints, indexes and access restrictions | None |
 | `backend/sql/migrations/002_profiles.sql` | Shared `profiles` for customer/merchant/admin roles, linked to existing Supabase `auth.users`, with RLS and access restrictions | None |
 | `backend/sql/migrations/003_auth_sessions.sql` | Hashed, revocable, eight-hour website sessions referencing profiles | None |
+| `backend/sql/migrations/004_merchant_contact_and_classification.sql` | Business contact name and primary city/category references | Adds three nullable columns to `merchants`; existing values preserved |
 
 The exports were taken before migration 001. This document records compatibility
 and code requirements, not a live deployment ledger. Verify each target database
@@ -27,6 +28,15 @@ not applied; the unapplied migration was replaced with `002_profiles.sql`. Migra
 `auth.users` table, which plain local Postgres fixtures do not provide. This is a
 prerequisite for login. Apply 003 as well: the admin and general login forms now
 use Supabase Auth and profile roles, with database-backed website sessions.
+
+## Admin business records
+
+On 2026-11-01 the admin Add business flow was connected to `merchants`, without
+merchant login provisioning. Migration 004 is required before using the updated
+business list, detail and overview. Contact email maps to existing `public_email`;
+only `contact_name`, `city_id` and `category_id` are new. See
+[admin business setup](admin-businesses.md) for mappings and verification.
+SQL has been tested locally, not applied to shared Supabase by the coding agent.
 
 ## Purchase relationships
 

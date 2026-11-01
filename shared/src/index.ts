@@ -4,3 +4,5 @@ export * from "./schemas/order";
 export * from "./schemas/auth";
 export * from "./schemas/voucher";
 export * from "./types/api";
+
+export * from "./schemas/merchant";

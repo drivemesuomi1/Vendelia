@@ -52,10 +52,18 @@ revoked in the database on logout. `/api/admin/*` requires an active admin profi
 | GET | `/api/merchant/payouts` | Statement for the current period + pending payout + history |
 
 ## Admin
+
+Business list/detail/create/status endpoints are implemented and require migration
+004 plus an active admin session. Creating a merchant does not create an Auth user.
+See [admin business setup](../admin-businesses.md). Other admin routes below remain
+planned unless otherwise documented.
+
 | GET | `/api/admin/deals?status` | Review queue |
 |---|---|---|
 | POST | `/api/admin/deals/:id/review` | `{ decision: approve|reject, note? }` |
-| GET | `/api/admin/merchants` · POST `/api/admin/merchants/:id/status` | List / activate / suspend |
+| GET/POST | `/api/admin/merchants` | List / create business records without credentials |
+| GET | `/api/admin/merchants/:id` | Business details |
+| POST | `/api/admin/merchants/:id/status` | Activate / suspend / mark pending |
 | GET/PUT | `/api/admin/settings/commission` | `{ rateBps }` |
 | GET/POST | `/api/admin/refunds` | List / support refund `{ code }` |
 | GET | `/api/admin/audit` · `/api/admin/emails` | Audit log, email outbox |
