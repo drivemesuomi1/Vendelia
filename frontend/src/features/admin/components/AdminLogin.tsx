@@ -17,7 +17,7 @@ export function AdminLogin({ configured }: { configured: boolean }) {
   return (
     <main className="alogin">
       <aside className="alogin-brand" aria-hidden="true">
-        <div className="alogin-mark"><LogoSymbol height={40} /></div>
+        <div className="alogin-mark"><LogoSymbol height={32} tight /></div>
         <div>
           <p className="alogin-eyebrow">Vendelia</p>
           <p className="alogin-claim">{t("admin.login.claim")}</p>
