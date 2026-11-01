@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { LogoSymbol } from "@/components/ui/Logo";
@@ -9,7 +10,7 @@ import { adminLogin, type AdminLoginState } from "../actions";
 
 /** Staff sign-in shown at /admin when there is no admin session: brand panel + a single focused form. */
 export function AdminLogin({ configured }: { configured: boolean }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [state, action, pending] = useActionState<AdminLoginState | null, FormData>(adminLogin, null);
   const [show, setShow] = useState(false);
   const error = !configured ? "notConfigured" : state?.error;
@@ -26,7 +27,10 @@ export function AdminLogin({ configured }: { configured: boolean }) {
       </aside>
 
       <section className="alogin-main">
-        <div className="alogin-top"><LangSwitch /></div>
+        <div className="alogin-top">
+          <Link className="alogin-back" href={`/${locale}`}><Icon name="left" />{t("business.backToSite")}</Link>
+          <LangSwitch />
+        </div>
         <form className="alogin-form" action={action} noValidate>
           <div className="alogin-mobile-mark"><LogoSymbol height={32} /></div>
           <h1>{t("admin.login.title")}</h1>

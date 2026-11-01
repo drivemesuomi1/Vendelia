@@ -82,11 +82,9 @@
 .adm-head p{margin-top:4px;font-size:13.5px}
 .demo-pill{display:inline-flex;align-items:center;gap:4px;color:var(--warn-tx);font-weight:600}
 .demo-pill .icon{width:13px;height:13px}
-/* .seg and .lang also exist on the customer site (checkout options, header pill); these reset them for admin. */
+/* .seg also exists on the customer site (checkout options); this resets it for the portals. */
 .pui .seg{display:inline-flex;flex-wrap:wrap;align-items:center;gap:2px;padding:3px;margin:0;border:0;background:var(--hover);border-radius:9px;box-sizing:border-box}
 .pui .seg button{flex:none;font:500 13px/1 inherit;font-family:inherit;box-shadow:none}
-.pui .lang{min-height:32px;height:32px;border-radius:8px;border-color:var(--line-strong);padding:0 26px 0 10px;font-size:12.5px;background-color:#fff;background-position:right 8px center}
-.pui .lang:hover{border-color:#BDBDB5}
 .portal-ui .side>.row{align-items:center}
 .pui .seg [aria-pressed="true"],.pui .seg [aria-pressed="true"]:hover{color:var(--navy);background:#fff;box-shadow:0 1px 2px rgba(20,20,25,.08),0 0 0 1px var(--line)}
 .toolbar .btn,.adm-head .btn{height:36px;min-height:36px}
@@ -363,3 +361,26 @@
 .portal-ui .tbl-compact summary{cursor:pointer;list-style-position:inside}
 @media(max-width:700px){.portal-ui .card>.pad{padding:16px}.portal-ui .card>.table-wrap th:first-child,.portal-ui .card>.table-wrap td:first-child{padding-left:16px}.portal-ui .card>.table-wrap th:last-child,.portal-ui .card>.table-wrap td:last-child{padding-right:16px}.portal-ui .tbl-compact td:first-child,.portal-ui .tbl-compact th:first-child,.portal-ui .tbl-compact td:nth-child(2),.portal-ui .tbl-compact th:nth-child(2){width:auto}}
 .portal-ui .card:has(>.table-wrap){overflow:hidden}
+
+/* ---------- Portal language picker + sign-in back link ---------- */
+.pui .langsw-btn{min-height:32px;height:32px;border-radius:8px;border-color:var(--line-strong);padding:0 8px 0 10px;font-size:12.5px;gap:7px}
+.pui .langsw-btn:hover{border-color:#BDBDB5}
+.pui .langsw-btn[aria-expanded="true"]{border-color:var(--indigo)}
+.pui .langsw-list{border-radius:12px;border-color:var(--line);box-shadow:0 12px 32px rgba(20,20,25,.14);min-width:176px}
+.pui .langsw-opt{min-height:40px;border-radius:8px;font-size:13.5px}
+.pui .langsw-opt:hover,.pui .langsw-opt:focus-visible{background:var(--soft)}
+.pui .langsw-opt[aria-selected="true"]{background:var(--info-bg)}
+.alogin-top{align-items:center;justify-content:space-between}
+.alogin-back{display:inline-flex;align-items:center;gap:4px;font-size:13.5px;font-weight:500;color:var(--navy-70);text-decoration:none;padding:6px 10px 6px 6px;margin-left:-6px;border-radius:8px}
+.alogin-back:hover{background:var(--hover);color:var(--navy)}
+.alogin-back .icon{width:16px;height:16px}
+/* In the narrow sidebar the picker shows just the flag and arrow; the language name is in the list and the button's label. */
+@media(min-width:960px){
+  .portal-ui .side .row.between{min-width:0;flex-wrap:nowrap}
+  .portal-ui .side .langsw-btn{padding:0 6px 0 8px;gap:4px}
+  .portal-ui .side .langsw-btn>span:not(.flag){display:none}
+  .portal-ui .side .langsw-btn .langsw-chev{width:12px;height:12px}
+  .portal-ui .side .row.between .logo{flex:0 1 auto;min-width:0;gap:6px}
+  .portal-ui .side .row.between .logo .sub{font-size:13.5px}
+  .portal-ui .side .row.between .logo svg{height:28px}
+}

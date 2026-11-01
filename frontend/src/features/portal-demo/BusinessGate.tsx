@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, type FormEvent, type ReactNode } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { LogoSymbol } from "@/components/ui/Logo";
@@ -37,7 +38,7 @@ export function BusinessGate({ children }: { children: ReactNode }) {
 }
 
 function AuthFrame({ children }: { children: ReactNode }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   return (
     <main className="alogin">
       <aside className="alogin-brand" aria-hidden="true">
@@ -49,7 +50,10 @@ function AuthFrame({ children }: { children: ReactNode }) {
         <p className="alogin-foot">© Mansio Group Oy</p>
       </aside>
       <section className="alogin-main">
-        <div className="alogin-top"><LangSwitch /></div>
+        <div className="alogin-top">
+          <Link className="alogin-back" href={`/${locale}`}><Icon name="left" />{t("business.backToSite")}</Link>
+          <LangSwitch />
+        </div>
         {children}
       </section>
     </main>
