@@ -1,6 +1,9 @@
-import { DealEditor } from "@/features/portal-demo/DealEditor";
+import { getSession } from "@/lib/session";
+import { BusinessGate } from "@/features/merchant/components/BusinessGate";
+import { MerchantFeaturePending } from "@/features/merchant/components/MerchantDashboard";
 
-export default async function EditDealPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  return <DealEditor id={id} />;
+export default async function EditDealPage() {
+  const user = await getSession();
+  if (user?.role !== "merchant" || !user.merchant) return <BusinessGate user={null}>{null}</BusinessGate>;
+  return <MerchantFeaturePending />;
 }

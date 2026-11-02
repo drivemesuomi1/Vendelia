@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { adminMerchantSchema, type AdminMerchantDTO, type MerchantStatus } from "@vendelia/shared";
+import { adminMerchantCreateSchema, type AdminMerchantDTO, type MerchantStatus } from "@vendelia/shared";
 import { ApiError } from "@/lib/api-client";
 import { createMerchant, setMerchantStatus } from "../api";
 import { useState, type FormEvent, type InputHTMLAttributes, type ReactNode } from "react";
@@ -12,7 +12,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { formatDate, loc } from "@/lib/format";
 import { useAppData } from "@/lib/meta-context";
 import { generatePassword } from "@/features/portal-demo/password";
-/** Admin business records come from Supabase; this screen does not provision login accounts. */
+/** Admin business records come from Supabase; optionally provisions a linked business login through Supabase Auth. */
 const EMPTY = { name: "", companyName: "", businessId: "", contactName: "", publicEmail: "", phone: "", cityId: "", categoryId: "", status: "active" as MerchantStatus };
 type FormKey = keyof typeof EMPTY;
 
@@ -24,10 +24,12 @@ export function ManageBusinesses({ businesses }: { businesses: AdminMerchantDTO[
   const [busy, setBusy] = useState(false);
   const [changing, setChanging] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY);
-  // Presentation only: never include these values in validation, API payloads or storage.
+  // Passwords are sent only for explicit account provisioning; never persist them in browser storage.
+  const [createLogin, setCreateLogin] = useState(false);
+  const [issued, setIssued] = useState<{ email: string; password: string | null; name: string } | null>(null);
   const [signInEmail, setSignInEmail] = useState("");
   const [temporaryPassword, setTemporaryPassword] = useState("");
-  const [errors, setErrors] = useState<Partial<Record<FormKey, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<FormKey | 'login.email' | 'login.password', string>>>({});
   const [failure, setFailure] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<"" | MerchantStatus>("");
@@ -42,7 +44,7 @@ export function ManageBusinesses({ businesses }: { businesses: AdminMerchantDTO[
     setErrors(e => ({ ...e, [key]: undefined }));
   };
   const openForm = () => {
-    setForm(EMPTY); setErrors({}); setFailure(null);
+    setForm(EMPTY); setErrors({}); setFailure(null); setCreateLogin(false); setIssued(null);
     setSignInEmail(""); setTemporaryPassword(generatePassword()); setOpen(true);
   };
   const closeForm = () => {
@@ -51,22 +53,24 @@ export function ManageBusinesses({ businesses }: { businesses: AdminMerchantDTO[
   };
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    const parsed = adminMerchantSchema.safeParse(form);
+    const parsed = adminMerchantCreateSchema.safeParse({ ...form, ...(createLogin ? { login: { email: signInEmail, password: temporaryPassword } } : {}) });
     if (!parsed.success) {
       const fields: typeof errors = {};
-      for (const issue of parsed.error.issues) fields[issue.path[0] as FormKey] ??= t(`errors.${issue.message}`);
+      for (const issue of parsed.error.issues) fields[issue.path.join('.') as keyof typeof errors] ??= t(`errors.${issue.message}`);
       setErrors(fields);
-      document.getElementById(`mb-${Object.keys(fields)[0]}`)?.focus();
+      const first = Object.keys(fields)[0];
+      document.getElementById(first === 'login.email' ? 'mb-signInEmail' : first === 'login.password' ? 'mb-temporaryPassword' : `mb-${first}`)?.focus();
       return;
     }
     setBusy(true); setFailure(null); setErrors({});
     try {
-      await createMerchant(parsed.data);
+      const result = await createMerchant(parsed.data);
+      if (result.login) setIssued({ email: result.login.email, password: result.login.passwordSet ? temporaryPassword : null, name: result.merchant.name });
       setOpen(false); setSignInEmail(""); setTemporaryPassword(""); router.refresh();
     } catch (error) {
       if (error instanceof ApiError) {
         const fields: typeof errors = {};
-        for (const [key, value] of Object.entries(error.fields)) fields[key as FormKey] = t(`errors.${value}`);
+        for (const [key, value] of Object.entries(error.fields)) fields[key as keyof typeof errors] = t(`errors.${value}`);
         if (error.code === "business_exists") fields.businessId = t("admin.mb.errDuplicateId");
         setErrors(fields);
         setFailure(t(`errors.${error.code}`));
@@ -107,6 +111,18 @@ export function ManageBusinesses({ businesses }: { businesses: AdminMerchantDTO[
           <div className="kpi-tile" key={k}><p className="kt-label">{t(k)}</p><p className="kt-value">{v}</p></div>
         ))}
       </section>
+
+      {issued && (
+        <section className="panel pad" style={{ marginTop: 20 }} aria-live="polite">
+          <div className="row between"><h2>{t("admin.mb.issuedTitle", { name: issued.name })}</h2><button className="btn btn-ghost btn-sm" onClick={() => setIssued(null)} aria-label={t("admin.mb.close")}><Icon name="x" /></button></div>
+          <p className="muted small">{t(issued.password ? "admin.mb.issuedHint" : "admin.mb.loginAlreadyProvisioned")}</p>
+          <dl className="stack" style={{ marginTop: 16 }}>
+            <div><dt>{t("admin.mb.loginEmail")}</dt><dd>{issued.email}</dd></div>
+            {issued.password && <div><dt>{t("admin.mb.tempPassword")}</dt><dd className="mono">{issued.password}</dd></div>}
+          </dl>
+          <Link className="btn btn-secondary btn-sm" style={{ marginTop: 16 }} href={`/${locale}/business`}>{t("admin.mb.loginUrl")}</Link>
+        </section>
+      )}
 
       {failure && !open && <p className="err-msg" role="alert">{failure}</p>}
 
@@ -224,21 +240,24 @@ export function ManageBusinesses({ businesses }: { businesses: AdminMerchantDTO[
 
             <fieldset>
               <legend>{t("admin.mb.secLogin")}</legend>
-              <p className="hint" id="mb-signin-preview">{t("admin.mb.signInPreviewHint")}</p>
+              <label className="row" style={{ gap: 8 }}><input type="checkbox" checked={createLogin} disabled={busy} onChange={event => setCreateLogin(event.target.checked)} />{t("admin.mb.createLogin")}</label>
+              <p className="hint" id="mb-signin-setup">{t("admin.mb.signInSetupHint")}</p>
               <div className="mb-field">
                 <label htmlFor="mb-signInEmail">{t("admin.mb.loginEmail")}</label>
-                <input id="mb-signInEmail" className="input" type="text" inputMode="email" autoComplete="off"
-                  value={signInEmail} onChange={event => setSignInEmail(event.target.value)} aria-describedby="mb-signin-preview" />
+                <input id="mb-signInEmail" className="input" type="email" inputMode="email" autoComplete="off" disabled={!createLogin || busy}
+                  value={signInEmail} onChange={event => setSignInEmail(event.target.value)} aria-describedby="mb-signin-setup" />
+                {errors['login.email'] && <p className="err-msg" role="alert">{errors['login.email']}</p>}
               </div>
               <div className="mb-field">
                 <label htmlFor="mb-temporaryPassword">{t("admin.mb.tempPassword")}</label>
                 <div className="mb-pw">
-                  <input id="mb-temporaryPassword" className="input mono" type="text" autoComplete="off" spellCheck={false}
-                    value={temporaryPassword} onChange={event => setTemporaryPassword(event.target.value)} aria-describedby="mb-signin-preview" />
-                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => setTemporaryPassword(generatePassword())}>
+                  <input id="mb-temporaryPassword" className="input mono" type="text" autoComplete="off" spellCheck={false} disabled={!createLogin || busy}
+                    value={temporaryPassword} onChange={event => setTemporaryPassword(event.target.value)} aria-describedby="mb-signin-setup" />
+                  <button type="button" className="btn btn-secondary btn-sm" disabled={!createLogin || busy} onClick={() => setTemporaryPassword(generatePassword())}>
                     <Icon name="refund" />{t("admin.mb.generate")}
                   </button>
                 </div>
+                {errors['login.password'] && <p className="err-msg" role="alert">{errors['login.password']}</p>}
               </div>
             </fieldset>
 
@@ -255,7 +274,7 @@ export function ManageBusinesses({ businesses }: { businesses: AdminMerchantDTO[
           </div>
           <div className="drawer-foot">
             {failure && <p className="err-msg" role="alert">{failure}</p>}
-            <button className="btn btn-primary btn-block" type="submit" disabled={busy}><Icon name="check" />{t("admin.mb.create")}</button>
+            <button className="btn btn-primary btn-block" type="submit" disabled={busy}><Icon name="check" />{t(createLogin ? "admin.mb.createWithLogin" : "admin.mb.create")}</button>
             <button className="btn btn-secondary btn-block" type="button" disabled={busy} onClick={closeForm}>{t("admin.mb.cancel")}</button>
           </div>
         </form>

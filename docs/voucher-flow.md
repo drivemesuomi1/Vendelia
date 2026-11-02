@@ -25,8 +25,10 @@ request protection is also pending.
 
 The QR encodes `https://www.vendelia.fi/fi/voucher/<CODE>`, a public check page that shows
 whether the code is valid, used or expired (no customer details), backed by
-`GET /api/vouchers/:code`. Marking a voucher as used (`/api/merchant/vouchers/redeem`) needs
-merchant sign-in and returns `501 redeemUnavailable` until that exists.
+`GET /api/vouchers/:code`. Merchant lookup now requires a verified business membership and checks voucher
+ownership; see [merchant login](merchant-login.md). Recording a voucher as used
+(`/api/merchant/vouchers/redeem`) still returns `501 redeemUnavailable` for signed-in
+merchants until the redemption transaction is implemented.
 
 ## Temporary test checkout (payment bypass)
 

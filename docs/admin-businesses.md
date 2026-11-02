@@ -2,12 +2,15 @@
 
 ## Scope
 
-The admin can add a business record without creating business login credentials.
-`Manage businesses`, its detail page and the overview's business counts read
-Supabase through admin-protected APIs. Creation and status changes are persisted
-in `public.merchants`. No Auth user, profile, membership or password is created.
+The admin can add a business record, optionally creating its Supabase Auth login
+at the same time. `Manage businesses`, its detail page and the overview's business
+counts read Supabase through admin-protected APIs. Creation/status changes persist
+in `public.merchants`. With **Create business login** selected, the backend also
+creates an Auth user, merchant profile and owner membership. Without it, only the
+business is saved. See [account provisioning](merchant-account-provisioning.md).
 
-The business portal remains a separate browser demo. Old browser-demo businesses
+The business portal now has [database-backed login](merchant-login.md), using
+separately provisioned Auth users, profiles and merchant membership. Old browser-demo businesses
 are not automatically imported. Existing database merchants are listed, including
 those without the new optional fields. Deal review/financial demo sections remain
 separate; their presence does not imply a working database workflow.
@@ -17,12 +20,12 @@ separate; their presence does not imply a working database workflow.
 | Location | Responsibility |
 | --- | --- |
 | `frontend/src/app/[locale]/(admin)/admin/businesses/page.tsx` | Checks admin access and loads persisted businesses |
-| `frontend/src/features/admin/components/ManageBusinesses.tsx` | Add drawer, search/status filters, status actions and UI-only credential previews |
+| `frontend/src/features/admin/components/ManageBusinesses.tsx` | Add drawer, status actions, optional account provisioning and one-time credential display |
 | `frontend/src/features/admin/api.ts` | Browser requests for merchant creation and status changes |
 | `frontend/src/app/[locale]/(admin)/admin/businesses/[id]/page.tsx` | Loads a persisted business by UUID |
 | `frontend/src/features/admin/components/StoredBusinessDetail.tsx` | Displays the saved business details |
 | `frontend/src/features/admin/components/AdminOverview.tsx` | Uses database business rows; deal-review metrics remain demo data |
-| `frontend/src/features/portal-demo/password.ts` | Generates a UI-only sample password; does not create credentials |
+| `frontend/src/features/portal-demo/password.ts` | Generates an initial password in memory; account creation happens only through the server |
 | `shared/src/schemas/merchant.ts` | Shared input validation, Business ID check digit, status and DTO types |
 | `backend/src/modules/merchants/routes.ts` | HTTP validation, response codes and API handlers |
 | `backend/src/modules/merchants/service.ts` | Business operations and duplicate/not-found handling |
@@ -31,9 +34,9 @@ separate; their presence does not imply a working database workflow.
 | `backend/tests/merchants.test.ts` | Validation and isolated PostgreSQL API tests |
 
 The persisted path is UI → API → routes → service → repository → `merchants`.
-Sign-in email and temporary password stay in separate UI state and never enter
-that path. Future contributors should not add them to the create payload without
-implementing a separate, authorized Auth account-provisioning workflow.
+When account creation is selected, credentials enter the authorized provisioning
+path described in [account provisioning](merchant-account-provisioning.md). They
+never enter the merchant insert, journal payload or persistent browser storage.
 
 ## Required migration
 
@@ -66,15 +69,17 @@ voucher documents; it is not a sign-in email. An omitted email/phone is stored a
 NULL. An email supplied by the admin must be valid; it need not be unique across
 businesses.
 
-The Sign-in email and Temporary password inputs (including Generate) are UI-only
-previews. They are optional, have no credential validation, and are held separately
-from the merchant form payload in component state. They are never sent to the API,
-saved to browser storage, or persisted to Supabase. Closing/successfully submitting
-the form clears them. The server schema continues to reject credential fields.
+Sign-in email and Temporary password (including Generate) are now functional when
+Create business login is selected. They are required only in that mode. Passwords
+are sent to the server for Supabase Auth creation, never to merchant columns or
+browser storage. Public contact email remains independent. Newly issued passwords
+are displayed once in component memory; retries never reset an existing password.
 
-No new environment variables or Auth configuration are needed beyond the working
-admin login and database connection. Pushing code or deploying does not apply SQL.
-Migration 004 has not been applied to shared Supabase by the coding agent.
+Apply migrations 005 and 006, then configure the server-only `SUPABASE_SECRET_KEY`
+for account provisioning. Ordinary business-only saves need the migration schema
+but do not require the new key. See [setup and recovery](merchant-account-provisioning.md).
+Pushing/deploying code does not apply SQL. No migration has been applied to shared
+Supabase by the coding agent.
 
 ## API and authorization
 
@@ -90,7 +95,8 @@ Browser mutations must also pass the existing Origin check.
 | POST | `/api/admin/merchants/:id/status` | Updates status and `updated_at` |
 
 Creation body: `name`, `companyName`, `businessId`, `contactName`, `publicEmail`,
-`phone`, `cityId`, `categoryId`, `status`. It accepts no credential fields. Country
+`phone`, `cityId`, `categoryId`, `status`. An optional `login: { email, password }` is handled by the separate provisioning
+service; unknown credential/role fields are rejected. Country
 code is set by the server to `FI`. Shared validation checks the Finnish Business
 ID's format/check digit, required fields, lengths and optional email. SQL verifies
 that the selected city/category are currently active. Duplicate Finnish Business
@@ -110,7 +116,8 @@ business operations; they are not just local UI flags.
 3. Open Manage businesses and add a business with a valid Finnish Business ID.
    Leave contact email blank to test the optional field, or supply a public email.
 4. Reload the page and inspect Supabase's `merchants` row. Check column mapping;
-   `auth.users` and `profiles` should have no new account from this operation.
+   With Create business login unchecked, Auth/profiles remain unchanged. When
+   selected, verify the new Auth user, merchant profile and owner membership.
 5. Open the business's detail page. Check real contacts, status and deal counts.
 6. Try the same Business ID again: expect a duplicate error with no second row.
 7. Confirm a customer or signed-out client cannot call these admin endpoints.
@@ -122,8 +129,9 @@ integration test requires a fresh `TEST_MERCHANT_DATABASE_URL` database named
 `vendelia_test_merchants` or `vendelia_test_merchants_<suffix>`. It creates fixtures
 and writes test rows only in that database; never use shared Supabase for this test.
 
-Business account invitations/login, ownership membership, editing/deleting business
-records, admin notes and database-backed deal review remain later work. The old
+Email invitations, password-management UI, editing/deleting business records, admin notes and
+database-backed deal review remain later work. Merchant login and ownership links
+are documented in [merchant login](merchant-login.md). The old
 `BusinessDetail` component is retained only for the legacy demo; the actual admin
 detail route now uses `StoredBusinessDetail`. The password helper is also reused
-by the new form for its UI-only temporary-password preview.
+by the new form for temporary-password generation.

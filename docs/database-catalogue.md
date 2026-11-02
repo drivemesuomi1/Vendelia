@@ -92,8 +92,9 @@ the grouping is a presentation rule. Mobile keeps the original direct service li
 Price-history writes, merchant submissions/reviews, public registration, real payments and
 settlement remain separate work. Guest test checkout and voucher issuance are now
 implemented in the orders module; see [voucher flow](voucher-flow.md).
-Business account/deal-review demos still use localStorage; admin orders/finance
-use sample data. Admin business creation/list/detail/status now use the database;
+Business login and the owned-deal list now use verified merchant membership;
+see [merchant login](merchant-login.md). Admin deal-review and orders/finance
+screens still include demo data. Admin business creation/list/detail/status now use the database;
 see [business setup](admin-businesses.md) and migration 004. Existing portal screens do not imply working database write endpoints.
 General/admin login now uses Supabase Auth and database sessions; see
 [accounts](accounts.md). The old Next admin cookie is retired; protected API routes

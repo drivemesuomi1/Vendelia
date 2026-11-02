@@ -20,12 +20,14 @@ src/
     auth/
       config.ts                  Auth environment and session cookie settings
       provider.ts                Supabase Auth password verification
+      user-provisioner.ts        Server-only Auth admin create/get adapter
       repository.ts              Profile/session SQL
       service.ts                 Login, current identity and logout
       routes.ts                  Auth HTTP handlers
     merchants/
       routes.ts                  Admin business list/detail/create/status handlers
       service.ts                 Business use cases and duplicate handling
+      provisioning.ts            Retry-safe Auth/profile/membership setup
       repository.ts              Merchant SQL and reference validation
     health/routes.ts             Database health endpoint
     orders/
@@ -53,19 +55,21 @@ the same exported `buildApp` function, so deployment setup does not change.
 
 Implemented:
 
-- `POST /api/auth/login`, `POST /api/auth/admin/login`: Auth password verification and profile-gated login.
+- `POST /api/auth/login`, `POST /api/auth/admin/login`, `POST /api/auth/merchant/login`: Auth password verification and profile-gated login.
 - `GET /api/auth/me`, `GET /api/auth/config`, `POST /api/auth/logout`: identity, configuration status and logout.
 - `GET /api/me/vouchers`: purchases belonging to the current confirmed email.
 - `GET /api/health`: runs a database query.
 - `GET /api/meta`: active cities/categories, live counts and server policy settings.
 - `GET /api/deals`: current public deals with city/category/search/featured filters.
 - `GET /api/deals/:slug`: localized content, merchant, options, images and service area.
-- `GET/POST /api/admin/merchants`, `GET /api/admin/merchants/:id`, `POST /api/admin/merchants/:id/status`: admin-only persisted businesses, without account creation.
+- `GET/POST /api/admin/merchants`, `GET /api/admin/merchants/:id`, `POST /api/admin/merchants/:id/status`: admin-only persisted businesses, with optional account provisioning.
 - `POST /api/cart/quote`: validates IDs/quantities and quotes current database prices.
 - `POST /api/orders`: guest test checkout, enabled only by payment bypass configuration.
 - `GET /api/orders/:id` and `GET /api/orders/:id/pdf`: require `x-order-token`.
-- `GET /api/vouchers/:code` and `POST /api/merchant/vouchers/lookup`: voucher validity lookup.
-- `POST /api/merchant/vouchers/redeem`: returns 501 until merchant authentication exists.
+- `GET /api/vouchers/:code`: public voucher validity lookup.
+- `GET /api/merchant/deals`: current merchant's saved deals only.
+- `POST /api/merchant/vouchers/lookup`: authenticated, own-business voucher check.
+- `POST /api/merchant/vouchers/redeem`: requires merchant login but still returns 501.
 
 Configure `.env` from `.env.example`, then run `npm run dev -w backend` from the
 repo root. `npm run db:check -w backend` exercises the API against the configured
@@ -82,7 +86,10 @@ Migration 002 prepares a shared `profiles` table for customers, business users a
 admins, linked to Supabase Auth. Migration 003 adds website sessions.
 See [account setup](../docs/accounts.md) for Auth configuration and testing.
 Admin business records require migration 004; see [business setup](../docs/admin-businesses.md).
-Public registration, merchant ownership/login, deal review writes, real payments, redemption and settlement
+Merchant login and ownership require migration 005; see [merchant login](../docs/merchant-login.md).
+Optional admin account provisioning requires 006 and SUPABASE_SECRET_KEY; see
+[provisioning setup](../docs/merchant-account-provisioning.md).
+Public registration, deal creation/editing/review writes, real payments, recording redemption and settlement
 still need implementations. The broader contract is [API endpoints](../docs/api/endpoints.md);
 it includes planned endpoints, not just implemented ones.
 Shared schemas and response types are in `shared/src`.

@@ -208,6 +208,16 @@ export class OrderService {
     return loaded ? this.pdfFor(loaded) : null;
   }
 
+  /** Business lookup is scoped to the merchant from the verified membership. */
+  async lookupForMerchant(rawCode: string, merchantId: string): Promise<RedeemLookupDTO> {
+    const parsed = voucherCodeSchema.safeParse(rawCode);
+    if (!parsed.success) return { code: rawCode.trim().toUpperCase(), result: 'not_found' };
+    const [row] = await this.sql<{ merchant_id: string }[]>`SELECT merchant_id FROM public.vouchers WHERE code = ${parsed.data}`;
+    if (!row) return { code: parsed.data, result: 'not_found' };
+    if (row.merchant_id !== merchantId) return { code: parsed.data, result: 'other_merchant' };
+    return this.lookup(parsed.data);
+  }
+
   /** Verification for the merchant redemption page, reached by scanning the QR code. */
   async lookup(rawCode: string): Promise<RedeemLookupDTO> {
     const parsed = voucherCodeSchema.safeParse(rawCode);

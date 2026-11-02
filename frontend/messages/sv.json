@@ -398,7 +398,12 @@
       "repeatPassword": "Upprepa lösenordet",
       "mismatch": "Lösenorden matchar inte.",
       "save": "Spara och fortsätt"
-    }
+    },
+    "accountPreview": "Dina sparade erbjudanden visas nedan. Redigering och inlösen av presentkort är ännu inte tillgängliga i företagsportalen.",
+    "savedDealsHint": "Sparade erbjudanden för detta företag visas här.",
+    "featurePending": "Den här funktionen är ännu inte tillgänglig",
+    "draft": "Utkast",
+    "redemptionPreview": "Du kan kontrollera företagets presentkortskoder. Registrering av inlösen är ännu inte tillgänglig."
   },
   "admin": {
     "title": "Administration",
@@ -597,7 +602,7 @@
       "sub": "Lägg till företag och hantera kontaktuppgifter och status",
       "total": "Företag totalt",
       "add": "Lägg till företag",
-      "addHint": "Spara företagets uppgifter. Inget inloggningskonto skapas.",
+      "addHint": "Spara företagsuppgifterna och skapa vid behov ett inloggningskonto.",
       "secCompany": "Företag",
       "secContact": "Kontaktperson",
       "secLogin": "Inloggning",
@@ -647,7 +652,10 @@
       "awaitingFirstLogin": "Har inte loggat in ännu",
       "contactEmail": "Kontaktens e-post",
       "contactEmailHint": "Valfritt. Offentlig kontaktadress som visas med företagets erbjudanden.",
-      "signInPreviewHint": "Valfri förhandsvisning. Dessa fält sparas inte och skapar ännu inget inloggningskonto för företaget."
+      "createLogin": "Skapa företagsinloggning",
+      "signInSetupHint": "Välj detta för att skapa ett Supabase Auth-konto kopplat till företaget. Inloggningsadress och ett lösenord med minst 12 tecken krävs.",
+      "createWithLogin": "Skapa företag och inloggning",
+      "loginAlreadyProvisioned": "Kontot skapades redan vid ett tidigare försök. Det ursprungliga lösenordet har inte ändrats."
     },
     "dr": {
       "live": "Live",
@@ -817,11 +825,17 @@
     "paymentUnavailable": "Onlinebetalning är inte tillgänglig just nu och du har inte debiterats. Försök igen om en stund eller skriv till tuki@vendelia.fi.",
     "testCheckoutNotAllowed": "Testbeställningar är inte tillåtna för den här e-postadressen.",
     "itemsUnavailable": "Några produkter i varukorgen finns inte längre. Uppdatera varukorgen och försök igen.",
-    "redeemUnavailable": "Att registrera inlösen kräver företagsinloggning, som ännu inte finns. Kodkontrollen fungerar.",
+    "redeemUnavailable": "Registrering av inlösen är ännu inte tillgänglig. Du kan fortfarande kontrollera företagets koder.",
     "authUnavailable": "Inloggningen är tillfälligt otillgänglig. Kontrollera serverinställningarna och försök igen.",
     "invalidLogin": "Felaktiga uppgifter eller kontot saknar åtkomst.",
     "tooManyAttempts": "För många inloggningsförsök. Vänta en minut och försök igen.",
-    "invalidMerchantReference": "Välj en aktiv stad och kategori och försök igen."
+    "invalidMerchantReference": "Välj en aktiv stad och kategori och försök igen.",
+    "provisioningNotConfigured": "Skapande av företagskonton har inte konfigurerats. Ange Supabases hemliga nyckel på servern och försök igen.",
+    "provisioningUnavailable": "Supabase Auth kunde inte nås. Försök igen om en stund.",
+    "provisioningPending": "Kontot är inte färdigskapat. Försök igen med samma företagsuppgifter och ursprungligt lösenord. Skapa inte ett andra konto.",
+    "provisioningConflict": "En tidigare kontoregistrering har andra uppgifter. Använd de ursprungliga uppgifterna eller be en administratör granska den.",
+    "merchantCredentialsRejected": "Supabase avvisade inloggningsuppgifterna. Kontrollera e-postadressen och lösenordskraven och försök igen.",
+    "merchantPasswordLength": "Använd minst 12 tecken och högst 72 UTF-8-byte."
   },
   "voucherCheck": {
     "title": "Kontroll av presentkort",

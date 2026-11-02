@@ -61,9 +61,14 @@ npm run build
   guest test orders, voucher PDFs/email and public voucher lookup are implemented.
   Checkout requires migration `001_orders_vouchers.sql` and explicit payment bypass configuration;
   real payments and merchant-authorized redemption are not implemented.
-  Business accounts/submissions/approvals use a browser demo store; admin orders/finance use sample data.
+  Merchant login, membership and the owned-deal list are database-backed; apply
+  migration 005 and follow [merchant login setup](docs/merchant-login.md). Deal
+  creation/editing and recording redemption remain pending; admin review/finance
+  screens still include demo data.
   General/admin login and email-owned customer vouchers are implemented. Public registration
-  remains separate work. Admin business creation/list/detail/status are database-backed;
+  remains separate work. Admin Add business can optionally provision a linked
+  Auth account; apply 005/006 and follow [account provisioning](docs/merchant-account-provisioning.md).
+  Admin business creation/list/detail/status are database-backed;
   apply migration 004. See [admin business setup](docs/admin-businesses.md).
   Remaining contract: [docs/api/endpoints.md](docs/api/endpoints.md).
 - **Deploy:** the Vercel project builds `frontend/` (root directory `frontend`, install from the repo root).

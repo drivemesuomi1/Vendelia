@@ -398,7 +398,12 @@
       "repeatPassword": "Repeat password",
       "mismatch": "The passwords don't match.",
       "save": "Save and continue"
-    }
+    },
+    "accountPreview": "Your saved deals are shown below. Deal editing and voucher redemption are not available in the business portal yet.",
+    "savedDealsHint": "Saved deals for this business will appear here.",
+    "featurePending": "This feature is not available yet",
+    "draft": "Draft",
+    "redemptionPreview": "You can check your business’s voucher codes. Recording a redemption is not available yet."
   },
   "admin": {
     "title": "Admin",
@@ -597,7 +602,7 @@
       "sub": "Add businesses and manage their contact details and status",
       "total": "Total businesses",
       "add": "Add business",
-      "addHint": "Save the business details. No sign-in account is created.",
+      "addHint": "Save the business details and optionally create its sign-in account.",
       "secCompany": "Company",
       "secContact": "Contact",
       "secLogin": "Sign-in",
@@ -647,7 +652,10 @@
       "awaitingFirstLogin": "Not signed in yet",
       "contactEmail": "Contact email",
       "contactEmailHint": "Optional. Public contact email shown with the business’s deals.",
-      "signInPreviewHint": "Optional preview only. These fields are not saved and do not create a business sign-in yet."
+      "createLogin": "Create business login",
+      "signInSetupHint": "Select this to create a Supabase Auth account linked to the business. Sign-in email and a password of at least 12 characters are required.",
+      "createWithLogin": "Create business and login",
+      "loginAlreadyProvisioned": "This account was already provisioned during an earlier attempt. Its original password has not been changed."
     },
     "dr": {
       "live": "Live",
@@ -817,11 +825,17 @@
     "paymentUnavailable": "Online payment isn't available right now and you have not been charged. Please try again shortly or email tuki@vendelia.fi.",
     "testCheckoutNotAllowed": "Test orders aren't allowed for this email address.",
     "itemsUnavailable": "Some items in your cart are no longer available. Update your cart and try again.",
-    "redeemUnavailable": "Recording a redemption needs business sign-in, which isn't available yet. Checking the code works.",
+    "redeemUnavailable": "Recording voucher redemption is not available yet. You can still check your business’s codes.",
     "authUnavailable": "Sign-in is temporarily unavailable. Check the server configuration and try again.",
     "invalidLogin": "Invalid credentials or account access is unavailable.",
     "tooManyAttempts": "Too many sign-in attempts. Please wait a minute and try again.",
-    "invalidMerchantReference": "Choose an active city and category, then try again."
+    "invalidMerchantReference": "Choose an active city and category, then try again.",
+    "provisioningNotConfigured": "Business account creation is not configured. Set the server-only Supabase secret key and try again.",
+    "provisioningUnavailable": "Account creation could not reach Supabase Auth. Try again shortly.",
+    "provisioningPending": "Account setup is incomplete. Retry with the same business details and original password; do not create a second account.",
+    "provisioningConflict": "An earlier setup exists with different details. Use the original details or ask an administrator to review it.",
+    "merchantCredentialsRejected": "Supabase rejected these sign-in details. Check the email and password policy, then try again.",
+    "merchantPasswordLength": "Use at least 12 characters and no more than 72 UTF-8 bytes."
   },
   "voucherCheck": {
     "title": "Voucher check",

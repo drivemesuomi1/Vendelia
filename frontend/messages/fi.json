@@ -398,7 +398,12 @@
       "repeatPassword": "Toista salasana",
       "mismatch": "Salasanat eivät täsmää.",
       "save": "Tallenna ja jatka"
-    }
+    },
+    "accountPreview": "Tallennetut tarjoukset näkyvät alla. Tarjousten muokkaus ja lahjakorttien lunastus eivät ole vielä käytettävissä yritysportaalissa.",
+    "savedDealsHint": "Tämän yrityksen tallennetut tarjoukset näkyvät tässä.",
+    "featurePending": "Tämä toiminto ei ole vielä käytettävissä",
+    "draft": "Luonnos",
+    "redemptionPreview": "Voit tarkistaa yrityksesi lahjakorttikoodit. Lunastuksen kirjaaminen ei ole vielä käytettävissä."
   },
   "admin": {
     "title": "Ylläpito",
@@ -597,7 +602,7 @@
       "sub": "Lisää yrityksiä ja hallitse niiden yhteystietoja ja tilaa",
       "total": "Yrityksiä yhteensä",
       "add": "Lisää yritys",
-      "addHint": "Tallenna yrityksen tiedot. Kirjautumistiliä ei luoda.",
+      "addHint": "Tallenna yrityksen tiedot ja luo halutessasi kirjautumistili.",
       "secCompany": "Yritys",
       "secContact": "Yhteyshenkilö",
       "secLogin": "Kirjautuminen",
@@ -647,7 +652,10 @@
       "awaitingFirstLogin": "Ei vielä kirjautunut",
       "contactEmail": "Yhteyssähköposti",
       "contactEmailHint": "Valinnainen. Julkinen yhteyssähköposti näkyy yrityksen tarjouksissa.",
-      "signInPreviewHint": "Valinnainen esikatselu. Näitä kenttiä ei tallenneta eikä yrityksen kirjautumistiliä vielä luoda."
+      "createLogin": "Luo yrityksen kirjautumistili",
+      "signInSetupHint": "Luo yritykseen liitetty Supabase Auth -tili valitsemalla tämä. Kirjautumissähköposti ja vähintään 12 merkin salasana vaaditaan.",
+      "createWithLogin": "Luo yritys ja kirjautumistili",
+      "loginAlreadyProvisioned": "Tili luotiin jo aiemmalla yrityksellä. Alkuperäistä salasanaa ei ole muutettu."
     },
     "dr": {
       "live": "Myynnissä",
@@ -817,11 +825,17 @@
     "paymentUnavailable": "Verkkomaksu ei ole juuri nyt käytettävissä, eikä sinulta veloitettu mitään. Yritä hetken kuluttua uudelleen tai kirjoita osoitteeseen tuki@vendelia.fi.",
     "testCheckoutNotAllowed": "Testitilaus ei ole sallittu tälle sähköpostiosoitteelle.",
     "itemsUnavailable": "Osa ostoskorin tuotteista ei ole enää saatavilla. Päivitä ostoskori ja yritä uudelleen.",
-    "redeemUnavailable": "Lunastuksen kirjaaminen vaatii yrityskirjautumisen, joka ei ole vielä käytössä. Koodin tarkistus toimii.",
+    "redeemUnavailable": "Lunastuksen kirjaaminen ei ole vielä käytettävissä. Voit tarkistaa yrityksesi lahjakorttikoodit.",
     "authUnavailable": "Kirjautuminen ei ole nyt saatavilla. Tarkista palvelimen asetukset ja yritä uudelleen.",
     "invalidLogin": "Virheelliset tunnukset tai tilin käyttö ei ole sallittu.",
     "tooManyAttempts": "Liian monta kirjautumisyritystä. Odota minuutti ja yritä uudelleen.",
-    "invalidMerchantReference": "Valitse aktiivinen kaupunki ja kategoria ja yritä uudelleen."
+    "invalidMerchantReference": "Valitse aktiivinen kaupunki ja kategoria ja yritä uudelleen.",
+    "provisioningNotConfigured": "Yritystilien luontia ei ole määritetty. Aseta palvelimen Supabase-salainen avain ja yritä uudelleen.",
+    "provisioningUnavailable": "Supabase Auth ei ole tavoitettavissa. Yritä pian uudelleen.",
+    "provisioningPending": "Tilin luonti on kesken. Yritä uudelleen samoilla yritystiedoilla ja alkuperäisellä salasanalla. Älä luo toista tiliä.",
+    "provisioningConflict": "Aiempi tilin luonti sisältää eri tiedot. Käytä alkuperäisiä tietoja tai pyydä ylläpitäjää tarkistamaan tilanne.",
+    "merchantCredentialsRejected": "Supabase hylkäsi kirjautumistiedot. Tarkista sähköposti ja salasanavaatimukset ja yritä uudelleen.",
+    "merchantPasswordLength": "Käytä vähintään 12 merkkiä ja enintään 72 UTF-8-tavua."
   },
   "voucherCheck": {
     "title": "Lahjakortin tarkistus",

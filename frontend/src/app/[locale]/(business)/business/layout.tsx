@@ -1,18 +1,17 @@
 import type { ReactNode } from "react";
-import { BusinessGate } from "@/features/portal-demo/BusinessGate";
+import { BusinessGate } from "@/features/merchant/components/BusinessGate";
+import { getSession } from "@/lib/session";
 import { portalClass } from "@/lib/portal-fonts";
 import "@/styles/portal.css";
 
 export const metadata = { title: "Yritysportaali", robots: { index: false } };
 
-/**
- * Business portal: a business signs in with the details the admin created, then creates deals for review.
- * Demo mode: accounts and deals live in the browser (features/portal-demo/store.ts) until the API exists.
- */
-export default function BusinessLayout({ children }: { children: ReactNode }) {
+/** Real Supabase Auth session and active merchant membership are checked server-side. */
+export default async function BusinessLayout({ children }: { children: ReactNode }) {
+  const user = await getSession();
   return (
     <div className={portalClass}>
-      <BusinessGate>{children}</BusinessGate>
+      <BusinessGate user={user}>{children}</BusinessGate>
     </div>
   );
 }

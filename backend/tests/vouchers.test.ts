@@ -91,6 +91,6 @@ it("refuses checkout without touching the database while the payment bypass is o
     assert.equal(response.statusCode, 503);
     assert.equal(response.json().error, "paymentUnavailable");
     const redeem = await app.inject({ method: "POST", url: "/api/merchant/vouchers/redeem", payload: { code: "VND-7KQ2-M9XA" } });
-    assert.equal(redeem.statusCode, 501);
+    assert.equal(redeem.statusCode, 401);
   } finally { await app.close(); }
 });

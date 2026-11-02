@@ -1,6 +1,8 @@
+import { MerchantProvisioningService } from "./modules/merchants/provisioning";
+import { SupabaseUserProvisioner, type UserProvisioner } from "./modules/auth/user-provisioner";
 import { MerchantRepository } from "./modules/merchants/repository";
 import { MerchantService } from "./modules/merchants/service";
-import { merchantRoutes } from "./modules/merchants/routes";
+import { merchantRoutes, merchantPortalRoutes } from "./modules/merchants/routes";
 import { authConfig, sessionToken, type AuthConfig } from "./modules/auth/config";
 import { AuthRepository } from "./modules/auth/repository";
 import { AuthService } from "./modules/auth/service";
@@ -21,7 +23,7 @@ import { orderConfig, platformConfig, type OrderConfig, type PlatformConfig } fr
 
 export function buildApp(database: Sql, options: {
   config?: PlatformConfig; orders?: OrderConfig; mailer?: Mailer; logger?: boolean;
-  auth?: AuthConfig; passwordProvider?: PasswordProvider;
+  auth?: AuthConfig; passwordProvider?: PasswordProvider; userProvisioner?: UserProvisioner;
 } = {}) {
   const app = Fastify({ logger: options.logger ?? false });
   const authSettings = options.auth ?? authConfig();
@@ -67,10 +69,14 @@ export function buildApp(database: Sql, options: {
     if (!user) throw new HttpProblem(401, "invalidLogin");
     return { vouchers: await orders.forCustomer(user.email) };
   });
-  app.register(merchantRoutes, { service: new MerchantService(new MerchantRepository(database)) });
+  app.register(merchantPortalRoutes, { repository: new MerchantRepository(database), auth: authService });
+  const merchantRepository = new MerchantRepository(database);
+  const provisioning = new MerchantProvisioningService(merchantRepository,
+    options.userProvisioner ?? new SupabaseUserProvisioner(authSettings.url, process.env.SUPABASE_SECRET_KEY?.trim() ?? ''));
+  app.register(merchantRoutes, { service: new MerchantService(merchantRepository, provisioning), auth: authService });
   app.register(authRoutes, { service: authService, config: authSettings });
   app.register(healthRoutes, { database });
   app.register(catalogueRoutes, { service });
-  app.register(orderRoutes, { service: orders });
+  app.register(orderRoutes, { service: orders, auth: authService });
   return app;
 }

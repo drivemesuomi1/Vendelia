@@ -20,12 +20,12 @@ it('does not establish sessions for missing profiles or non-admin users at admin
     createSession: async () => { writes++; }, deleteSession: async () => {},
   };
   const service = new AuthService(repository, { verify: async () => ({ id, email: user.email }) });
-  await assert.rejects(service.login(user.email, 'secret', true), { code: 'invalidLogin' });
+  await assert.rejects(service.login(user.email, 'secret', 'admin'), { code: 'invalidLogin' });
   profile = { ...user, role: 'customer' };
-  await assert.rejects(service.login(user.email, 'secret', true), { code: 'invalidLogin' });
+  await assert.rejects(service.login(user.email, 'secret', 'admin'), { code: 'invalidLogin' });
   assert.equal(writes, 0);
   profile = user;
-  const result = await service.login(user.email, 'secret', true);
+  const result = await service.login(user.email, 'secret', 'admin');
   assert.equal(writes, 1); assert.match(result.token, /^[a-f0-9]{64}$/);
   assert.notEqual(hashSession(result.token), result.token);
   assert.equal(sessionToken(`other=x; vd_session=${result.token}`), result.token);

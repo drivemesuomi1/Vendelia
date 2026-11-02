@@ -17,6 +17,8 @@ The owner's schema exports reviewed on 2026-10-31 contained these seven tables:
 | `backend/sql/migrations/002_profiles.sql` | Shared `profiles` for customer/merchant/admin roles, linked to existing Supabase `auth.users`, with RLS and access restrictions | None |
 | `backend/sql/migrations/003_auth_sessions.sql` | Hashed, revocable, eight-hour website sessions referencing profiles | None |
 | `backend/sql/migrations/004_merchant_contact_and_classification.sql` | Business contact name and primary city/category references | Adds three nullable columns to `merchants`; existing values preserved |
+| `backend/sql/migrations/005_merchant_members.sql` | Links business users to merchants, with member role, active flag, RLS and access restrictions | None |
+| `backend/sql/migrations/006_merchant_account_provisioning.sql` | Private recovery journal for optional admin business-account creation; no passwords | None |
 
 The exports were taken before migration 001. This document records compatibility
 and code requirements, not a live deployment ledger. Verify each target database
@@ -37,6 +39,16 @@ business list, detail and overview. Contact email maps to existing `public_email
 only `contact_name`, `city_id` and `category_id` are new. See
 [admin business setup](admin-businesses.md) for mappings and verification.
 SQL has been tested locally, not applied to shared Supabase by the coding agent.
+
+## Business login
+
+Migration 005 adds the membership link required for merchant-role users to enter
+the real business portal. Credentials stay in Supabase Auth; the existing shared
+profile and session tables are reused. See [merchant login](merchant-login.md)
+for manual account provisioning, SQL, file structure and current limits. Admin Add business can now optionally create the Auth user/profile/membership.
+Apply 005 then 006 and configure the server secret for that flow; see
+[account provisioning](merchant-account-provisioning.md). Business-only creation
+remains available with the option unchecked.
 
 ## Purchase relationships
 
@@ -98,7 +110,7 @@ LIMIT 10;
 
 One line with quantity two produces two vouchers. With payment bypass enabled,
 expect `test_unpaid` and `is_test = true`. Verify the emailed/downloaded PDF and QR
-origin as well. Merchant redemption returns 501 until merchant authentication exists.
+origin as well. Signed-in merchant redemption returns 501 until the recording transaction is implemented.
 
 ## Team change procedure
 
@@ -118,7 +130,7 @@ origin as well. Merchant redemption returns 501 until merchant authentication ex
 
 Shared profiles now have a migration with `customer`, `merchant` and `admin` roles.
 Login is connected to Supabase Auth and profiles; public registration remains pending.
-Merchant membership, authorized redemption and real payments remain later work.
-Business portal localStorage and admin sample data are not Supabase
-records. The large `docs/domain/database.dbml` is a future design, not a migration
+Merchant membership and scoped business reads are implemented. Deal editing,
+recording redemption and real payments remain later work. Legacy browser demo
+records and admin sample financial data are not Supabase records. The large `docs/domain/database.dbml` is a future design, not a migration
 or a description of every table currently deployed.

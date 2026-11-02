@@ -5,7 +5,8 @@
 Migration `backend/sql/migrations/002_profiles.sql` creates **one application table**,
 `public.profiles`, for ordinary users, business users and admins. Supabase's existing
 `auth.users` manages login identities and passwords. No separate `admin_accounts`
-table or password table is needed. Catalogue and purchase tables remain unchanged.
+table or password table is needed. Business users additionally need an active
+`merchant_members` link from migration 005; see [merchant login](merchant-login.md). Catalogue and purchase tables remain unchanged.
 
 The owner confirmed on 2026-10-31 that the earlier admin-only migration had **not**
 been applied. Its unapplied SQL file was replaced by `002_profiles.sql`; use the
@@ -45,8 +46,8 @@ Secure in production, with an eight-hour lifetime. Logout deletes the server row
 These values match `shared/src/schemas/auth.ts`. Each identity currently has one
 role; a business/admin user does not need a duplicate customer identity. 
 API authorization must explicitly decide which capabilities each role receives.
-A `merchant` role does not establish ownership of any business. Linking people to
-specific `merchants` will require `merchant_members` and ownership checks later.
+A `merchant` role does not establish ownership of any business. Business users are linked to specific `merchants` through `merchant_members`
+and the backend checks that link on every session lookup.
 Business/company details stay in `merchants`, rather than being duplicated here.
 
 Email/passwords remain in Supabase Auth. Deleting an Auth user cascades to that
@@ -103,6 +104,9 @@ UPDATE public.profiles
 SET is_active = false
 WHERE user_id = 'PASTE-AUTH-USER-UUID-HERE'::uuid;
 ```
+
+New business users can also be created through the admin form with migrations
+005/006 and the server secret; see [account provisioning](merchant-account-provisioning.md).
 
 Profile role and active status are rechecked on protected requests. Disabling a
 profile immediately blocks its website session on the next request. This does
@@ -177,11 +181,13 @@ Auth user deletion cascades through the profile to these sessions. The existing
 DB role must have the necessary access to `auth.users`, `profiles`, `auth_sessions`
 and purchase tables; the current privileged Supabase connection supports this.
 
-Business portal localStorage login/workflows remain a separate demo. A merchant
-profile can authenticate through `/login`, but merchant membership/ownership
-links and replacing the business demo are still pending. Admin business creation,
-list/detail and status now use `merchants` (migration 004), without creating Auth
-accounts; see [business setup](admin-businesses.md). Other admin demo workflows
+The business portal now authenticates merchant profiles through Supabase Auth
+and requires an active merchant membership. Its dashboard lists only the linked
+business's saved deals. See [merchant login](merchant-login.md). Deal creation/editing
+and recording redemption remain pending; real routes no longer save browser demo deals. Admin business creation,
+list/detail and status use `merchants` (migration 004). Optional account provisioning
+now creates business Auth users and links using migrations 005/006; see
+[business setup](admin-businesses.md). Other admin demo workflows
 and sample financial data remain separate from authentication.
 
 The future `docs/domain/database.dbml` differs from these minimal migrations:

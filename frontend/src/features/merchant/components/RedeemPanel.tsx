@@ -11,7 +11,7 @@ import { ApiError } from "@/lib/api-client";
 import { formatDate, formatMoney, itemTitle } from "@/lib/format";
 import { lookupVoucher, redeemVoucher } from "../api";
 
-/** Check a code, then confirm redemption. The API enforces single use atomically. */
+/** Check codes for the authenticated business. Recording redemption is a separate pending workflow. */
 export function RedeemPanel() {
   const { t, locale } = useI18n();
   const toast = useToast();
@@ -44,8 +44,8 @@ export function RedeemPanel() {
     setBusy(true);
     try {
       setResult(await lookupVoucher(c));
-    } catch {
-      setError(t("errors.network"));
+    } catch (error) {
+      setError(t(`errors.${error instanceof ApiError ? error.code : "network"}`));
     } finally {
       setBusy(false);
     }

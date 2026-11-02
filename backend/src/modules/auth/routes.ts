@@ -6,7 +6,7 @@ import type { AuthService } from './service';
 export async function authRoutes(app: FastifyInstance, { service, config }: { service: AuthService; config: AuthConfig }) {
   // Bounded per-instance limiter supplements Supabase Auth's provider-side limits.
   const attempts = new Map<string, { count: number; until: number }>();
-  for (const [path, adminOnly] of [['/api/auth/login', false], ['/api/auth/admin/login', true]] as const) {
+  for (const [path, audience] of [['/api/auth/login', 'any'], ['/api/auth/admin/login', 'admin'], ['/api/auth/merchant/login', 'merchant']] as const) {
     app.post(path, async (request, reply) => {
       const origin = request.headers.origin;
       if (origin && !config.origins.includes(origin)) throw new HttpProblem(403, 'forbidden');
@@ -18,7 +18,7 @@ export async function authRoutes(app: FastifyInstance, { service, config }: { se
       const entry = attempts.get(key) ?? { count: 0, until: now + 60000 };
       if (entry.count >= 5 || (attempts.size >= 1000 && !attempts.has(key))) throw new HttpProblem(429, 'tooManyAttempts');
       entry.count++; attempts.set(key, entry);
-      const result = await service.login(parsed.data.email, parsed.data.password, adminOnly);
+      const result = await service.login(parsed.data.email, parsed.data.password, audience);
       await service.logout(sessionToken(request.headers.cookie));
       return reply.header('set-cookie', sessionCookie(result.token, config.secure)).send({ user: result.user });
     });

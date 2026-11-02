@@ -24,6 +24,15 @@ export const adminMerchantSchema = z.object({
   status: merchantStatusSchema.default('active'),
 }).strict();
 export type AdminMerchantInput = z.infer<typeof adminMerchantSchema>;
+export const adminMerchantCreateSchema = adminMerchantSchema.extend({
+  login: z.object({
+    email: z.string().trim().toLowerCase().max(254).email({ message: 'invalidEmail' }),
+    password: z.string().min(12, { message: 'merchantPasswordLength' }).max(72, { message: 'merchantPasswordLength' })
+      .refine(value => new TextEncoder().encode(value).length <= 72, { message: 'merchantPasswordLength' }),
+  }).strict().optional(),
+}).strict();
+export type AdminMerchantCreateInput = z.infer<typeof adminMerchantCreateSchema>;
+
 export interface AdminMerchantDTO {
   id: string;
   name: string;
@@ -40,4 +49,16 @@ export interface AdminMerchantDTO {
   updatedAt: string;
   dealCount: number;
   liveDealCount: number;
+}
+
+/** A business user's own saved deal list; no draft data from another merchant is included. */
+export interface MerchantDealDTO {
+  id: string;
+  slug: string;
+  title: import('./common').LocalizedText;
+  imageUrl: string;
+  status: 'draft' | 'pending' | 'live' | 'rejected';
+  createdAt: string;
+  fromPriceCents: number | null;
+  optionCount: number;
 }

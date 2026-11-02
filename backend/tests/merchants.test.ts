@@ -29,7 +29,7 @@ it('admin business API persists fields, protects writes, rejects duplicates and 
   await sql.unsafe(await fixture('./fixtures/catalogue-schema.sql'));
   await sql.unsafe(await fixture('../sql/seed-catalogue.sql'));
   const before = await sql`SELECT id, company_name, display_name, public_email FROM public.merchants ORDER BY id`;
-  for (const file of ['002_profiles.sql', '003_auth_sessions.sql', '004_merchant_contact_and_classification.sql', '004_merchant_contact_and_classification.sql']) {
+  for (const file of ['002_profiles.sql', '003_auth_sessions.sql', '004_merchant_contact_and_classification.sql', '004_merchant_contact_and_classification.sql', '005_merchant_members.sql', '006_merchant_account_provisioning.sql']) {
     await sql.begin(async tx => { await tx.unsafe('SET LOCAL client_min_messages = warning;\n' + await fixture(`../sql/migrations/${file}`)); });
   }
   assert.deepEqual(await sql`SELECT id, company_name, display_name, public_email FROM public.merchants ORDER BY id`, before);

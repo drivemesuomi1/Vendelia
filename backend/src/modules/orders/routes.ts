@@ -1,9 +1,12 @@
 import type { FastifyInstance } from "fastify";
 import { checkoutSchema, localeSchema, redeemLookupSchema } from "@vendelia/shared";
 import type { OrderService } from "./service";
+import type { AuthService } from "../auth/service";
+import { sessionToken } from "../auth/config";
+import { HttpProblem } from "../../errors";
 
 /** Checkout, order/voucher retrieval and voucher verification. Business rules live in the service. */
-export async function orderRoutes(app: FastifyInstance, { service }: { service: OrderService }) {
+export async function orderRoutes(app: FastifyInstance, { service, auth }: { service: OrderService; auth: AuthService }) {
   app.post("/api/orders", async (request, reply) => {
     const parsed = checkoutSchema.safeParse(request.body);
     if (!parsed.success) {
@@ -32,14 +35,21 @@ export async function orderRoutes(app: FastifyInstance, { service }: { service: 
   app.get<{ Params: { code: string } }>("/api/vouchers/:code", async (request) => service.lookup(request.params.code));
 
   app.post("/api/merchant/vouchers/lookup", async (request, reply) => {
+    const user = await auth.current(sessionToken(request.headers.cookie));
+    if (!user) throw new HttpProblem(401, 'invalidLogin');
+    if (user.role !== 'merchant' || !user.merchant) throw new HttpProblem(403, 'forbidden');
     const parsed = redeemLookupSchema.safeParse(request.body);
     if (!parsed.success) return reply.code(400).send({ error: "invalidVoucherCode", message: "Invalid voucher code" });
-    return service.lookup(parsed.data.code);
+    return service.lookupForMerchant(parsed.data.code, user.merchant.id);
   });
 
-  // Marking a voucher used must be limited to the voucher's own merchant, which needs merchant sign-in.
-  app.post("/api/merchant/vouchers/redeem", async (_request, reply) =>
-    reply.code(501).send({ error: "redeemUnavailable", message: "Redemption requires merchant sign-in" }));
+  // Recording a redemption is a separate transactional workflow and remains unavailable.
+  app.post("/api/merchant/vouchers/redeem", async (request, reply) => {
+    const user = await auth.current(sessionToken(request.headers.cookie));
+    if (!user) throw new HttpProblem(401, 'invalidLogin');
+    if (user.role !== 'merchant' || !user.merchant) throw new HttpProblem(403, 'forbidden');
+    return reply.code(501).send({ error: "redeemUnavailable", message: "Recording redemptions is not available yet" });
+  });
 }
 
 const header = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value);
