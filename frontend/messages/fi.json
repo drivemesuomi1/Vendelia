@@ -827,5 +827,9 @@
     "title": "Lahjakortin tarkistus",
     "merchantNote": "Palveluntarjoaja: kirjaa lahjakortti käytetyksi Vendelian yritysportaalissa.",
     "openPortal": "Avaa yritysportaali"
+  },
+  "previewBanner": {
+    "label": "Esikatselu",
+    "message": "Vendelia on kehitteillä. Ostaminen ei ole vielä mahdollista. Voit tutustua sivuston nykyiseen esikatseluversioon."
   }
 }

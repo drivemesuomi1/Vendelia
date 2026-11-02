@@ -25,6 +25,28 @@ For the shared customer/business/admin profile migration and account setup, see
 [user accounts](docs/accounts.md). Login uses Supabase Auth plus profile roles;
 apply migrations 002/003 and configure the Auth variables before testing.
 
+## Public preview notice
+
+A shared `PreviewBanner` at the top of the locale root layout identifies the site
+as under development and not yet open for purchases. It appears on customer,
+authentication and portal pages, with an equivalent notice in the global error
+fallback. Wording is translated in `frontend/messages/{fi,sv,en}.json` under
+`previewBanner`; styling is in `frontend/src/components/layout/PreviewBanner.css`.
+The notice is not dismissible and is rendered without client-side state. It is
+informational: payment/test-checkout controls remain governed by backend settings.
+No database migration or new environment variable is required.
+
+## Homepage banner
+
+The homepage uses a static, rounded services card in
+`frontend/src/features/deals/components/PromoBanner.tsx`, inside a slightly wider
+hero wrapper (1320px maximum; other page sections keep their existing width). It displays the brand, localized headline and Browse deals button,
+plus `/banner/home-services.webp` with database-backed category labels/links.
+There are no rotating slides, autoplay timers, progress bars or carousel controls.
+Responsive styles are in the Home banner section of `frontend/src/styles/globals.css`.
+Deals below the banner continue loading from the database. No database or environment
+changes are needed for this presentation change.
+
 ## Checks
 ```bash
 npm run typecheck

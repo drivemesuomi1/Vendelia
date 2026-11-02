@@ -1,5 +1,6 @@
 "use client";
 
+import { PreviewBanner } from "@/components/layout/PreviewBanner";
 import { useEffect, useState } from "react";
 import { isLocale, type Locale } from "@/i18n/config";
 import { createTranslator } from "@/i18n/translate";
@@ -17,10 +18,13 @@ export default function GlobalError({ retry }: { error: unknown; retry: () => vo
   const t = createTranslator({ fi, sv, en }[locale], fi);
   return (
     <html lang={locale}>
-      <body style={{ fontFamily: "system-ui, sans-serif", padding: "10vh 24px", textAlign: "center" }}>
-        <h1>{t("errors.catalogueUnavailable")}</h1>
-        <p>{t("errors.generic")}</p>
-        <button type="button" onClick={retry}>{t("common.retry")}</button>
+      <body style={{ fontFamily: "system-ui, sans-serif", margin: 0 }}>
+        <PreviewBanner label={t("previewBanner.label")} message={t("previewBanner.message")} />
+        <main style={{ padding: "10vh 24px", textAlign: "center" }}>
+          <h1>{t("errors.catalogueUnavailable")}</h1>
+          <p>{t("errors.generic")}</p>
+          <button type="button" onClick={retry}>{t("common.retry")}</button>
+        </main>
       </body>
     </html>
   );

@@ -179,56 +179,9 @@ section{padding:var(--s4) 0}
 .merchant-cta .btn-line{color:#fff;border-color:rgba(255,255,255,.3)}
 .merchant-cta .btn-line:hover{background:rgba(255,255,255,.08);border-color:#fff}
 
-/* ---------- Home: hero carousel ---------- */
-.home{padding-top:0}
-.home>.wrap{padding-top:var(--s3)}
-.hero-c{position:relative;height:clamp(440px,52vw,540px);border-radius:var(--radius-lg);overflow:hidden;background:var(--navy);isolation:isolate;box-shadow:0 24px 48px -28px rgba(23,34,59,.5)}
-.hs{position:absolute;inset:0;display:block;color:#fff;text-decoration:none;opacity:0;visibility:hidden;transition:opacity .9s ease,visibility 0s .9s}
-.hs.on{opacity:1;visibility:visible;transition:opacity .9s ease;z-index:1}
-.hs img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.08)}
-.hs.on img{animation:kb 7s ease-out forwards}
-@keyframes kb{from{transform:scale(1.12)}to{transform:scale(1)}}
-.hs::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,23,41,.78) 0%,rgba(15,23,41,.45) 45%,rgba(15,23,41,0) 75%),linear-gradient(0deg,rgba(15,23,41,.7) 0%,rgba(15,23,41,0) 40%)}
-.hs-txt{position:absolute;z-index:1;left:clamp(20px,4vw,48px);right:20px;top:50%;transform:translateY(-62%);max-width:560px}
-.hs.on .hs-txt>*{animation:up .8s var(--ease) both}
-.hs.on .hs-txt>:nth-child(2){animation-delay:.12s}
-.hs.on .hs-txt>:nth-child(3){animation-delay:.22s}
-.hs.on .hs-txt>:nth-child(4){animation-delay:.32s}
-@keyframes up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-.hs-txt .chip{background:rgba(255,255,255,.16);color:#fff;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.25)}
-.hs-txt h2{font-size:clamp(28px,4.2vw,48px);font-weight:800;letter-spacing:-.03em;line-height:1.08;margin-top:16px;color:#fff;text-wrap:balance}
-.hs-txt p{margin-top:12px;font-size:16px;opacity:.9;display:flex;align-items:center;gap:6px}
-.hs-txt p .icon{width:16px;height:16px}
-.hs-row{display:flex;align-items:center;gap:20px;margin-top:24px;flex-wrap:wrap}
-.hs-price{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
-.hs-price small{font-size:15px;font-weight:500;opacity:.85;margin-right:6px;letter-spacing:0}
-.hs-price s{font-size:16px;font-weight:500;opacity:.7;margin-left:10px}
-.hs-row .btn{background:#fff;color:var(--navy);border-radius:999px;padding:0 24px;transition:transform .25s var(--ease),box-shadow .25s}
-.hs:hover .hs-row .btn{transform:translateY(-2px);box-shadow:0 12px 24px -10px rgba(0,0,0,.5)}
-.hs-row .btn .icon{transition:transform .25s var(--ease)}
-.hs:hover .hs-row .btn .icon{transform:translateX(3px)}
-.hc-arrow{position:absolute;z-index:3;top:50%;width:48px;height:48px;margin-top:-24px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(15,23,41,.35);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#fff;display:grid;place-items:center;cursor:pointer;opacity:0;transition:opacity .3s,transform .3s var(--ease),background .2s}
-.hc-arrow.prev{left:16px;transform:translateX(-8px)}
-.hc-arrow.next{right:16px;transform:translateX(8px)}
-.hero-c:hover .hc-arrow,.hc-arrow:focus-visible{opacity:1;transform:none}
-.hc-arrow:hover{background:rgba(15,23,41,.6)}
-@media(hover:none){.hc-arrow{display:none}}
-.hc-pause{position:absolute;z-index:3;top:16px;right:16px;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(15,23,41,.35);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#fff;display:grid;place-items:center;cursor:pointer;transition:background .2s}
-.hc-pause:hover{background:rgba(15,23,41,.6)}
-.hc-pause .icon,.hc-arrow .icon{width:18px;height:18px}
-.hero-c :focus-visible{outline-color:#fff}
-.hc-tabs{position:absolute;z-index:3;left:clamp(20px,4vw,48px);right:clamp(20px,4vw,48px);bottom:20px;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:12px}
-.hc-tab{display:flex;flex-direction:column;gap:10px;padding:10px 0 4px;background:none;border:0;color:#fff;text-align:left;cursor:pointer;opacity:.65;transition:opacity .3s;min-width:0}
-.hc-tab:hover,.hc-tab[aria-current="true"]{opacity:1}
-.bar{display:block;height:3px;border-radius:3px;background:rgba(255,255,255,.3);overflow:hidden}
-.bar i{display:block;height:100%;background:#fff;transform:scaleX(0);transform-origin:left}
-.hc-tab[aria-current="true"] .bar i{animation:fill 5s linear forwards}
-@keyframes fill{to{transform:scaleX(1)}}
-.hero-c:is(:hover,:focus-within,.paused) :is(.bar i,.hs.on img){animation-play-state:paused}
-.tl{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tl small{display:block;font-size:12px;font-weight:500;opacity:.75}
-@media(max-width:720px){.tl{display:none}.hc-tabs{gap:6px}.hs-txt{top:auto;bottom:56px;transform:none}.hs::after{background:linear-gradient(0deg,rgba(15,23,41,.88) 0%,rgba(15,23,41,.35) 60%,rgba(15,23,41,.1) 100%)}}
-@media(prefers-reduced-motion:reduce){.hs.on img,.hs.on .hs-txt>*{animation:none!important}}
+/* ---------- Home ---------- */
+.home{padding-top:var(--s3)}
+.home-hero{max-width:1320px}
 .catbar{display:flex;gap:8px;overflow-x:auto;padding:20px 0 4px;scrollbar-width:none}
 .pill{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--navy);text-decoration:none;font-weight:500;white-space:nowrap;transition:border-color .2s,color .2s}
 .pill:hover{border-color:var(--indigo);color:var(--indigo)}
@@ -236,106 +189,38 @@ section{padding:var(--s4) 0}
 .pill small{color:var(--navy-50);font-size:13px}
 .home .deals{grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr))}
 .home section{padding:40px 0 8px}
-/* Home hero carousel: full width. The copy lines up with the header's content edge and the picture runs to the
-   right edge. Slides share one grid cell, so the hero is as tall as its tallest slide and nothing jumps when slides
-   change. The services photo (three slanted photos in one image) keeps its 1434:724 shape so its labels stay put. */
+/* Home banner: copy on the left, slanted category panels on the right */
 .home .promo{padding:0}
-.promo{--g:16px;position:relative;overflow:hidden;isolation:isolate;border-bottom:1px solid var(--line);
-  background:radial-gradient(55% 90% at 0% 100%,rgba(127,214,207,.42),transparent 62%),radial-gradient(45% 80% at 30% 0%,rgba(59,50,179,.12),transparent 70%),linear-gradient(115deg,#F1EFFC 0%,#EEF2FB 50%,#E5F3F1 100%)}
-.promo::before{content:"";position:absolute;inset:0;z-index:-1;background-image:radial-gradient(rgba(23,34,59,.08) 1px,transparent 1px);background-size:18px 18px;-webkit-mask-image:linear-gradient(90deg,#000,transparent 45%);mask-image:linear-gradient(90deg,#000,transparent 45%)}
-@media(min-width:768px){.promo{--g:24px}}
-.promo-track{display:grid}
-.promo-slide{grid-area:1/1;display:grid;grid-template-columns:minmax(0,1fr);opacity:0;visibility:hidden;transition:opacity .5s var(--ease),visibility 0s linear .5s}
-.promo-slide.on{opacity:1;visibility:visible;transition:opacity .5s var(--ease),visibility 0s}
-.promo-copy{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:32px var(--g) 24px}
-.promo-eyebrow{display:inline-flex;align-items:center;gap:6px;color:var(--teal);font-size:13px;font-weight:600;letter-spacing:.01em}
-.promo-eyebrow .icon{width:16px;height:16px}
-.home .promo h2{margin-top:12px;color:var(--navy);font-size:clamp(34px,3.2vw,50px);line-height:1;letter-spacing:-.04em;font-weight:800;text-wrap:balance}
-.home .promo h2.promo-h-deal{font-size:clamp(28px,2.6vw,42px);line-height:1.08;letter-spacing:-.03em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.promo-slide--deal .promo-lead{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.promo-accent{color:var(--indigo)}
-.promo-lead{margin-top:16px;max-width:440px;color:var(--navy-70);font-size:clamp(16px,1.15vw,18px);line-height:1.55}
-.promo-inline-ic{width:16px;height:16px;vertical-align:-3px;margin-right:4px;color:var(--teal)}
-.promo-price{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 10px;margin-top:16px;color:var(--navy)}
-.promo-price small{font-size:14px;color:var(--navy-70)}
-.promo-price b{font-size:30px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-.promo-price s{font-size:16px;color:var(--navy-50)}
-.promo-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
-.promo-trust{display:none;list-style:none;margin:28px 0 0;padding:20px 0 0;border-top:1px solid rgba(23,34,59,.1);grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 24px;width:100%;max-width:520px}
-.promo-trust li{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:500;color:var(--navy)}
-.promo-trust .icon{width:20px;height:20px;flex:none;color:var(--teal)}
-/* Large faint brand mark filling the far-left gutter on wide screens. */
-.promo-mark{position:absolute;z-index:-1;left:-90px;bottom:-110px;opacity:.07;pointer-events:none;display:none;filter:saturate(.6)}
-.promo-mark svg{display:block;height:520px}
-/* Wide screens have room beside the photo: show the brand mark, and the trust points in the hero (hiding the
-   duplicate bar below). Narrower desktops keep them in the bar, so the copy never outgrows and crops the photo. */
-@media(min-width:1500px){.promo-mark{display:block}}
-/* From 1760px the photo is tall enough for the extra lines (measured); below that they would crop its right edge. */
-@media(min-width:1760px){.promo-trust{display:grid}.home .trustbar{display:none}}
-.promo-cta{min-height:52px;padding:0 26px;font-size:16px;box-shadow:0 12px 24px -14px rgba(59,50,179,.75)}
-.promo-cta .icon{transition:transform .2s var(--ease)}
-.promo-cta:hover .icon{transform:translateX(3px)}
-.promo-cta-2{min-height:52px;padding:0 22px;font-size:16px;color:var(--navy);background:rgba(255,255,255,.72);border-color:rgba(23,34,59,.14);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-.promo-cta-2:hover{background:#fff;border-color:var(--navy-50)}
-.promo-art{position:relative;overflow:hidden;aspect-ratio:1434/724}
-.promo-frame{position:absolute;inset:0;display:block}
-.promo-frame img{display:block;width:100%;height:100%;object-fit:cover}
-.promo-slide.on .promo-frame img{animation:promo-in 1.1s var(--ease) both}
-@keyframes promo-in{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}
-.promo-tag{position:absolute;bottom:7%;color:#fff;font:700 clamp(15px,1.6vw,22px)/1.2 var(--font);white-space:nowrap;text-decoration:none;text-shadow:0 1px 10px rgba(0,0,0,.35);padding:4px 0}
+/* Home banner: brand copy on the left, the services photo (three slanted photos in one image) on the right */
+.promo{display:grid;grid-template-columns:minmax(0,40fr) minmax(0,60fr);border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--line);background:radial-gradient(120% 70% at 0% 100%,rgba(127,214,207,.45),transparent 60%),linear-gradient(135deg,#EFEBFF 0%,#F4F3FC 55%,#E6F6F4 100%)}
+.promo-copy{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:24px 24px 24px 44px}
+.promo-brand{display:inline-flex;align-items:center;gap:10px;color:var(--navy);font-size:22px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.home .promo h2{margin-top:14px;color:var(--navy);font-size:clamp(30px,3vw,44px);line-height:1.02;letter-spacing:-.035em;font-weight:800}
+.promo-lead{margin-top:12px;max-width:400px;color:var(--navy-70);font-size:16px;line-height:1.5}
+.promo-cta{margin-top:20px;min-height:50px;padding:0 24px;font-size:16px}
+/* Height that shows the whole image (60% column of a max 1272px banner, image ratio 1.98); taller copy just crops the slanted left edge. */
+.promo-art{position:relative;overflow:hidden;min-height:calc(min(100vw - 48px,1272px) * .6 / 1.98)}
+/* The frame keeps the image's own proportions so labels stay on their photos; when the cell is narrower, the slanted left edge is what gets cut. */
+.promo-frame{position:absolute;top:0;right:0;width:max-content;height:100%;min-width:100%;clip-path:polygon(13.5% 0,100% 0,100% 100%,0 100%)}
+.promo-frame img{display:block;height:100%;width:auto;min-width:100%;object-fit:cover}
+.promo-tag{position:absolute;bottom:7%;color:#fff;font:700 clamp(15px,1.6vw,22px)/1.2 var(--font);text-decoration:none;text-shadow:0 1px 10px rgba(0,0,0,.35);padding:4px 0}
 .promo-tag:hover{text-decoration:underline;text-underline-offset:4px}
 .promo-tag:focus-visible{outline:2px solid #fff;outline-offset:4px;border-radius:4px}
-/* Business slide: no photo, a branded panel listing what sellers get. */
-.promo-biz-art{display:grid;place-items:center;padding:24px var(--g);color:#fff;background:radial-gradient(60% 80% at 85% 15%,rgba(127,214,207,.35),transparent 60%),radial-gradient(70% 90% at 10% 100%,rgba(94,82,230,.55),transparent 65%),linear-gradient(135deg,#2A2380 0%,#17223B 60%,#0B4F4C 100%)}
-.promo-slide--business .promo-art{aspect-ratio:auto}
-.promo-slide--business .promo-frame{position:relative}
-.promo-biz-card{width:100%;max-width:440px;padding:24px 28px;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-.promo-biz-mark{width:56px;height:56px;border-radius:14px;background:#fff;display:grid;place-items:center;margin-bottom:18px}
-.promo-biz-card ul{list-style:none;margin:0;padding:0;display:grid;gap:14px}
-.promo-biz-card li{display:flex;gap:10px;font-size:15px;line-height:1.45}
-.promo-biz-card .icon{width:20px;height:20px;flex:none;margin-top:1px;color:#7FD6CF}
-/* Controls: arrows, one bar per slide (the active bar fills over 7 s and then moves on) and pause. */
-.promo-ctrls{display:flex;align-items:center;gap:8px;padding:14px var(--g) 18px}
-.promo-arrow{width:40px;height:40px;flex:none;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(23,34,59,.14);background:rgba(255,255,255,.82);color:var(--navy);cursor:pointer;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:background .15s,border-color .15s}
-.promo-arrow:hover{background:#fff;border-color:var(--navy-50)}
-.promo-arrow .icon{width:18px;height:18px}
-.promo-pause{margin-left:4px}
-.promo-bars{display:flex;align-items:center;gap:6px;padding:0 6px}
-.promo-bar{position:relative;width:24px;height:28px;padding:0;border:0;background:none;cursor:pointer;transition:width .3s var(--ease)}
-.promo-bar::before,.promo-bar i{content:"";position:absolute;left:0;top:50%;height:4px;margin-top:-2px;border-radius:2px}
-.promo-bar::before{right:0;background:rgba(23,34,59,.16)}
-.promo-bar i{width:0;background:var(--indigo)}
-.promo-bar[aria-current="true"]{width:48px}
-.promo-bar[aria-current="true"] i{animation:promo-fill 7s linear forwards}
-.promo:is(:hover,:focus-within,.paused) .promo-bar i{animation-play-state:paused}
-@keyframes promo-fill{from{width:0}to{width:100%}}
-@media(min-width:1200px){
-  /* Columns: gutter up to the page content edge | copy | picture to the right edge. Row height follows the photo;
-     below 1200px the copy would outgrow it, so the layout stacks instead. */
-  .promo-slide{grid-template-columns:max(var(--g),calc((100% - 1200px) / 2 + var(--g))) minmax(380px,min(36%,540px)) minmax(0,1fr)}
-  .promo-copy{grid-column:2;padding:40px 32px 40px 0}
-  /* The pseudo-element gives the row the photo's height; the cell itself stretches if the copy is a little taller. */
-  .promo-art,.promo-slide--business .promo-art{grid-column:3;aspect-ratio:auto;align-self:stretch}
-  .promo-art::before{content:"";display:block;aspect-ratio:1434/724}
-  .promo-frame,.promo-slide--business .promo-frame{position:absolute;inset:0 auto 0 0;width:max-content;min-width:100%;clip-path:polygon(13.5% 0,100% 0,100% 100%,0 100%)}
-  .promo-frame img{width:auto;min-width:100%}
-  .promo-photo,.promo-biz-art{width:100%!important}
-  .promo-photo img{width:100%}
-  .promo-biz-art{padding-left:16%}
-  /* Over the picture's top-right corner, as a dark glass pill, so the controls never make the hero taller. */
-  .promo-ctrls{position:absolute;z-index:2;top:20px;right:24px;gap:2px;padding:4px;border-radius:999px;background:rgba(17,24,39,.5);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-  .promo-ctrls .promo-arrow{width:36px;height:36px;border-color:transparent;background:transparent;color:#fff}
-  .promo-ctrls .promo-arrow:hover{background:rgba(255,255,255,.16);border-color:transparent}
-  .promo-ctrls .promo-arrow:focus-visible{outline-color:#fff}
-  .promo-ctrls .promo-bar::before{background:rgba(255,255,255,.32)}
-  .promo-ctrls .promo-bar i{background:#fff}
-  .promo-pause{margin-left:0}
+@media(max-width:1099px){
+  .promo{grid-template-columns:1fr;min-height:0}
+  .promo-copy{padding:28px 24px 24px}
+  .promo-brand{font-size:22px}
+  .promo-lead{font-size:16px}
+  .promo-cta{margin-top:20px}
+  .promo-art{min-height:0}
+  .promo-frame{position:relative;width:100%;height:auto}
+  .promo-frame img{width:100%;height:auto}
+  .promo-tag{bottom:6%}
 }
 @media(max-width:599px){
   .promo-tag{font-size:12px;letter-spacing:-.01em}
   .promo-tag:last-of-type{left:67.5%!important}
 }
-@media(prefers-reduced-motion:reduce){.promo-slide,.promo-slide.on{transition:none}.promo-slide.on .promo-frame img{animation:none}.promo-cta .icon,.promo-bar{transition:none}}
 
 .trustbar{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:40px;padding:20px 24px;background:#fff;border:1px solid var(--line);border-radius:var(--radius)}
 .trustbar div{display:flex;gap:12px;align-items:center;font-size:15px;font-weight:500}

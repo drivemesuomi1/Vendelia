@@ -827,5 +827,9 @@
     "title": "Kontroll av presentkort",
     "merchantNote": "Tjänsteleverantör: registrera presentkortet som använt i Vendelias företagsportal.",
     "openPortal": "Öppna företagsportalen"
+  },
+  "previewBanner": {
+    "label": "Förhandsvisning",
+    "message": "Vendelia är under utveckling. Det går ännu inte att göra köp. Du kan utforska webbplatsens nuvarande förhandsversion."
   }
 }

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
+import { PreviewBanner } from "@/components/layout/PreviewBanner";
 import { Providers } from "@/components/layout/Providers";
 import { isLocale, LOCALES } from "@/i18n/config";
 import { getMessages, getT } from "@/i18n/server";
@@ -29,10 +30,12 @@ export const viewport: Viewport = { themeColor: "#3B32B3", width: "device-width"
 export default async function LocaleLayout({ children, params }: { children: ReactNode; params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
+  const t = getT(locale);
   const [meta, user] = await Promise.all([getMeta(), getSession()]);
   return (
     <html lang={locale} className={inter.className}>
       <body>
+        <PreviewBanner label={t("previewBanner.label")} message={t("previewBanner.message")} />
         <Providers locale={locale} messages={getMessages(locale)} fallback={getMessages("fi")} meta={meta} user={user}>
           {children}
         </Providers>

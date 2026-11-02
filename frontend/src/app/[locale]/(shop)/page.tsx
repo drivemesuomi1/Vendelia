@@ -16,8 +16,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
   return (
     <main className="home">
-      <h1 className="sr-only">{t("home.title")}</h1>
-      <PromoBanner deals={deals.filter((d) => d.imageUrl)} />
+      <div className="wrap home-hero">
+        <h1 className="sr-only">{t("home.title")}</h1>
+        <PromoBanner locale={locale} meta={meta} />
+      </div>
       <div className="wrap">
         <CategoryBar />
 
@@ -37,7 +39,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           )}
         </section>
 
-        {/* On wide screens these points sit in the hero instead (see .promo-trust). */}
         <div className="trustbar">
           <div><Icon name="checkc" />{t("home.trustVat")}</div>
           <div><Icon name="refund" />{t("home.trustRefund", { days: meta.refundWindowDays })}</div>

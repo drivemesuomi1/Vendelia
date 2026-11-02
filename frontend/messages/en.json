@@ -827,5 +827,9 @@
     "title": "Voucher check",
     "merchantNote": "Service provider: mark the voucher as used in Vendelia's business portal.",
     "openPortal": "Open the business portal"
+  },
+  "previewBanner": {
+    "label": "Preview",
+    "message": "Vendelia is under development and is not yet open for purchases. You may browse the site in current preview mode."
   }
 }
