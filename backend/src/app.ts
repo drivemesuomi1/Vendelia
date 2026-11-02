@@ -32,7 +32,8 @@ export function buildApp(database: Sql, options: {
   const config = options.config ?? platformConfig();
   const ordersConfig = options.orders ?? orderConfig();
   const service = new CatalogueService(repository, { ...config, paymentBypass: ordersConfig.paymentBypass });
-  const orders = new OrderService(database, service, config, ordersConfig, options.mailer ?? createMailer(ordersConfig.mail));
+  const mailer = options.mailer ?? createMailer(ordersConfig.mail);
+  const orders = new OrderService(database, service, config, ordersConfig, mailer);
   app.register(cors, { origin: process.env.FRONTEND_URL ?? "http://localhost:3000", credentials: true });
   app.addHook("onSend", async (_request, reply) => { reply.header("cache-control", "no-store"); });
   app.addHook("onClose", async () => { await database.end({ timeout: 5 }); });
@@ -73,7 +74,8 @@ export function buildApp(database: Sql, options: {
   const merchantRepository = new MerchantRepository(database);
   const provisioning = new MerchantProvisioningService(merchantRepository,
     options.userProvisioner ?? new SupabaseUserProvisioner(authSettings.url, process.env.SUPABASE_SECRET_KEY?.trim() ?? ''));
-  app.register(merchantRoutes, { service: new MerchantService(merchantRepository, provisioning), auth: authService });
+  const merchantMail = { siteUrl: ordersConfig.siteUrl, supportEmail: ordersConfig.mail.replyTo };
+  app.register(merchantRoutes, { service: new MerchantService(merchantRepository, provisioning, mailer, merchantMail), auth: authService });
   app.register(authRoutes, { service: authService, config: authSettings });
   app.register(healthRoutes, { database });
   app.register(catalogueRoutes, { service });

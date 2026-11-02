@@ -73,7 +73,9 @@ Sign-in email and Temporary password (including Generate) are now functional whe
 Create business login is selected. They are required only in that mode. Passwords
 are sent to the server for Supabase Auth creation, never to merchant columns or
 browser storage. Public contact email remains independent. Newly issued passwords
-are displayed once in component memory; retries never reset an existing password.
+are displayed once in component memory and emailed with the sign-in email and
+portal link to the new login's address; retries never reset an existing password
+or send another email.
 
 Apply migrations 005 and 006, then configure the server-only `SUPABASE_SECRET_KEY`
 for account provisioning. Ordinary business-only saves need the migration schema

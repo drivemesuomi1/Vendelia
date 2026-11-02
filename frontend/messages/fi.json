@@ -626,6 +626,8 @@
       "issuedTitle": "Tunnukset luotu: {name}",
       "resetTitle": "Uusi salasana: {name}",
       "issuedHint": "Salasana näytetään vain nyt. Kopioi se ja toimita yritykselle turvallisesti.",
+      "issuedEmailed": "Kirjautumistiedot lähetettiin osoitteeseen {email}.",
+      "issuedEmailFailed": "Kirjautumistietoja ei voitu lähettää sähköpostilla. Kopioi salasana alta ja toimita se yritykselle turvallisesti.",
       "loginUrl": "Kirjautumissivu",
       "copy": "Kopioi",
       "copied": "Kopioitu",

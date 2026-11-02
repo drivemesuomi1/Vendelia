@@ -43,8 +43,12 @@ account provisioning is unavailable. No extra npm dependency is required.
    most 72 UTF-8 bytes; Supabase's configured password policy also applies.
 5. Submit. On success, the new password is displayed once in component memory
    when the server confirms it was set by this request. Copy/share it securely
-   before closing; it cannot be retrieved from Auth afterward. No email is sent
-   automatically, and no first-login password-change UI is implemented yet.
+   before closing; it cannot be retrieved from Auth afterward. The sign-in email,
+   password and portal link are also emailed to the sign-in email right away
+   (same SMTP settings as voucher emails, in the admin's UI language). The panel
+   says whether that email was sent; if it failed, share the password manually.
+   The password is never stored or logged. A replayed/recovered account
+   (`passwordSet=false`) gets no email. No first-login password-change UI yet.
 6. Sign in at `/en/business` (or the other locale routes) with the new credentials.
 
 The backend creates a confirmed Supabase Auth identity, a merchant profile and an

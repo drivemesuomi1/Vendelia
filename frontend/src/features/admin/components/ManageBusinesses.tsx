@@ -8,6 +8,7 @@ import { createMerchant, setMerchantStatus } from "../api";
 import { useState, type FormEvent, type InputHTMLAttributes, type ReactNode } from "react";
 import { Dialog } from "@/components/ui/Dialog";
 import { Icon } from "@/components/ui/Icon";
+import { Notice } from "@/components/ui/Notice";
 import { useI18n } from "@/i18n/I18nProvider";
 import { formatDate, loc } from "@/lib/format";
 import { useAppData } from "@/lib/meta-context";
@@ -26,7 +27,7 @@ export function ManageBusinesses({ businesses }: { businesses: AdminMerchantDTO[
   const [form, setForm] = useState(EMPTY);
   // Passwords are sent only for explicit account provisioning; never persist them in browser storage.
   const [createLogin, setCreateLogin] = useState(false);
-  const [issued, setIssued] = useState<{ email: string; password: string | null; name: string } | null>(null);
+  const [issued, setIssued] = useState<{ email: string; password: string | null; name: string; emailed: boolean } | null>(null);
   const [signInEmail, setSignInEmail] = useState("");
   const [temporaryPassword, setTemporaryPassword] = useState("");
   const [errors, setErrors] = useState<Partial<Record<FormKey | 'login.email' | 'login.password', string>>>({});
@@ -64,8 +65,8 @@ export function ManageBusinesses({ businesses }: { businesses: AdminMerchantDTO[
     }
     setBusy(true); setFailure(null); setErrors({});
     try {
-      const result = await createMerchant(parsed.data);
-      if (result.login) setIssued({ email: result.login.email, password: result.login.passwordSet ? temporaryPassword : null, name: result.merchant.name });
+      const result = await createMerchant(parsed.data, locale);
+      if (result.login) setIssued({ email: result.login.email, password: result.login.passwordSet ? temporaryPassword : null, name: result.merchant.name, emailed: !!result.login.emailed });
       setOpen(false); setSignInEmail(""); setTemporaryPassword(""); router.refresh();
     } catch (error) {
       if (error instanceof ApiError) {
@@ -115,6 +116,9 @@ export function ManageBusinesses({ businesses }: { businesses: AdminMerchantDTO[
       {issued && (
         <section className="panel pad" style={{ marginTop: 20 }} aria-live="polite">
           <div className="row between"><h2>{t("admin.mb.issuedTitle", { name: issued.name })}</h2><button className="btn btn-ghost btn-sm" onClick={() => setIssued(null)} aria-label={t("admin.mb.close")}><Icon name="x" /></button></div>
+          {issued.password && issued.emailed
+            ? <Notice tone="teal" icon="checkc"><p>{t("admin.mb.issuedEmailed", { email: issued.email })}</p></Notice>
+            : issued.password && <Notice tone="warn" icon="info"><p>{t("admin.mb.issuedEmailFailed")}</p></Notice>}
           <p className="muted small">{t(issued.password ? "admin.mb.issuedHint" : "admin.mb.loginAlreadyProvisioned")}</p>
           <dl className="stack" style={{ marginTop: 16 }}>
             <div><dt>{t("admin.mb.loginEmail")}</dt><dd>{issued.email}</dd></div>

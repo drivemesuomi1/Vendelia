@@ -626,6 +626,8 @@
       "issuedTitle": "Inloggning skapad: {name}",
       "resetTitle": "Nytt lösenord: {name}",
       "issuedHint": "Lösenordet visas bara nu. Kopiera det och skicka det säkert till företaget.",
+      "issuedEmailed": "Inloggningsuppgifterna skickades till {email}.",
+      "issuedEmailFailed": "Inloggningsuppgifterna kunde inte skickas per e-post. Kopiera lösenordet nedan och ge det till företaget på ett säkert sätt.",
       "loginUrl": "Inloggningssida",
       "copy": "Kopiera",
       "copied": "Kopierat",

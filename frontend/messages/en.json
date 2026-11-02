@@ -626,6 +626,8 @@
       "issuedTitle": "Sign-in created for {name}",
       "resetTitle": "New password for {name}",
       "issuedHint": "The password is shown only now. Copy it and send it to the business securely.",
+      "issuedEmailed": "Sign-in details were emailed to {email}.",
+      "issuedEmailFailed": "The sign-in details couldn't be emailed. Copy the password below and send it to the business securely.",
       "loginUrl": "Sign-in page",
       "copy": "Copy",
       "copied": "Copied",
