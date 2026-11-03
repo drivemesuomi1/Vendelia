@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState, type FormEvent } from "react";
-import { dealInputSchema, VAT_RATES_BPS, type DealDetailDTO, type DealInput, type SplitDTO } from "@vendelia/shared";
+import { useState, type FormEvent } from "react";
+import { dealInputSchema, VAT_RATES_BPS, type DealInput, type SplitDTO } from "@vendelia/shared";
 import { Field, TextArea, TextInput } from "@/components/ui/Field";
 import { Icon } from "@/components/ui/Icon";
 import { Notice } from "@/components/ui/Notice";
@@ -11,7 +11,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { ApiError } from "@/lib/api-client";
 import { formatMoney, formatPct, loc } from "@/lib/format";
 import { useAppData } from "@/lib/meta-context";
-import { createDeal, previewCommission, updateDeal, uploadImage } from "../api";
+import { createDeal, resizeImage, updateDeal, uploadImage } from "../api";
 import { splitPrice } from "@/features/portal-demo/money";
 
 const toCents = (euros: string) => Math.round(parseFloat(euros.replace(",", ".")) * 100);
@@ -21,35 +21,17 @@ const VAT_KEYS: Record<number, string> = { 2550: "business.vatGeneral", 1350: "b
 
 interface OptionRow { id?: string; label: string; price: string }
 
-/** Shrinks a photo to at most 1200px JPEG so it fits in browser storage (demo mode). */
-function resizeImage(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      const scale = Math.min(1, 1200 / Math.max(img.width, img.height));
-      const canvas = document.createElement("canvas");
-      canvas.width = Math.round(img.width * scale);
-      canvas.height = Math.round(img.height * scale);
-      canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
-      URL.revokeObjectURL(img.src);
-      resolve(canvas.toDataURL("image/jpeg", 0.82));
-    };
-    img.onerror = reject;
-    img.src = URL.createObjectURL(file);
-  });
-}
-
 /**
  * Create or edit a deal. Shows what the merchant receives per voucher as they type.
- * With `onSave` (demo mode, no API) the deal is handed to the caller, the split is computed locally
- * and photos are kept as resized data URLs.
+ * With `dealId` the deal is updated (and goes back to review); without it a new deal is submitted.
+ * With `onSave` (demo mode, no API) the deal is handed to the caller and photos are kept as resized data URLs.
  */
 export function DealForm({
-  deal,
+  dealId,
   initial,
   onSave,
 }: {
-  deal?: DealDetailDTO & { merchantId: string };
+  dealId?: string;
   initial?: DealInput;
   onSave?: (input: DealInput) => void | Promise<void>;
 }) {
@@ -57,7 +39,7 @@ export function DealForm({
   const { meta } = useAppData();
   const router = useRouter();
   const toast = useToast();
-  const src = deal ?? initial;
+  const src = initial;
   const [f, setF] = useState({
     titleFi: src?.title.fi ?? "",
     titleSv: src?.title.sv ?? "",
@@ -69,7 +51,7 @@ export function DealForm({
     howTo: src?.howTo.fi.join("\n") ?? "",
     categoryId: src?.categoryId ?? meta.categories[0]?.id ?? "",
     cityId: src?.cityId ?? meta.cities[0]?.id ?? "",
-    area: deal?.area.fi ?? initial?.area ?? "",
+    area: src?.area ?? "",
     street: src?.street ?? "",
     zip: src?.zip ?? "",
     vatBps: src?.vatBps ?? 2550,
@@ -80,19 +62,15 @@ export function DealForm({
     src?.options.map((o) => ({ id: o.id, label: o.label?.fi ?? "", price: toEuros(o.priceCents) })) ?? [{ label: "", price: "" }],
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [split, setSplit] = useState<SplitDTO | null>(null);
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
   const set = <K extends keyof typeof f>(k: K, v: (typeof f)[K]) => setF((p) => ({ ...p, [k]: v }));
   const err = (k: string) => (errors[k] ? t(`errors.${errors[k]}`) : undefined);
 
+  // Same rule as the backend: commission on the VAT-exclusive price, VAT on the commission.
   const firstPrice = toCents(options[0]?.price ?? "");
-  useEffect(() => {
-    if (!Number.isFinite(firstPrice) || firstPrice <= 0) return setSplit(null);
-    if (onSave) return setSplit(splitPrice(firstPrice, f.vatBps, meta.commissionBps, meta.commissionVatBps));
-    const timer = setTimeout(() => previewCommission(firstPrice, f.vatBps).then((r) => setSplit(r.split)).catch(() => setSplit(null)), 250);
-    return () => clearTimeout(timer);
-  }, [firstPrice, f.vatBps, onSave, meta.commissionBps, meta.commissionVatBps]);
+  const split: SplitDTO | null = Number.isFinite(firstPrice) && firstPrice > 0
+    ? splitPrice(firstPrice, f.vatBps, meta.commissionBps, meta.commissionVatBps) : null;
 
   function build(): DealInput | null {
     const ref = f.reference ? toCents(f.reference) : null;
@@ -131,7 +109,7 @@ export function DealForm({
     setBusy(true);
     try {
       if (onSave) await onSave(input);
-      else if (deal) await updateDeal(deal.id, input);
+      else if (dealId) await updateDeal(dealId, input);
       else await createDeal(input);
       toast(t("business.submitted"));
       router.push(`/${locale}/business`);

@@ -1,37 +1,103 @@
 "use client";
 
 import { useState } from "react";
+import type { DealInput, MerchantStatus } from "@vendelia/shared";
 import { Dialog } from "@/components/ui/Dialog";
 import { Icon } from "@/components/ui/Icon";
+import { Notice } from "@/components/ui/Notice";
 import { useI18n } from "@/i18n/I18nProvider";
+import { ApiError } from "@/lib/api-client";
 import { formatDate } from "@/lib/format";
 import { DealChip } from "@/features/portal-demo/DealChip";
 import { DealPreview } from "@/features/portal-demo/DealPreview";
-import { reviewDeal, useDemoStore, type DemoDeal } from "@/features/portal-demo/store";
+
+/** What the review UI needs from a deal, whether it comes from the API or the browser demo store. */
+export interface ReviewableDeal {
+  id: string;
+  status: "draft" | "pending" | "live" | "rejected";
+  input: DealInput;
+  submittedAt: string | null;
+  reviewNote: string | null;
+  merchantName: string;
+  merchantStatus?: MerchantStatus;
+}
+
+type Decide = (id: string, decision: "approve" | "reject", note?: string) => void | Promise<void>;
 
 /**
- * Side panel to review one deal: full preview, approve, reject (reason required) or take a live deal off sale.
- * Mount with a `key` of the deal id so the reject form resets between deals.
+ * Preview, reject-reason field and the approve / reject / take-off-sale buttons for one deal.
+ * Used in the drawer (browser demo) and on the full review page. Mount with a `key` of the deal id.
  */
-export function DealReviewDrawer({ deal, onClose }: { deal: DemoDeal | null; onClose: () => void }) {
-  const { t, locale } = useI18n();
-  const { businesses } = useDemoStore();
-  const [rejecting, setRejecting] = useState(false);
+export function DealReviewForm({ deal, variant, onDecision, onDone }: {
+  deal: ReviewableDeal;
+  variant: "drawer" | "page";
+  onDecision: Decide;
+  onDone: () => void;
+}) {
+  const { t } = useI18n();
   const [note, setNote] = useState("");
   const [noteError, setNoteError] = useState(false);
-  const businessName = businesses.find((b) => b.id === deal?.businessId)?.name ?? "–";
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const approve = (d: DemoDeal) => {
-    reviewDeal(d.id, "approve");
-    onClose();
-  };
-  const reject = (d: DemoDeal) => {
-    if (!rejecting) return setRejecting(true);
-    if (!note.trim()) return setNoteError(true);
-    reviewDeal(d.id, "reject", note);
-    onClose();
+  // The comment goes to the business with either decision; rejecting needs one so they know what to fix.
+  const decide = async (decision: "approve" | "reject") => {
+    if (decision === "reject" && !note.trim()) return setNoteError(true);
+    setBusy(true);
+    setError(null);
+    try {
+      await onDecision(deal.id, decision, note.trim() || undefined);
+      onDone();
+    } catch (e) {
+      setError(e instanceof ApiError ? e.code : "network");
+      setBusy(false);
+    }
   };
 
+  const body = (
+    <>
+      <div className="row" style={{ gap: 8 }}><DealChip status={deal.status === "draft" ? "pending" : deal.status} /></div>
+      {deal.merchantStatus && deal.merchantStatus !== "active" && <Notice tone="warn" icon="info">{t("admin.dr.merchantInactive")}</Notice>}
+      {error && <Notice tone="danger" icon="xc">{t(`errors.${error}`)}</Notice>}
+      {deal.reviewNote && <p className={`review-note${deal.status === "rejected" ? "" : " ok"}`}><span><b>{t("admin.dr.lastFeedback")}:</b> {deal.reviewNote}</span></p>}
+      <DealPreview input={deal.input} businessName={deal.merchantName} />
+      <div className="mb-field">
+        <label htmlFor="dr-note">{t("admin.dr.feedback")}</label>
+        <textarea id="dr-note" className="input" rows={4} maxLength={1000} value={note} onChange={(e) => { setNote(e.target.value); setNoteError(false); }} aria-invalid={noteError || undefined} aria-describedby="dr-note-hint" />
+        <p className="hint" id="dr-note-hint">{t("admin.dr.feedbackHint")}</p>
+        {noteError && <p className="err-msg"><Icon name="xc" />{t("admin.dr.reasonRequired")}</p>}
+      </div>
+    </>
+  );
+  const actions = (
+    <>
+      {deal.status !== "live" && (
+        <button className="btn btn-primary" type="button" onClick={() => decide("approve")} disabled={busy}><Icon name="check" />{t("admin.dr.approve")}</button>
+      )}
+      {deal.status !== "rejected" && (
+        <button className="btn btn-danger" type="button" onClick={() => decide("reject")} disabled={busy}>
+          <Icon name="x" />{t(deal.status === "live" ? "admin.dr.unpublish" : "admin.dr.reject")}
+        </button>
+      )}
+    </>
+  );
+
+  return variant === "drawer" ? (
+    <>
+      <div className="drawer-body">{body}</div>
+      <div className="drawer-foot two">{actions}</div>
+    </>
+  ) : (
+    <div className="review-page">
+      <section className="panel stack">{body}</section>
+      <div className="review-actions">{actions}</div>
+    </div>
+  );
+}
+
+/** Side panel version, still used by the browser-only demo business view. */
+export function DealReviewDrawer({ deal, onDecision, onClose }: { deal: ReviewableDeal | null; onDecision: Decide; onClose: () => void }) {
+  const { t, locale } = useI18n();
   return (
     <Dialog open={!!deal} onClose={onClose} className="drawer drawer-wide" labelledBy="dr-title">
       {deal && (
@@ -39,33 +105,11 @@ export function DealReviewDrawer({ deal, onClose }: { deal: DemoDeal | null; onC
           <div className="drawer-head">
             <div>
               <h2 id="dr-title" style={{ fontSize: 20 }}>{t("admin.dr.reviewTitle")}</h2>
-              <p className="muted small">{t("admin.dr.submittedBy", { name: businessName, date: formatDate(deal.submittedAt, locale) })}</p>
+              <p className="muted small">{t("admin.dr.submittedBy", { name: deal.merchantName, date: deal.submittedAt ? formatDate(deal.submittedAt, locale) : "–" })}</p>
             </div>
             <button type="button" className="btn btn-ghost btn-sm" onClick={onClose} aria-label={t("admin.mb.close")}><Icon name="x" /></button>
           </div>
-          <div className="drawer-body">
-            <div className="row" style={{ gap: 8 }}><DealChip status={deal.status} /></div>
-            {deal.status === "rejected" && deal.reviewNote && <p className="review-note"><b>{t("admin.dr.reason")}:</b> {deal.reviewNote}</p>}
-            <DealPreview input={deal.input} businessName={businessName} />
-            {rejecting && (
-              <div className="mb-field">
-                <label htmlFor="dr-note">{t("admin.rejectReason")}</label>
-                <textarea id="dr-note" className="input" rows={3} value={note} autoFocus onChange={(e) => { setNote(e.target.value); setNoteError(false); }} aria-invalid={noteError || undefined} />
-                {noteError && <p className="err-msg"><Icon name="xc" />{t("admin.dr.reasonRequired")}</p>}
-              </div>
-            )}
-          </div>
-          <div className="drawer-foot two">
-            {deal.status !== "live" && (
-              <button className="btn btn-primary" type="button" onClick={() => approve(deal)} disabled={rejecting}><Icon name="check" />{t("admin.dr.approve")}</button>
-            )}
-            {deal.status !== "rejected" && (
-              <button className="btn btn-danger" type="button" onClick={() => reject(deal)}>
-                <Icon name="x" />{rejecting ? t("admin.dr.confirmReject") : t(deal.status === "live" ? "admin.dr.unpublish" : "admin.dr.reject")}
-              </button>
-            )}
-            {rejecting && <button className="btn btn-secondary" type="button" onClick={() => setRejecting(false)}>{t("admin.mb.cancel")}</button>}
-          </div>
+          <DealReviewForm deal={deal} variant="drawer" onDecision={onDecision} onDone={onClose} />
         </div>
       )}
     </Dialog>

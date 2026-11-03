@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import type { AdminMerchantDTO } from "@vendelia/shared";
+import type { AdminDealDTO, AdminMerchantDTO } from "@vendelia/shared";
 import { useMemo, useState } from "react";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { useI18n } from "@/i18n/I18nProvider";
 import { loc } from "@/lib/format";
 import { useAppData } from "@/lib/meta-context";
-import { useDemoStore, useHydrated } from "@/features/portal-demo/store";
+import { useHydrated } from "@/features/portal-demo/store";
 import { ago, dayLabel, int, ratio } from "../format";
 import { BarList, Donut, SERIES, StackedBar, TrendChart, type ChartItem } from "./charts";
 
@@ -18,12 +18,16 @@ const isoDay = (t: number) => new Date(t).toISOString().slice(0, 10);
 
 /**
  * Admin home for the business -> deal -> review flow: what needs attention, how businesses and deals
- * are progressing, and recent activity. Business rows are persisted; review data is still a demo.
+ * are progressing, and recent activity, all from the database.
  */
-export function AdminOverview({ businesses }: { businesses: AdminMerchantDTO[] }) {
+export function AdminOverview({ businesses, deals: records }: { businesses: AdminMerchantDTO[]; deals: AdminDealDTO[] }) {
   const { t, locale } = useI18n();
   const { meta } = useAppData();
-  const { deals } = useDemoStore();
+  // A deal that is waiting again after a review was edited and resubmitted by the business.
+  const deals = useMemo(() => records.map((d) => ({
+    id: d.id, businessId: d.merchantId, input: d.input, status: d.status === "draft" ? ("pending" as const) : d.status,
+    submittedAt: d.submittedAt ?? d.createdAt, reviewedAt: d.reviewedAt, revision: d.reviewedAt && d.status === "pending" ? 2 : 1,
+  })), [records]);
   const hydrated = useHydrated();
   const [range, setRange] = useState<Range>(30);
   const base = `/${locale}/admin`;

@@ -403,7 +403,10 @@
     "savedDealsHint": "Saved deals for this business will appear here.",
     "featurePending": "This feature is not available yet",
     "draft": "Draft",
-    "redemptionPreview": "You can check your business’s voucher codes. Recording a redemption is not available yet."
+    "redemptionPreview": "You can check your business’s voucher codes. Recording a redemption is not available yet.",
+    "viewLive": "View on site",
+    "optionCount": "{n} options",
+    "liveSince": "live since {date}"
   },
   "admin": {
     "title": "Admin",
@@ -678,7 +681,11 @@
       "approve": "Approve and publish",
       "reject": "Reject",
       "confirmReject": "Confirm rejection",
-      "unpublish": "Remove from sale"
+      "unpublish": "Remove from sale",
+      "merchantInactive": "This business isn't active, so the deal won't be shown on the site even after approval.",
+      "feedback": "Feedback to the business",
+      "feedbackHint": "Shown on this deal's card in the business portal. Required when rejecting; optional with an approval.",
+      "lastFeedback": "Last feedback sent"
     },
     "ov": {
       "sub": "Businesses, deal review and latest activity",
@@ -837,7 +844,10 @@
     "provisioningPending": "Account setup is incomplete. Retry with the same business details and original password; do not create a second account.",
     "provisioningConflict": "An earlier setup exists with different details. Use the original details or ask an administrator to review it.",
     "merchantCredentialsRejected": "Supabase rejected these sign-in details. Check the email and password policy, then try again.",
-    "merchantPasswordLength": "Use at least 12 characters and no more than 72 UTF-8 bytes."
+    "merchantPasswordLength": "Use at least 12 characters and no more than 72 UTF-8 bytes.",
+    "reasonRequired": "Write a reason so the business can fix the deal.",
+    "invalidDealReference": "Choose an available category and city.",
+    "invalidTransition": "This deal has already been reviewed. Refresh the page."
   },
   "voucherCheck": {
     "title": "Voucher check",

@@ -403,7 +403,10 @@
     "savedDealsHint": "Sparade erbjudanden för detta företag visas här.",
     "featurePending": "Den här funktionen är ännu inte tillgänglig",
     "draft": "Utkast",
-    "redemptionPreview": "Du kan kontrollera företagets presentkortskoder. Registrering av inlösen är ännu inte tillgänglig."
+    "redemptionPreview": "Du kan kontrollera företagets presentkortskoder. Registrering av inlösen är ännu inte tillgänglig.",
+    "viewLive": "Visa på webbplatsen",
+    "optionCount": "{n} alternativ",
+    "liveSince": "till salu sedan {date}"
   },
   "admin": {
     "title": "Administration",
@@ -678,7 +681,11 @@
       "approve": "Godkänn och publicera",
       "reject": "Avvisa",
       "confirmReject": "Bekräfta avvisning",
-      "unpublish": "Ta bort från försäljning"
+      "unpublish": "Ta bort från försäljning",
+      "merchantInactive": "Företaget är inte aktivt, så erbjudandet visas inte på webbplatsen ens efter godkännande.",
+      "feedback": "Återkoppling till företaget",
+      "feedbackHint": "Visas på erbjudandets kort i företagsportalen. Krävs vid avslag, valfritt vid godkännande.",
+      "lastFeedback": "Senast skickad återkoppling"
     },
     "ov": {
       "sub": "Företag, granskning av erbjudanden och senaste händelser",
@@ -837,7 +844,10 @@
     "provisioningPending": "Kontot är inte färdigskapat. Försök igen med samma företagsuppgifter och ursprungligt lösenord. Skapa inte ett andra konto.",
     "provisioningConflict": "En tidigare kontoregistrering har andra uppgifter. Använd de ursprungliga uppgifterna eller be en administratör granska den.",
     "merchantCredentialsRejected": "Supabase avvisade inloggningsuppgifterna. Kontrollera e-postadressen och lösenordskraven och försök igen.",
-    "merchantPasswordLength": "Använd minst 12 tecken och högst 72 UTF-8-byte."
+    "merchantPasswordLength": "Använd minst 12 tecken och högst 72 UTF-8-byte.",
+    "reasonRequired": "Skriv en orsak så att företaget kan rätta erbjudandet.",
+    "invalidDealReference": "Välj en tillgänglig kategori och stad.",
+    "invalidTransition": "Erbjudandet har redan granskats. Uppdatera sidan."
   },
   "voucherCheck": {
     "title": "Kontroll av presentkort",

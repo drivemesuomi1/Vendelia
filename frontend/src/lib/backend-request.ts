@@ -81,7 +81,8 @@ export async function handleApiRequest(request: Request): Promise<Response> {
     const headers = new Headers(response.headers);
     // fetch may decompress an external response; do not forward stale length/encoding.
     for (const name of ["content-length", "content-encoding", "connection", "transfer-encoding"]) headers.delete(name);
-    headers.set("cache-control", "no-store");
+    // Deal photos are immutable and say so; everything else stays uncached.
+    if (!headers.has("cache-control")) headers.set("cache-control", "no-store");
     return new Response(response.body, { status: response.status, headers });
   } catch (error) {
     console.error("Catalogue API request failed", error);

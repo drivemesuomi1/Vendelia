@@ -403,7 +403,10 @@
     "savedDealsHint": "Tämän yrityksen tallennetut tarjoukset näkyvät tässä.",
     "featurePending": "Tämä toiminto ei ole vielä käytettävissä",
     "draft": "Luonnos",
-    "redemptionPreview": "Voit tarkistaa yrityksesi lahjakorttikoodit. Lunastuksen kirjaaminen ei ole vielä käytettävissä."
+    "redemptionPreview": "Voit tarkistaa yrityksesi lahjakorttikoodit. Lunastuksen kirjaaminen ei ole vielä käytettävissä.",
+    "viewLive": "Näytä sivustolla",
+    "optionCount": "{n} vaihtoehtoa",
+    "liveSince": "myynnissä {date} alkaen"
   },
   "admin": {
     "title": "Ylläpito",
@@ -678,7 +681,11 @@
       "approve": "Hyväksy ja julkaise",
       "reject": "Hylkää",
       "confirmReject": "Vahvista hylkäys",
-      "unpublish": "Poista myynnistä"
+      "unpublish": "Poista myynnistä",
+      "merchantInactive": "Yritys ei ole aktiivinen, joten diili ei näy sivustolla hyväksynnänkään jälkeen.",
+      "feedback": "Palaute yritykselle",
+      "feedbackHint": "Näkyy yrityksen portaalissa tämän diilin kortilla. Pakollinen hylättäessä, vapaaehtoinen hyväksyttäessä.",
+      "lastFeedback": "Viimeksi lähetetty palaute"
     },
     "ov": {
       "sub": "Yritykset, diilien tarkistus ja viimeisimmät tapahtumat",
@@ -837,7 +844,10 @@
     "provisioningPending": "Tilin luonti on kesken. Yritä uudelleen samoilla yritystiedoilla ja alkuperäisellä salasanalla. Älä luo toista tiliä.",
     "provisioningConflict": "Aiempi tilin luonti sisältää eri tiedot. Käytä alkuperäisiä tietoja tai pyydä ylläpitäjää tarkistamaan tilanne.",
     "merchantCredentialsRejected": "Supabase hylkäsi kirjautumistiedot. Tarkista sähköposti ja salasanavaatimukset ja yritä uudelleen.",
-    "merchantPasswordLength": "Käytä vähintään 12 merkkiä ja enintään 72 UTF-8-tavua."
+    "merchantPasswordLength": "Käytä vähintään 12 merkkiä ja enintään 72 UTF-8-tavua.",
+    "reasonRequired": "Kirjoita syy, jotta yritys voi korjata diilin.",
+    "invalidDealReference": "Valitse käytössä oleva kategoria ja kaupunki.",
+    "invalidTransition": "Diili on jo tarkistettu. Päivitä sivu."
   },
   "voucherCheck": {
     "title": "Lahjakortin tarkistus",

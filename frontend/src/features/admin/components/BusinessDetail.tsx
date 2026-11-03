@@ -13,6 +13,7 @@ import {
   addBusinessNote,
   removeBusinessNote,
   resetBusinessPassword,
+  reviewDeal as reviewDemoDeal,
   setBusinessStatus,
   updateBusiness,
   useDemoStore,
@@ -332,7 +333,12 @@ export function BusinessDetail({ id }: { id: string }) {
         </section>
       </div>
 
-      <DealReviewDrawer key={reviewId ?? "none"} deal={reviewDeal} onClose={() => setReviewId(null)} />
+      <DealReviewDrawer
+        key={reviewId ?? "none"}
+        deal={reviewDeal && { ...reviewDeal, merchantName: b.name, merchantStatus: b.status }}
+        onDecision={reviewDemoDeal}
+        onClose={() => setReviewId(null)}
+      />
       <EditDrawer key={editing ? b.id : "closed"} business={b} open={editing} onClose={() => setEditing(false)} />
     </div>
   );

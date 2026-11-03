@@ -62,3 +62,35 @@ export interface MerchantDealDTO {
   fromPriceCents: number | null;
   optionCount: number;
 }
+
+/** A business's own deal with what it needs for the portal card (review outcome included). */
+export interface MerchantDealCardDTO extends MerchantDealDTO {
+  vatBps: number;
+  reviewNote: string | null;
+  submittedAt: string | null;
+  reviewedAt: string | null;
+}
+
+/** One deal as stored, in the same shape the deal form submits, plus its review state. */
+export interface DealRecordDTO {
+  id: string;
+  slug: string;
+  status: MerchantDealDTO['status'];
+  reviewNote: string | null;
+  submittedAt: string | null;
+  reviewedAt: string | null;
+  createdAt: string;
+  input: import('./deal').DealInput;
+}
+
+export interface AdminDealDTO extends DealRecordDTO {
+  merchantId: string;
+  merchantName: string;
+  merchantStatus: MerchantStatus;
+}
+
+/** Photo upload from the business portal: base64 bytes of an image already resized in the browser. */
+export const dealImageUploadSchema = z.object({
+  contentType: z.enum(['image/jpeg', 'image/png', 'image/webp']),
+  data: z.string().min(4).max(1_000_000),
+});

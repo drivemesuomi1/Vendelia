@@ -3,6 +3,8 @@ import { SupabaseUserProvisioner, type UserProvisioner } from "./modules/auth/us
 import { MerchantRepository } from "./modules/merchants/repository";
 import { MerchantService } from "./modules/merchants/service";
 import { merchantRoutes, merchantPortalRoutes } from "./modules/merchants/routes";
+import { DealRepository } from "./modules/deals/repository";
+import { dealRoutes } from "./modules/deals/routes";
 import { authConfig, sessionToken, type AuthConfig } from "./modules/auth/config";
 import { AuthRepository } from "./modules/auth/repository";
 import { AuthService } from "./modules/auth/service";
@@ -35,7 +37,8 @@ export function buildApp(database: Sql, options: {
   const mailer = options.mailer ?? createMailer(ordersConfig.mail);
   const orders = new OrderService(database, service, config, ordersConfig, mailer);
   app.register(cors, { origin: process.env.FRONTEND_URL ?? "http://localhost:3000", credentials: true });
-  app.addHook("onSend", async (_request, reply) => { reply.header("cache-control", "no-store"); });
+  // Nothing is cached unless a route says otherwise (only immutable deal photos do).
+  app.addHook("onSend", async (_request, reply) => { if (!reply.hasHeader("cache-control")) reply.header("cache-control", "no-store"); });
   app.addHook("onClose", async () => { await database.end({ timeout: 5 }); });
   app.setErrorHandler<FastifyError>((error, request, reply) => {
     if (error instanceof HttpProblem) {
@@ -76,6 +79,7 @@ export function buildApp(database: Sql, options: {
     options.userProvisioner ?? new SupabaseUserProvisioner(authSettings.url, process.env.SUPABASE_SECRET_KEY?.trim() ?? ''));
   const merchantMail = { siteUrl: ordersConfig.siteUrl, supportEmail: ordersConfig.mail.replyTo };
   app.register(merchantRoutes, { service: new MerchantService(merchantRepository, provisioning, mailer, merchantMail), auth: authService });
+  app.register(dealRoutes, { repository: new DealRepository(database), auth: authService, origins: authSettings.origins });
   app.register(authRoutes, { service: authService, config: authSettings });
   app.register(healthRoutes, { database });
   app.register(catalogueRoutes, { service });
