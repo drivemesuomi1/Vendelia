@@ -1,6 +1,7 @@
 "use client";
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import type { DealRecordDTO, MerchantDealCardDTO, SessionUserDTO } from '@vendelia/shared';
 import { useI18n } from '@/i18n/I18nProvider';
 import { formatDate, formatMoney, loc } from '@/lib/format';
@@ -20,6 +21,30 @@ function StatusChip({ status }: { status: Status }) {
   if (status === 'pending') return <span className="chip warn"><Icon name="clock" />{t('business.inReview')}</span>;
   if (status === 'draft') return <span className="chip"><Icon name="doc" />{t('business.draft')}</span>;
   return <span className="chip danger"><Icon name="xc" />{t('admin.dr.rejected')}</span>;
+}
+
+/**
+ * Admin feedback on a deal, with a dismiss button. Dismissal is remembered in this browser for that deal and
+ * review (so newer feedback shows again); nothing is deleted on the server.
+ */
+function FeedbackNote({ dealId, note, reviewedAt, rejected }: { dealId: string; note: string; reviewedAt: string | null; rejected: boolean }) {
+  const { t } = useI18n();
+  const key = `vd-feedback-dismissed:${dealId}:${reviewedAt ?? ''}`;
+  const [dismissed, setDismissed] = useState<boolean | null>(null);
+  useEffect(() => {
+    try { setDismissed(localStorage.getItem(key) === '1'); } catch { setDismissed(false); }
+  }, [key]);
+  if (dismissed !== false) return null;
+  const dismiss = () => {
+    setDismissed(true);
+    try { localStorage.setItem(key, '1'); } catch { /* private mode: hidden until the page reloads */ }
+  };
+  return (
+    <p className={`review-note${rejected ? '' : ' ok'}`}>
+      <span><b>{t('business.rejectedReason')}:</b> {note}</span>
+      <button type="button" className="review-note-x" onClick={dismiss} aria-label={t('business.dismissFeedback')} title={t('business.dismissFeedback')}><Icon name="x" /></button>
+    </p>
+  );
 }
 
 /** Business home: one card per deal with its review state, the admin's feedback, and edit. */
@@ -75,9 +100,7 @@ export function MerchantDashboard({ merchant, deals }: { merchant: Merchant; dea
                       ? t('business.liveSince', { date: formatDate(deal.reviewedAt, locale) })
                       : t('business.submittedOn', { date: formatDate(deal.submittedAt ?? deal.createdAt, locale) })}
                   </p>
-                  {deal.reviewNote && (
-                    <p className={`review-note${deal.status === 'rejected' ? '' : ' ok'}`}><span><b>{t('business.rejectedReason')}:</b> {deal.reviewNote}</span></p>
-                  )}
+                  {deal.reviewNote && <FeedbackNote dealId={deal.id} note={deal.reviewNote} reviewedAt={deal.reviewedAt} rejected={deal.status === 'rejected'} />}
                 </div>
                 <div className="dc-actions">
                   <Link className={`btn btn-sm ${deal.status === 'rejected' ? 'btn-primary' : 'btn-secondary'}`} href={`${base}/deals/${deal.id}/edit`}>
@@ -109,9 +132,7 @@ export function MerchantDealEditor({ record }: { record?: DealRecordDTO }) {
           <p className="muted small">{t(record?.status === 'live' ? 'business.editLiveNote' : record ? 'business.editNote' : 'business.reviewNote')}</p>
         </div>
       </header>
-      {record?.reviewNote && (
-        <p className={`review-note${record.status === 'rejected' ? '' : ' ok'}`}><span><b>{t('business.rejectedReason')}:</b> {record.reviewNote}</span></p>
-      )}
+      {record?.reviewNote && <FeedbackNote dealId={record.id} note={record.reviewNote} reviewedAt={record.reviewedAt} rejected={record.status === 'rejected'} />}
       <DealForm key={record?.id ?? 'new'} dealId={record?.id} initial={record?.input} />
     </div>
   );

@@ -407,7 +407,8 @@
     "redemptionPreview": "Voit tarkistaa yrityksesi lahjakorttikoodit. Lunastuksen kirjaaminen ei ole vielä käytettävissä.",
     "viewLive": "Näytä sivustolla",
     "optionCount": "{n} vaihtoehtoa",
-    "liveSince": "myynnissä {date} alkaen"
+    "liveSince": "myynnissä {date} alkaen",
+    "dismissFeedback": "Piilota palaute"
   },
   "admin": {
     "title": "Ylläpito",

@@ -311,6 +311,10 @@
 .review-note.warn{background:var(--warn-bg);color:var(--warn-tx);margin-bottom:16px}
 .review-note .icon{width:16px;height:16px;flex:none;margin-top:2px}
 .review-note.ok{background:var(--info-bg);color:var(--indigo)}
+.review-note>span{flex:1;min-width:0}
+.review-note-x{flex:none;display:grid;place-items:center;width:24px;height:24px;margin:-2px -4px -2px 0;padding:0;border:0;border-radius:6px;background:none;color:inherit;opacity:.65;cursor:pointer;transition:opacity .15s,background .15s}
+.review-note-x:hover,.review-note-x:focus-visible{opacity:1;background:rgba(20,20,25,.08)}
+.review-note-x .icon{margin:0}
 .crumbs{margin:0 0 14px}
 .crumbs ol{list-style:none;display:flex;flex-wrap:wrap;align-items:center;gap:2px 4px;margin:0;padding:0;font-size:13px}
 .crumbs li{display:flex;align-items:center;gap:4px;min-width:0;color:var(--navy-50)}

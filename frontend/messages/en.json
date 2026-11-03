@@ -407,7 +407,8 @@
     "redemptionPreview": "You can check your business’s voucher codes. Recording a redemption is not available yet.",
     "viewLive": "View on site",
     "optionCount": "{n} options",
-    "liveSince": "live since {date}"
+    "liveSince": "live since {date}",
+    "dismissFeedback": "Dismiss feedback"
   },
   "admin": {
     "title": "Admin",

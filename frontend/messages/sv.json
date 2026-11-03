@@ -407,7 +407,8 @@
     "redemptionPreview": "Du kan kontrollera företagets presentkortskoder. Registrering av inlösen är ännu inte tillgänglig.",
     "viewLive": "Visa på webbplatsen",
     "optionCount": "{n} alternativ",
-    "liveSince": "till salu sedan {date}"
+    "liveSince": "till salu sedan {date}",
+    "dismissFeedback": "Dölj återkoppling"
   },
   "admin": {
     "title": "Administration",
