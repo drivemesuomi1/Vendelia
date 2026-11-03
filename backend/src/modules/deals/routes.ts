@@ -79,10 +79,11 @@ export async function dealRoutes(app: FastifyInstance, { repository, auth, origi
     return reply.header('content-type', image.content_type).header('cache-control', 'public, max-age=31536000, immutable').send(image.data);
   });
 
-  app.get<{ Querystring: { status?: string } }>('/api/admin/deals', async request => {
+  app.get<{ Querystring: { status?: string; merchantId?: string } }>('/api/admin/deals', async request => {
     const status = request.query.status && request.query.status !== 'all' ? request.query.status : null;
     if (status && !STATUSES.includes(status as DealStatus)) throw new HttpProblem(400, 'invalid_request');
-    return { deals: await repository.adminList(status as DealStatus | null) };
+    const merchantId = request.query.merchantId ? dealId(request.query.merchantId) : null;
+    return { deals: await repository.adminList(status as DealStatus | null, merchantId) };
   });
 
   app.get<{ Params: { id: string } }>('/api/admin/deals/:id', async request => {

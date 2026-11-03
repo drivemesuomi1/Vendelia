@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import type { AdminMerchantDTO } from "@vendelia/shared";
+import type { AdminDealDTO, AdminMerchantDTO } from "@vendelia/shared";
 import { adminConfigured, getAdminSession } from "@/lib/admin-auth";
-import { serverApiOrNull } from "@/lib/server-api";
+import { serverApi, serverApiOrNull } from "@/lib/server-api";
 import { AdminLogin } from "@/features/admin/components/AdminLogin";
 import { StoredBusinessDetail } from "@/features/admin/components/StoredBusinessDetail";
 
@@ -10,5 +10,6 @@ export default async function AdminBusinessPage({ params }: { params: Promise<{ 
   const { id } = await params;
   const result = await serverApiOrNull<{ merchant: AdminMerchantDTO }>(`/api/admin/merchants/${encodeURIComponent(id)}`);
   if (!result) notFound();
-  return <StoredBusinessDetail merchant={result.merchant} />;
+  const { deals } = await serverApi<{ deals: AdminDealDTO[] }>(`/api/admin/deals?status=all&merchantId=${encodeURIComponent(result.merchant.id)}`);
+  return <StoredBusinessDetail merchant={result.merchant} deals={deals} />;
 }

@@ -7,7 +7,8 @@
     "decrease": "Decrease",
     "increase": "Increase",
     "inclVat": "incl. VAT",
-    "optional": "(optional)"
+    "optional": "(optional)",
+    "breadcrumb": "Breadcrumb"
   },
   "nav": {
     "home": "Home",
@@ -780,7 +781,9 @@
         "dealWithdrawn": "Withdrew deal: {detail}",
         "noteAdded": "An admin added a note",
         "detailsEdited": "Business details were edited"
-      }
+      },
+      "contact": "Contact",
+      "dealsHint": "Open a deal to see its details, review it and leave feedback."
     }
   },
   "errors": {

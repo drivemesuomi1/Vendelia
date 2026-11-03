@@ -7,7 +7,8 @@
     "decrease": "Vähennä",
     "increase": "Lisää",
     "inclVat": "sis. ALV",
-    "optional": "(valinnainen)"
+    "optional": "(valinnainen)",
+    "breadcrumb": "Murupolku"
   },
   "nav": {
     "home": "Etusivu",
@@ -780,7 +781,9 @@
         "dealWithdrawn": "Peruutti diilin: {detail}",
         "noteAdded": "Ylläpito lisäsi muistiinpanon",
         "detailsEdited": "Yrityksen tietoja muokattiin"
-      }
+      },
+      "contact": "Yhteystiedot",
+      "dealsHint": "Avaa diili nähdäksesi sen tiedot, tarkistaaksesi sen ja antaaksesi palautetta."
     }
   },
   "errors": {

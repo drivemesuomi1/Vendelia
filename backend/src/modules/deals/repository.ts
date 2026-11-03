@@ -154,8 +154,9 @@ export class DealRepository {
     });
   }
 
-  async adminList(status: DealStatus | null): Promise<AdminDealDTO[]> {
-    const rows = await this.select(status ? this.sql`d.status = ${status}` : this.sql`true`);
+  async adminList(status: DealStatus | null, merchantId: string | null = null): Promise<AdminDealDTO[]> {
+    const rows = await this.select(this.sql`${status ? this.sql`d.status = ${status}` : this.sql`true`}
+      AND ${merchantId ? this.sql`d.merchant_id = ${merchantId}` : this.sql`true`}`);
     return rows.map(row => ({ ...toRecord(row), merchantId: row.merchant_id, merchantName: row.merchant_name, merchantStatus: row.merchant_status }))
       .sort((a, b) => Number(b.status === 'pending') - Number(a.status === 'pending')
         || (b.submittedAt ?? b.createdAt).localeCompare(a.submittedAt ?? a.createdAt));

@@ -5,6 +5,7 @@ import type { DealRecordDTO, MerchantDealCardDTO, SessionUserDTO } from '@vendel
 import { useI18n } from '@/i18n/I18nProvider';
 import { formatDate, formatMoney, loc } from '@/lib/format';
 import { useAppData } from '@/lib/meta-context';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Icon } from '@/components/ui/Icon';
 import { splitPrice } from '@/features/portal-demo/money';
 import { DealForm } from './DealForm';
@@ -98,12 +99,15 @@ export function MerchantDealEditor({ record }: { record?: DealRecordDTO }) {
   const { t, locale } = useI18n();
   return (
     <div className="adm">
+      <Breadcrumbs items={[
+        { label: t('business.myDeals'), href: `/${locale}/business` },
+        ...(record ? [{ label: loc(record.input.title, locale) }, { label: t('business.editDeal') }] : [{ label: t('business.createDeal') }]),
+      ]} />
       <header className="adm-head">
         <div>
           <h1>{t(record ? 'business.editDeal' : 'business.createDeal')}</h1>
           <p className="muted small">{t(record?.status === 'live' ? 'business.editLiveNote' : record ? 'business.editNote' : 'business.reviewNote')}</p>
         </div>
-        <Link className="btn btn-secondary btn-sm" href={`/${locale}/business`}><Icon name="left" />{t('business.myDeals')}</Link>
       </header>
       {record?.reviewNote && (
         <p className={`review-note${record.status === 'rejected' ? '' : ' ok'}`}><span><b>{t('business.rejectedReason')}:</b> {record.reviewNote}</span></p>

@@ -104,6 +104,9 @@ it('business creates and edits deals, admin reviews them, approved deals go publ
     assert.equal((await as(a, 'GET', '/api/admin/deals')).statusCode, 403);
     const queue = (await as(admin, 'GET', '/api/admin/deals?status=pending')).json().deals;
     assert.equal(queue.length, 1); assert.equal(queue[0].merchantId, merchantA); assert.equal(queue[0].merchantStatus, 'active');
+    assert.equal((await as(admin, 'GET', `/api/admin/deals?merchantId=${merchantA}`)).json().deals.length, 2);
+    assert.equal((await as(admin, 'GET', `/api/admin/deals?merchantId=${merchantB}`)).json().deals.length, 0);
+    assert.equal((await as(admin, 'GET', '/api/admin/deals?merchantId=nope')).statusCode, 400);
     assert.equal((await as(admin, 'POST', `/api/admin/deals/${id}/review`, { decision: 'reject' })).statusCode, 400);
     const rejected = await as(admin, 'POST', `/api/admin/deals/${id}/review`, { decision: 'reject', note: 'Add a real photo' });
     assert.equal(rejected.statusCode, 200); assert.equal(rejected.json().deal.status, 'rejected');

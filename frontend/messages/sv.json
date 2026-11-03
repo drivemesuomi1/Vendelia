@@ -7,7 +7,8 @@
     "decrease": "Minska",
     "increase": "Öka",
     "inclVat": "inkl. moms",
-    "optional": "(valfritt)"
+    "optional": "(valfritt)",
+    "breadcrumb": "Sökväg"
   },
   "nav": {
     "home": "Startsida",
@@ -780,7 +781,9 @@
         "dealWithdrawn": "Drog tillbaka erbjudandet: {detail}",
         "noteAdded": "Administrationen la till en anteckning",
         "detailsEdited": "Företagets uppgifter ändrades"
-      }
+      },
+      "contact": "Kontakt",
+      "dealsHint": "Öppna ett erbjudande för att se detaljerna, granska det och lämna återkoppling."
     }
   },
   "errors": {
