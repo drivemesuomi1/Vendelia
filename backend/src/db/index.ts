@@ -12,7 +12,9 @@ if (!url) throw new Error("DATABASE_URL is required");
 
 export const sql = postgres(url, {
   // Supabase requires TLS; DATABASE_SSL=disable is only for a local Postgres during development.
-  ssl: process.env.DATABASE_SSL === "disable" ? false : "require", max: 3, connect_timeout: 10, idle_timeout: 10,
+  ssl: process.env.DATABASE_SSL === "disable" ? false : "require", max: 3, connect_timeout: 10,
+  // Opening a TLS connection to Supabase costs several round trips; keep idle ones for reuse between page views.
+  idle_timeout: 120,
   // Also works if the deployment uses Supabase's transaction pooler.
   prepare: false,
 });

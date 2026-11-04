@@ -1,15 +1,17 @@
 "use client";
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import type { DealRecordDTO, MerchantDealCardDTO, SessionUserDTO } from '@vendelia/shared';
+import { useEffect, useMemo, useState } from 'react';
+import type { DealInput, DealRecordDTO, MerchantDealCardDTO, SessionUserDTO } from '@vendelia/shared';
 import { useI18n } from '@/i18n/I18nProvider';
 import { formatDate, formatMoney, loc } from '@/lib/format';
 import { useAppData } from '@/lib/meta-context';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Icon } from '@/components/ui/Icon';
 import { splitPrice } from '@/features/portal-demo/money';
+import { toPreviewDeal } from '../preview';
 import { DealForm } from './DealForm';
+import { DealPreviewFrame } from './DealPreviewFrame';
 
 type Merchant = NonNullable<SessionUserDTO['merchant']>;
 type Status = MerchantDealCardDTO['status'];
@@ -117,23 +119,47 @@ export function MerchantDashboard({ merchant, deals }: { merchant: Merchant; dea
   );
 }
 
-/** Create page (no `record`) or edit page for one of the business's own deals. */
-export function MerchantDealEditor({ record }: { record?: DealRecordDTO }) {
+const FORM_ID = 'deal-form';
+
+/**
+ * Create page (no `record`) or edit page for one of the business's own deals. "Preview" swaps the form for the
+ * real public deal page built from what has been typed; the form stays mounted (only hidden), so nothing is lost,
+ * and it can be submitted from the preview too. If the details are not valid, the form is shown again with errors.
+ */
+export function MerchantDealEditor({ record, merchant }: { record?: DealRecordDTO; merchant: Merchant }) {
   const { t, locale } = useI18n();
+  const [previewing, setPreviewing] = useState(false);
+  const [draft, setDraft] = useState<DealInput | null>(record?.input ?? null);
+  const preview = useMemo(() => (draft ? toPreviewDeal(draft, merchant) : null), [draft, merchant]);
+  const show = (on: boolean) => {
+    setPreviewing(on);
+    window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  };
+
   return (
-    <div className="adm">
+    <div className="adm editor">
       <Breadcrumbs items={[
         { label: t('business.myDeals'), href: `/${locale}/business` },
         ...(record ? [{ label: loc(record.input.title, locale) }, { label: t('business.editDeal') }] : [{ label: t('business.createDeal') }]),
+        ...(previewing ? [{ label: t('business.preview') }] : []),
       ]} />
       <header className="adm-head">
         <div>
-          <h1>{t(record ? 'business.editDeal' : 'business.createDeal')}</h1>
-          <p className="muted small">{t(record?.status === 'live' ? 'business.editLiveNote' : record ? 'business.editNote' : 'business.reviewNote')}</p>
+          <h1>{t(previewing ? 'business.previewTitle' : record ? 'business.editDeal' : 'business.createDeal')}</h1>
+          <p className="muted small">{t(previewing ? 'business.previewSub' : record?.status === 'live' ? 'business.editLiveNote' : record ? 'business.editNote' : 'business.reviewNote')}</p>
         </div>
       </header>
-      {record?.reviewNote && <FeedbackNote dealId={record.id} note={record.reviewNote} reviewedAt={record.reviewedAt} rejected={record.status === 'rejected'} />}
-      <DealForm key={record?.id ?? 'new'} dealId={record?.id} initial={record?.input} />
+      {record?.reviewNote && !previewing && <FeedbackNote dealId={record.id} note={record.reviewNote} reviewedAt={record.reviewedAt} rejected={record.status === 'rejected'} />}
+      <div className="editor-form" hidden={previewing}>
+        <DealForm key={record?.id ?? 'new'} formId={FORM_ID} dealId={record?.id} initial={record?.input} onDraft={setDraft} onPreview={() => show(true)} onInvalid={() => show(false)} />
+      </div>
+      {previewing && (
+        <DealPreviewFrame
+          deal={preview}
+          start={<button type="button" className="btn btn-ghost btn-sm preview-back" onClick={() => show(false)}><Icon name="left" />{t('business.backToEditing')}</button>}
+          end={<button type="submit" form={FORM_ID} className="btn btn-primary btn-sm"><Icon name="send" />{t('business.submitReview')}</button>}
+        />
+      )}
     </div>
   );
 }

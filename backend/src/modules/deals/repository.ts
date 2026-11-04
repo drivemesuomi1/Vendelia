@@ -23,6 +23,25 @@ function galleryOf(input: DealInput) {
   return [...new Set(input.galleryUrls)].filter(url => url !== input.imageUrl);
 }
 
+type Option = DealInput['options'][number];
+
+/**
+ * How one submitted option is stored. `short_label` is the option's own name (its tile, e.g. "3 h");
+ * `label` is the full name used in the cart and on vouchers, which includes the section ("Home cleaning: 3 h").
+ */
+function optionColumns(option: Option) {
+  const { label, group } = option;
+  const join = (a: string, b: string) => (a && b ? `${a}: ${b}` : '');
+  const full = label && group
+    ? { fi: join(group.fi, label.fi), sv: join(group.sv, label.sv), en: join(group.en, label.en) }
+    : label;
+  return {
+    label: full ? json(full) : null, short_label: option.label ? json(option.label) : null,
+    group_label: option.group ? json(option.group) : null,
+    price_cents: option.priceCents, reference_price_cents: option.referencePriceCents,
+  };
+}
+
 interface DealRow {
   id: string; slug: string; status: DealStatus; review_note: string | null;
   submitted_at: string | null; reviewed_at: string | null; created_at: string;
@@ -30,7 +49,7 @@ interface DealRow {
   inclusions: DealInput['inclusions']; terms: DealInput['terms']; how_to: DealInput['howTo'];
   category_id: string; city_id: string; area: { fi?: string } | null; street: string | null; zip: string | null;
   vat_bps: number; reference_price_cents: number | null; image_url: string; gallery_urls: string[] | null;
-  options: { id: string; label: DealInput['options'][number]['label']; priceCents: number }[];
+  options: { id: string; label: Option['label']; group: Option['group']; priceCents: number; referencePriceCents: number | null }[];
   merchant_id: string; merchant_name: string; merchant_status: AdminDealDTO['merchantStatus'];
 }
 
@@ -47,7 +66,7 @@ function toRecord(row: DealRow): DealRecordDTO {
       categoryId: row.category_id, cityId: row.city_id, area: row.area?.fi ?? '',
       street: row.street ?? '', zip: row.zip ?? '', vatBps: row.vat_bps,
       referencePriceCents: row.reference_price_cents, imageUrl: row.image_url, galleryUrls: row.gallery_urls ?? [],
-      options: row.options.map(o => ({ id: o.id, label: o.label, priceCents: o.priceCents })),
+      options: row.options.map(o => ({ id: o.id, label: o.label, group: o.group, priceCents: o.priceCents, referencePriceCents: o.referencePriceCents })),
     },
   };
 }
@@ -62,7 +81,8 @@ export class DealRepository {
         d.title, d.description, d.restrictions, d.inclusions, d.terms, d.how_to, d.category_id, d.city_id,
         d.area, d.street, d.zip, d.vat_bps, d.reference_price_cents, d.image_url, d.gallery_urls,
         d.merchant_id, m.display_name AS merchant_name, m.status AS merchant_status,
-        coalesce((SELECT jsonb_agg(jsonb_build_object('id', o.id, 'label', o.label, 'priceCents', o.price_cents)
+        coalesce((SELECT jsonb_agg(jsonb_build_object('id', o.id, 'label', coalesce(o.short_label, o.label), 'group', o.group_label,
+          'priceCents', o.price_cents, 'referencePriceCents', o.reference_price_cents)
           ORDER BY o.sort_order, o.id) FROM public.deal_options o WHERE o.deal_id = d.id AND o.active), '[]'::jsonb) AS options
       FROM public.deals d JOIN public.merchants m ON m.id = d.merchant_id
       WHERE ${where}`;
@@ -90,10 +110,9 @@ export class DealRepository {
     if (!ok.length) throw new HttpProblem(400, 'invalidDealReference');
   }
 
-  private async addOption(tx: TransactionSql, dealId: string, option: DealInput['options'][number], sortOrder: number) {
+  private async addOption(tx: TransactionSql, dealId: string, option: Option, sortOrder: number) {
     const [created] = await tx<{ id: string }[]>`
-      INSERT INTO public.deal_options (deal_id, label, price_cents, sort_order, active)
-      VALUES (${dealId}, ${option.label ? json(option.label) : null}, ${option.priceCents}, ${sortOrder}, true) RETURNING id`;
+      INSERT INTO public.deal_options ${tx({ deal_id: dealId, ...optionColumns(option), sort_order: sortOrder, active: true })} RETURNING id`;
     await this.recordPrice(tx, created!.id, option.priceCents);
   }
 
@@ -151,8 +170,8 @@ export class DealRepository {
         const current = option.id ? existing.get(option.id) : undefined;
         if (option.id && current !== undefined) {
           kept.add(option.id);
-          await tx`UPDATE public.deal_options SET label = ${option.label ? json(option.label) : null},
-            price_cents = ${option.priceCents}, sort_order = ${i}, active = true, updated_at = now() WHERE id = ${option.id}`;
+          await tx`UPDATE public.deal_options SET ${tx({ ...optionColumns(option), sort_order: i, active: true })},
+            updated_at = now() WHERE id = ${option.id}`;
           if (current !== option.priceCents) await this.recordPrice(tx, option.id, option.priceCents);
         } else {
           await this.addOption(tx, id, option, i);

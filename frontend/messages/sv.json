@@ -384,7 +384,7 @@
     "fixResubmit": "Rätta och skicka",
     "withdraw": "Dra tillbaka",
     "confirmWithdraw": "Dra tillbaka erbjudandet? Det kan inte ångras.",
-    "previewTitle": "Förhandsvisning",
+    "previewTitle": "Förhandsvisning av erbjudandet",
     "notFound": "Erbjudandet hittades inte.",
     "editLiveNote": "Ändringar skickas för ny granskning. Erbjudandet tas bort från försäljning under tiden.",
     "login": {
@@ -419,7 +419,26 @@
     "photoLater": "Flytta bild {n} senare",
     "photoMoved": "Bilden flyttad till plats {n} av {m}",
     "photoRemoved": "Bilden borttagen",
-    "photosDragHint": "Dra bilderna för att ändra ordningen. Den första bilden är omslaget som visas på korten och överst i erbjudandet."
+    "photosDragHint": "Dra bilderna för att ändra ordningen. Den första bilden är omslaget som visas på korten och överst i erbjudandet.",
+    "useSections": "Gruppera alternativen i avsnitt",
+    "useSectionsHint": "Till exempel Hemstädning och Flyttstädning. Kunden byter avsnitt med flikar och väljer ett alternativ bland rutorna.",
+    "sectionName": "Namn på avsnitt {n}",
+    "sectionPlaceholder1": "t.ex. Hemstädning",
+    "sectionPlaceholder2": "t.ex. Flyttstädning",
+    "addSection": "Lägg till avsnitt",
+    "removeSection": "Ta bort avsnitt",
+    "optionTilePlaceholder": "t.ex. 3 h",
+    "regularPrice": "Ordinarie pris (€)",
+    "previewWaiting": "Laddar förhandsvisning…",
+    "previewDevice": "Storlek på förhandsvisning",
+    "device": {
+      "mobile": "Mobil",
+      "desktop": "Dator"
+    },
+    "preview": "Förhandsvisa",
+    "backToEditing": "Tillbaka till redigering",
+    "previewSub": "Så här ser kunderna erbjudandet. Inget sparas förrän du skickar det för granskning.",
+    "submitting": "Skickar…"
   },
   "admin": {
     "title": "Administration",
@@ -863,7 +882,8 @@
     "reasonRequired": "Skriv en orsak så att företaget kan rätta erbjudandet.",
     "invalidDealReference": "Välj en tillgänglig kategori och stad.",
     "invalidTransition": "Erbjudandet har redan granskats. Uppdatera sidan.",
-    "tooManyPhotos": "Du kan lägga till högst 8 bilder."
+    "tooManyPhotos": "Du kan lägga till högst 8 bilder.",
+    "referenceTooLow": "Ordinarie pris måste vara högre än priset."
   },
   "voucherCheck": {
     "title": "Kontroll av presentkort",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { dealInputSchema, VAT_RATES_BPS, type DealInput, type SplitDTO } from "@vendelia/shared";
 import { Field, TextArea, TextInput } from "@/components/ui/Field";
 import { Icon } from "@/components/ui/Icon";
@@ -18,23 +18,63 @@ import { splitPrice } from "@/features/portal-demo/money";
 const toCents = (euros: string) => Math.round(parseFloat(euros.replace(",", ".")) * 100);
 const toEuros = (cents: number | null | undefined) => (cents ? (cents / 100).toFixed(2) : "");
 const lines = (s: string) => s.split("\n").map((l) => l.trim()).filter(Boolean);
+const fiOnly = (text: string) => ({ fi: text, sv: "", en: "" });
 const VAT_KEYS: Record<number, string> = { 2550: "business.vatGeneral", 1350: "business.vatReduced", 1000: "business.vatLow" };
+const MAX_OPTIONS = 12;
+const MAX_SECTIONS = 4;
 
-interface OptionRow { id?: string; label: string; price: string }
+interface OptionRow { key: string; id?: string; label: string; price: string; reference: string }
+interface Section { key: string; name: string; options: OptionRow[] }
+
+// Keys for rows added while editing; rows from the saved deal get fixed keys so server and browser render the same ids.
+let keySeq = 0;
+const newKey = () => `n${++keySeq}`;
+const emptyOption = (key = newKey()): OptionRow => ({ key, label: "", price: "", reference: "" });
+
+/** Options as the form edits them: consecutive options with the same section heading form one section. */
+function toSections(input?: DealInput): Section[] {
+  let n = 0;
+  const initialKey = () => `i${n++}`;
+  if (!input?.options.length) return [{ key: initialKey(), name: "", options: [emptyOption(initialKey())] }];
+  // Older deals have one regular price for the whole deal: show it on the cheapest option.
+  const cheapest = input.options.reduce((a, b) => (b.priceCents < a.priceCents ? b : a));
+  const perOption = input.options.some((o) => o.referencePriceCents);
+  const sections: Section[] = [];
+  for (const o of input.options) {
+    const reference = perOption ? o.referencePriceCents : o === cheapest ? input.referencePriceCents : null;
+    const row = { key: initialKey(), id: o.id, label: o.label?.fi ?? "", price: toEuros(o.priceCents), reference: toEuros(reference) };
+    const last = sections[sections.length - 1];
+    if (last && last.name === (o.group?.fi ?? "")) last.options.push(row);
+    else sections.push({ key: initialKey(), name: o.group?.fi ?? "", options: [row] });
+  }
+  return sections;
+}
 
 /**
- * Create or edit a deal. Shows what the merchant receives per voucher as they type.
+ * Create or edit a deal. Shows what the merchant receives per voucher as they type, and reports every change
+ * through `onDraft` so a live preview can follow. Options can optionally be grouped into sections
+ * ("Home cleaning", "Move-out cleaning"), shown to customers as tabs with one tile per option.
  * With `dealId` the deal is updated (and goes back to review); without it a new deal is submitted.
  * With `onSave` (demo mode, no API) the deal is handed to the caller and photos are kept as resized data URLs.
+ * `onPreview` adds a Preview button next to submit; `onInvalid` runs when a submit is refused, so a caller showing
+ * the preview instead of the form can bring the form (and its errors) back.
  */
 export function DealForm({
   dealId,
   initial,
   onSave,
+  onDraft,
+  onPreview,
+  onInvalid,
+  formId,
 }: {
   dealId?: string;
   initial?: DealInput;
   onSave?: (input: DealInput) => void | Promise<void>;
+  onDraft?: (draft: DealInput) => void;
+  onPreview?: () => void;
+  onInvalid?: () => void;
+  formId?: string;
 }) {
   const { t, locale } = useI18n();
   const { meta } = useAppData();
@@ -56,29 +96,48 @@ export function DealForm({
     street: src?.street ?? "",
     zip: src?.zip ?? "",
     vatBps: src?.vatBps ?? 2550,
-    reference: toEuros(src?.referencePriceCents),
   });
   // Cover photo first, then the gallery in display order.
   const [photos, setPhotos] = useState<string[]>(src ? [src.imageUrl, ...(src.galleryUrls ?? [])].filter(Boolean) : []);
-  const [options, setOptions] = useState<OptionRow[]>(
-    src?.options.map((o) => ({ id: o.id, label: o.label?.fi ?? "", price: toEuros(o.priceCents) })) ?? [{ label: "", price: "" }],
-  );
+  const [sections, setSections] = useState<Section[]>(() => toSections(src));
+  const [sectioned, setSectioned] = useState(() => !!src?.options.some((o) => o.group));
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const set = <K extends keyof typeof f>(k: K, v: (typeof f)[K]) => setF((p) => ({ ...p, [k]: v }));
   const err = (k: string) => (errors[k] ? t(`errors.${errors[k]}`) : undefined);
 
+  const rows = sections.flatMap((s) => s.options.map((o) => ({ section: s, option: o })));
+  const indexOf = new Map(rows.map((r, i) => [r.option.key, i]));
+  const editSection = (key: string, change: (s: Section) => Section) => setSections((p) => p.map((s) => (s.key === key ? change(s) : s)));
+  const editOption = (key: string, change: Partial<OptionRow>) =>
+    setSections((p) => p.map((s) => ({ ...s, options: s.options.map((o) => (o.key === key ? { ...o, ...change } : o)) })));
+  const removeOption = (key: string) => setSections((p) => p.map((s) => ({ ...s, options: s.options.filter((o) => o.key !== key) })));
+  const toggleSections = (on: boolean) => {
+    setSectioned(on);
+    // Turning sections off keeps every option, in order, in one list.
+    if (!on) setSections((p) => [{ key: p[0]!.key, name: "", options: p.flatMap((s) => s.options) }]);
+  };
+
   // Same rule as the backend: commission on the VAT-exclusive price, VAT on the commission.
-  const firstPrice = toCents(options[0]?.price ?? "");
+  const firstPrice = toCents(rows[0]?.option.price ?? "");
   const split: SplitDTO | null = Number.isFinite(firstPrice) && firstPrice > 0
     ? splitPrice(firstPrice, f.vatBps, meta.commissionBps, meta.commissionVatBps) : null;
 
-  function build(): DealInput | null {
-    const ref = f.reference ? toCents(f.reference) : null;
-    const raw = {
+  /** The form as a deal, before validation (the preview shows it as typed). */
+  function raw() {
+    const options = rows.map(({ section, option }) => ({
+      id: option.id,
+      label: option.label.trim() ? fiOnly(option.label.trim()) : null,
+      group: sectioned ? fiOnly(section.name.trim()) : null,
+      priceCents: toCents(option.price) || 0,
+      referencePriceCents: option.reference.trim() ? toCents(option.reference) || 0 : null,
+    }));
+    // Cards show the cheapest option's regular price.
+    const cheapest = options.reduce<(typeof options)[number] | null>((a, b) => (!a || b.priceCents < a.priceCents ? b : a), null);
+    return {
       title: { fi: f.titleFi, sv: f.titleSv, en: f.titleEn },
-      description: { fi: f.descFi, sv: "", en: "" },
-      restrictions: { fi: f.restrictions, sv: "", en: "" },
+      description: fiOnly(f.descFi),
+      restrictions: fiOnly(f.restrictions),
       inclusions: { fi: lines(f.inclusions), sv: [], en: [] },
       terms: { fi: lines(f.terms), sv: [], en: [] },
       howTo: { fi: lines(f.howTo), sv: [], en: [] },
@@ -88,16 +147,28 @@ export function DealForm({
       street: f.street,
       zip: f.zip,
       vatBps: f.vatBps,
-      referencePriceCents: ref,
+      referencePriceCents: cheapest?.referencePriceCents ?? null,
       imageUrl: photos[0] ?? "",
       galleryUrls: photos.slice(1),
-      options: options.map((o) => ({ id: o.id, label: o.label ? { fi: o.label, sv: "", en: "" } : null, priceCents: toCents(o.price) || 0 })),
+      options,
     };
-    const parsed = dealInputSchema.safeParse(raw);
+  }
+
+  useEffect(() => {
+    if (!onDraft) return;
+    const timer = setTimeout(() => onDraft(raw() as DealInput), 120);
+    return () => clearTimeout(timer);
+    // raw() reads exactly these values.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [f, sections, sectioned, photos, onDraft]);
+
+  function build(): DealInput | null {
+    const parsed = dealInputSchema.safeParse(raw());
     if (!parsed.success) {
       const next: Record<string, string> = {};
       for (const i of parsed.error.issues) next[i.path.join(".")] ??= i.message;
       setErrors(next);
+      onInvalid?.();
       return null;
     }
     setErrors({});
@@ -118,6 +189,7 @@ export function DealForm({
       router.refresh();
     } catch (e2) {
       if (e2 instanceof ApiError) setErrors(Object.keys(e2.fields).length ? e2.fields : { _: e2.code });
+      onInvalid?.();
       setBusy(false);
     }
   }
@@ -128,8 +200,60 @@ export function DealForm({
   const L = ({ k, label, cls = "" }: { k: keyof SplitDTO; label: string; cls?: string }) =>
     split ? <div className={`summary-line ${cls}`}><span>{label}</span><span>{k === "commissionCents" || k === "commissionVatCents" ? "−" : ""}{formatMoney(split[k], locale)}</span></div> : null;
 
+  const optionRow = (section: Section, o: OptionRow) => {
+    const i = indexOf.get(o.key)!;
+    const canRemove = section.options.length > 1;
+    return (
+      <div className="opt-row" key={o.key}>
+        <Field id={`ol-${o.key}`} label={t("business.optionLabel")} required={sectioned} error={err(`options.${i}.label.fi`)}>
+          <TextInput id={`ol-${o.key}`} value={o.label} placeholder={t(sectioned ? "business.optionTilePlaceholder" : "business.optionPlaceholder")} onChange={(e) => editOption(o.key, { label: e.target.value })} error={err(`options.${i}.label.fi`)} />
+        </Field>
+        <Field id={`op-${o.key}`} label={t("business.priceInclVat")} required error={err(`options.${i}.priceCents`)}>
+          <TextInput id={`op-${o.key}`} inputMode="decimal" value={o.price} placeholder="35,00" onChange={(e) => editOption(o.key, { price: e.target.value })} error={err(`options.${i}.priceCents`)} />
+        </Field>
+        <Field id={`or-${o.key}`} label={t("business.regularPrice")} error={err(`options.${i}.referencePriceCents`)}>
+          <div className="input-action">
+            <TextInput id={`or-${o.key}`} inputMode="decimal" value={o.reference} placeholder="45,00" onChange={(e) => editOption(o.key, { reference: e.target.value })} error={err(`options.${i}.referencePriceCents`)} />
+            {canRemove && (
+              <button type="button" className="btn btn-ghost btn-icon" aria-label={t("business.removeOption")} title={t("business.removeOption")} onClick={() => removeOption(o.key)}><Icon name="trash" /></button>
+            )}
+          </div>
+        </Field>
+      </div>
+    );
+  };
+  const addOptionButton = (section: Section) => rows.length < MAX_OPTIONS && (
+    <button type="button" className="btn btn-secondary btn-sm" style={{ alignSelf: "flex-start" }} onClick={() => editSection(section.key, (s) => ({ ...s, options: [...s.options, emptyOption()] }))}>
+      <Icon name="plus" />{t("business.addOption")}
+    </button>
+  );
+
+  const payout = (
+    <aside className="card pad stack breakdown breakdown-side" aria-labelledby="bd">
+      <h2 id="bd" style={{ fontSize: 18 }}>{t("business.perVoucher")}</h2>
+      <div aria-live="polite">
+        {split ? (
+          <>
+            <L k="grossCents" label={t("business.customerPays")} />
+            <L k="saleVatCents" label={t("business.saleVat", { rate: formatPct(f.vatBps, locale) })} cls="muted" />
+            <L k="netCents" label={t("business.commissionBase")} cls="muted" />
+            <L k="commissionCents" label={t("business.commission", { rate: formatPct(meta.commissionBps, locale) })} />
+            <L k="commissionVatCents" label={t("business.commissionVat", { rate: formatPct(meta.commissionVatBps, locale) })} />
+            <L k="payoutCents" label={t("business.yourPayout")} cls="total" />
+            <p className="hint" style={{ marginTop: 8 }}>
+              {t("business.totalDeduction", { amount: formatMoney(split.feeCents, locale), pct: formatPct(Math.round((split.feeCents / split.grossCents) * 10000), locale) })}
+            </p>
+          </>
+        ) : (
+          <p className="muted small">{t("business.enterPrice")}</p>
+        )}
+      </div>
+      <p className="hint">{t("business.commissionNote", { rate: formatPct(meta.commissionBps, locale) })}</p>
+    </aside>
+  );
+
   return (
-    <form className="split" style={{ marginTop: "var(--s3)" }} onSubmit={submit} noValidate>
+    <form id={formId} className="split" style={{ marginTop: "var(--s3)" }} onSubmit={submit} noValidate>
       <div className="card pad form-grid">
         {errors._ && <Notice tone="danger" icon="xc">{t(`errors.${errors._}`)}</Notice>}
         <Field id="t-fi" label={t("business.offerTitle")} required error={err("title.fi")}>
@@ -171,41 +295,56 @@ export function DealForm({
           </div>
         </div>
 
-        <fieldset className="stack">
-          <legend className="label" style={{ marginBottom: 8 }}>{t("business.options")}</legend>
-          {options.map((o, i) => (
-            <div className="opt-row" key={o.id ?? i}>
-              <Field id={`ol-${i}`} label={t("business.optionLabel")}>
-                <TextInput id={`ol-${i}`} value={o.label} placeholder={t("business.optionPlaceholder")} onChange={(e) => setOptions((p) => p.map((x, k) => (k === i ? { ...x, label: e.target.value } : x)))} />
-              </Field>
-              <Field id={`op-${i}`} label={t("business.priceInclVat")} required error={err(`options.${i}.priceCents`)}>
-                <div className="input-action">
-                  <TextInput id={`op-${i}`} inputMode="decimal" value={o.price} placeholder="35,00" onChange={(e) => setOptions((p) => p.map((x, k) => (k === i ? { ...x, price: e.target.value } : x)))} error={err(`options.${i}.priceCents`)} />
-                  {options.length > 1 && (
-                    <button type="button" className="btn btn-ghost btn-icon" aria-label={t("business.removeOption")} title={t("business.removeOption")} onClick={() => setOptions((p) => p.filter((_, k) => k !== i))}><Icon name="trash" /></button>
-                  )}
-                </div>
-              </Field>
-            </div>
-          ))}
-          {options.length === 1 && <p className="hint">{t("business.optionLabelHint")}</p>}
-          {options.length < 6 && (
-            <button type="button" className="btn btn-secondary btn-sm" style={{ alignSelf: "flex-start" }} onClick={() => setOptions((p) => [...p, { label: "", price: "" }])}>
-              <Icon name="plus" />{t("business.addOption")}
-            </button>
+        <fieldset className="stack opt-fieldset">
+          <legend className="label">{t("business.options")}</legend>
+          <label className="opt-toggle">
+            <input type="checkbox" checked={sectioned} onChange={(e) => toggleSections(e.target.checked)} />
+            <span>
+              <b>{t("business.useSections")}</b>
+              <small className="muted">{t("business.useSectionsHint")}</small>
+            </span>
+          </label>
+
+          {sectioned ? (
+            <>
+              {sections.map((section, k) => {
+                const nameError = section.options.map((o) => err(`options.${indexOf.get(o.key)}.group.fi`)).find(Boolean);
+                return (
+                  <div className="opt-section" key={section.key}>
+                    <Field id={`sec-${section.key}`} label={t("business.sectionName", { n: k + 1 })} required error={nameError}>
+                      <div className="input-action">
+                        <TextInput id={`sec-${section.key}`} value={section.name} placeholder={t(k === 0 ? "business.sectionPlaceholder1" : "business.sectionPlaceholder2")} onChange={(e) => editSection(section.key, (s) => ({ ...s, name: e.target.value }))} error={nameError} />
+                        {sections.length > 1 && (
+                          <button type="button" className="btn btn-ghost btn-icon" aria-label={t("business.removeSection")} title={t("business.removeSection")} onClick={() => setSections((p) => p.filter((s) => s.key !== section.key))}><Icon name="trash" /></button>
+                        )}
+                      </div>
+                    </Field>
+                    {section.options.map((o) => optionRow(section, o))}
+                    {addOptionButton(section)}
+                  </div>
+                );
+              })}
+              {sections.length < MAX_SECTIONS && rows.length < MAX_OPTIONS && (
+                <button type="button" className="btn btn-secondary btn-sm" style={{ alignSelf: "flex-start" }} onClick={() => setSections((p) => [...p, { key: newKey(), name: "", options: [emptyOption()] }])}>
+                  <Icon name="plus" />{t("business.addSection")}
+                </button>
+              )}
+            </>
+          ) : (
+            <>
+              {sections[0]!.options.map((o) => optionRow(sections[0]!, o))}
+              {rows.length === 1 && <p className="hint">{t("business.optionLabelHint")}</p>}
+              {addOptionButton(sections[0]!)}
+            </>
           )}
+          <p className="hint">{t("business.referenceHint")}</p>
         </fieldset>
 
-        <div className="form-grid two">
-          <Field id="vat" label={t("business.vatRate")} hint={t("business.vatHint")}>
-            <select id="vat" className="select" value={f.vatBps} onChange={(e) => set("vatBps", Number(e.target.value))}>
-              {VAT_RATES_BPS.map((v) => <option key={v} value={v}>{formatPct(v, locale)} – {t(VAT_KEYS[v]!)}</option>)}
-            </select>
-          </Field>
-          <Field id="ref" label={t("business.referencePrice")} hint={t("business.referenceHint")}>
-            <TextInput id="ref" inputMode="decimal" value={f.reference} placeholder="45,00" onChange={(e) => set("reference", e.target.value)} hint />
-          </Field>
-        </div>
+        <Field id="vat" label={t("business.vatRate")} hint={t("business.vatHint")}>
+          <select id="vat" className="select" value={f.vatBps} onChange={(e) => set("vatBps", Number(e.target.value))}>
+            {VAT_RATES_BPS.map((v) => <option key={v} value={v}>{formatPct(v, locale)} – {t(VAT_KEYS[v]!)}</option>)}
+          </select>
+        </Field>
         <Field id="restr" label={t("business.restrictionsShort")} required error={err("restrictions.fi")}>
           <TextInput id="restr" value={f.restrictions} placeholder={t("business.restrictionsPlaceholder")} onChange={(e) => set("restrictions", e.target.value)} error={err("restrictions.fi")} />
         </Field>
@@ -221,32 +360,15 @@ export function DealForm({
         <Field id="img" label={t("business.photos")} required>
           <PhotoManager photos={photos} onChange={setPhotos} upload={uploadPhoto} error={errors.imageUrl ?? errors["galleryUrls"] ?? Object.entries(errors).find(([k]) => k.startsWith("galleryUrls."))?.[1]} />
         </Field>
-        <div className="row wrap-row">
-          <button className="btn btn-primary" type="submit" disabled={busy}>{t("business.submitReview")}</button>
+        <div className="form-actions">
+          <p className="form-actions-note"><Icon name="clock" />{t("business.reviewNote")}</p>
+          <div className="form-actions-btns">
+            {onPreview && <button className="btn btn-secondary" type="button" onClick={onPreview}><Icon name="eye" />{t("business.preview")}</button>}
+            <button className="btn btn-primary" type="submit" disabled={busy}><Icon name="send" />{t(busy ? "business.submitting" : "business.submitReview")}</button>
+          </div>
         </div>
       </div>
-
-      <aside className="card pad stack breakdown" aria-labelledby="bd" style={{ position: "sticky", top: 24 }}>
-        <h2 id="bd" style={{ fontSize: 18 }}>{t("business.perVoucher")}</h2>
-        <div aria-live="polite">
-          {split ? (
-            <>
-              <L k="grossCents" label={t("business.customerPays")} />
-              <L k="saleVatCents" label={t("business.saleVat", { rate: formatPct(f.vatBps, locale) })} cls="muted" />
-              <L k="netCents" label={t("business.commissionBase")} cls="muted" />
-              <L k="commissionCents" label={t("business.commission", { rate: formatPct(meta.commissionBps, locale) })} />
-              <L k="commissionVatCents" label={t("business.commissionVat", { rate: formatPct(meta.commissionVatBps, locale) })} />
-              <L k="payoutCents" label={t("business.yourPayout")} cls="total" />
-              <p className="hint" style={{ marginTop: 8 }}>
-                {t("business.totalDeduction", { amount: formatMoney(split.feeCents, locale), pct: formatPct(Math.round((split.feeCents / split.grossCents) * 10000), locale) })}
-              </p>
-            </>
-          ) : (
-            <p className="muted small">{t("business.enterPrice")}</p>
-          )}
-        </div>
-        <p className="hint">{t("business.commissionNote", { rate: formatPct(meta.commissionBps, locale) })}</p>
-      </aside>
+      {payout}
     </form>
   );
 }

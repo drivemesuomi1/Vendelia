@@ -11,8 +11,8 @@ import { formatDate, loc, locList, expiryFromToday } from "@/lib/format";
 import { BuyBox } from "./BuyBox";
 
 
-/** Full deal page: what's included, terms, how to use, location, refunds and the seller. */
-export function DealDetail({ deal }: { deal: DealDetailDTO }) {
+/** Full deal page: what's included, terms, how to use, location, refunds and the seller. `preview` renders a draft (nothing can be bought). */
+export function DealDetail({ deal, preview = false }: { deal: DealDetailDTO; preview?: boolean }) {
   const { t, locale } = useI18n();
   const { meta } = useAppData();
   const city = meta.cities.find((c) => c.id === deal.cityId);
@@ -121,7 +121,7 @@ export function DealDetail({ deal }: { deal: DealDetailDTO }) {
               <p className="hint" style={{ marginTop: 12 }}>{t("deal.onBehalf")}</p>
             </section>
           </div>
-          <BuyBox deal={deal} expiry={expiry} />
+          <BuyBox deal={deal} expiry={expiry} preview={preview} />
         </div>
       </main>
     </div>

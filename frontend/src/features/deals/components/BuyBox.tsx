@@ -9,8 +9,8 @@ import { discountPct, formatMoney, formatPct, loc } from "@/lib/format";
 import { useCart } from "@/features/cart/store";
 import { useAppData } from "@/lib/meta-context";
 
-/** Option picker, quantity and "Add to cart" (desktop sidebar + sticky mobile bar). */
-export function BuyBox({ deal, expiry }: { deal: DealDetailDTO; expiry: string }) {
+/** Option picker, quantity and "Add to cart" (desktop sidebar + sticky mobile bar). In `preview`, adding does nothing. */
+export function BuyBox({ deal, expiry, preview = false }: { deal: DealDetailDTO; expiry: string; preview?: boolean }) {
   const { t, locale } = useI18n();
   const cart = useCart();
   const { meta } = useAppData();
@@ -31,7 +31,7 @@ export function BuyBox({ deal, expiry }: { deal: DealDetailDTO; expiry: string }
   const ref = refOf(option);
   const off = discountPct(option.priceCents, ref);
   const total = option.priceCents * qty;
-  const add = () => cart.add({ dealId: deal.id, optionId: option.id, qty });
+  const add = () => { if (!preview) cart.add({ dealId: deal.id, optionId: option.id, qty }); };
   // Consecutive options with the same group heading form one tab.
   const groups: { label: DealOptionDTO["group"]; options: DealOptionDTO[] }[] = [];
   for (const o of deal.options) {

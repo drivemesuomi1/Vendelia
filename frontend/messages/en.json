@@ -419,7 +419,26 @@
     "photoLater": "Move photo {n} later",
     "photoMoved": "Photo moved to position {n} of {m}",
     "photoRemoved": "Photo removed",
-    "photosDragHint": "Drag photos to change the order. The first photo is the cover shown on cards and at the top of the deal."
+    "photosDragHint": "Drag photos to change the order. The first photo is the cover shown on cards and at the top of the deal.",
+    "useSections": "Group options into sections",
+    "useSectionsHint": "For example Home cleaning and Move-out cleaning. Customers switch between sections with tabs and pick an option from tiles.",
+    "sectionName": "Section {n} name",
+    "sectionPlaceholder1": "e.g. Home cleaning",
+    "sectionPlaceholder2": "e.g. Move-out cleaning",
+    "addSection": "Add section",
+    "removeSection": "Remove section",
+    "optionTilePlaceholder": "e.g. 3 h",
+    "regularPrice": "Regular price (€)",
+    "previewWaiting": "Loading preview…",
+    "previewDevice": "Preview size",
+    "device": {
+      "mobile": "Mobile",
+      "desktop": "Desktop"
+    },
+    "preview": "Preview",
+    "backToEditing": "Back to editing",
+    "previewSub": "This is how customers will see the deal. Nothing is saved until you submit it for review.",
+    "submitting": "Submitting…"
   },
   "admin": {
     "title": "Admin",
@@ -863,7 +882,8 @@
     "reasonRequired": "Write a reason so the business can fix the deal.",
     "invalidDealReference": "Choose an available category and city.",
     "invalidTransition": "This deal has already been reviewed. Refresh the page.",
-    "tooManyPhotos": "You can add up to 8 photos."
+    "tooManyPhotos": "You can add up to 8 photos.",
+    "referenceTooLow": "The regular price must be higher than the price."
   },
   "voucherCheck": {
     "title": "Voucher check",

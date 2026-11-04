@@ -149,6 +149,27 @@ it('business creates and edits deals, admin reviews them, approved deals go publ
     assert.ok(!(await publicSlugs()).includes(slug));
     assert.equal((await as(admin, 'POST', '/api/admin/deals/00000000-0000-4000-8000-0000000000ff/review', { decision: 'approve' })).statusCode, 404);
 
+    // Sections: options grouped under headings, tile names, regular prices per option.
+    const fi = (text: string) => ({ fi: text, sv: '', en: '' });
+    const opt = (section: string | null, name: string | null, priceCents: number, referencePriceCents: number | null = null) =>
+      ({ label: name ? fi(name) : null, group: section ? fi(section) : null, priceCents, referencePriceCents });
+    const mixed = await as(a, 'POST', '/api/merchant/deals', deal({ imageUrl, options: [opt('Kotisiivous', '3 h', 8900), opt(null, null, 9900)] }));
+    assert.equal(mixed.statusCode, 400); assert.ok(mixed.json().fields['options.1.group.fi']); assert.ok(mixed.json().fields['options.1.label.fi']);
+    const badRef = await as(a, 'POST', '/api/merchant/deals', deal({ imageUrl, options: [opt(null, null, 8900, 8900)] }));
+    assert.equal(badRef.statusCode, 400); assert.ok(badRef.json().fields['options.0.referencePriceCents']);
+    const sectioned = await as(a, 'POST', '/api/merchant/deals', deal({ imageUrl, options: [
+      opt('Kotisiivous', '3 h', 8900, 14700), opt('Kotisiivous', '4 h', 11900), opt('Muuttosiivous', '50 m²', 19900, 25000),
+    ] }));
+    assert.equal(sectioned.statusCode, 201);
+    const sectionedOwn = (await as(a, 'GET', `/api/merchant/deals/${sectioned.json().id}`)).json().deal;
+    assert.deepEqual(sectionedOwn.input.options.map((o: { label: { fi: string }; group: { fi: string }; referencePriceCents: number | null }) =>
+      [o.group.fi, o.label.fi, o.referencePriceCents]), [['Kotisiivous', '3 h', 14700], ['Kotisiivous', '4 h', null], ['Muuttosiivous', '50 m²', 25000]]);
+    await as(admin, 'POST', `/api/admin/deals/${sectioned.json().id}/review`, { decision: 'approve' });
+    const live = (await app.inject({ url: `/api/deals/${sectioned.json().slug}` })).json();
+    assert.deepEqual(live.options.map((o: { group: { fi: string }; shortLabel: { fi: string }; label: { fi: string }; referencePriceCents: number | null }) =>
+      [o.group.fi, o.shortLabel.fi, o.label.fi, o.referencePriceCents]),
+    [['Kotisiivous', '3 h', 'Kotisiivous: 3 h', 14700], ['Kotisiivous', '4 h', 'Kotisiivous: 4 h', null], ['Muuttosiivous', '50 m²', 'Muuttosiivous: 50 m²', 25000]]);
+
     // Suspending a business ends its portal session, so it can no longer change deals.
     await sql`UPDATE public.merchants SET status = 'suspended' WHERE id = ${merchantA}`;
     assert.equal((await as(a, 'PUT', `/api/merchant/deals/${id}`, deal({ imageUrl }))).statusCode, 401);

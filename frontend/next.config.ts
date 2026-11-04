@@ -29,6 +29,15 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
         ],
       },
+      // The deal editor's live preview frames this page from the same site; it renders only drafts posted to it.
+      // A later rule wins for the same header.
+      {
+        source: "/:locale/deal-preview",
+        headers: [
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
+        ],
+      },
     ];
   },
 };

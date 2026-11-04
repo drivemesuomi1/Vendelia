@@ -14,5 +14,5 @@ export default async function EditDealPage({ params }: { params: Promise<{ id: s
     if (e instanceof ServerApiError && (e.status === 404 || e.status === 400)) notFound();
     throw e;
   });
-  return <MerchantDealEditor record={record.deal} />;
+  return <MerchantDealEditor record={record.deal} merchant={user.merchant} />;
 }

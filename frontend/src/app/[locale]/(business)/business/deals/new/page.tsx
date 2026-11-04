@@ -5,5 +5,5 @@ import { MerchantDealEditor } from "@/features/merchant/components/MerchantDashb
 export default async function NewDealPage() {
   const user = await getSession();
   if (user?.role !== "merchant" || !user.merchant) return <BusinessGate user={null}>{null}</BusinessGate>;
-  return <MerchantDealEditor />;
+  return <MerchantDealEditor merchant={user.merchant} />;
 }

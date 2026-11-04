@@ -419,7 +419,26 @@
     "photoLater": "Siirrä kuvaa {n} myöhemmäksi",
     "photoMoved": "Kuva siirretty paikalle {n} / {m}",
     "photoRemoved": "Kuva poistettu",
-    "photosDragHint": "Vedä kuvia muuttaaksesi järjestystä. Ensimmäinen kuva on kansikuva, joka näkyy korteissa ja diilin yläosassa."
+    "photosDragHint": "Vedä kuvia muuttaaksesi järjestystä. Ensimmäinen kuva on kansikuva, joka näkyy korteissa ja diilin yläosassa.",
+    "useSections": "Ryhmittele vaihtoehdot osioihin",
+    "useSectionsHint": "Esimerkiksi Kotisiivous ja Muuttosiivous. Asiakas vaihtaa osiota välilehdiltä ja valitsee vaihtoehdon ruuduista.",
+    "sectionName": "Osion {n} nimi",
+    "sectionPlaceholder1": "esim. Kotisiivous",
+    "sectionPlaceholder2": "esim. Muuttosiivous",
+    "addSection": "Lisää osio",
+    "removeSection": "Poista osio",
+    "optionTilePlaceholder": "esim. 3 h",
+    "regularPrice": "Normaalihinta (€)",
+    "previewWaiting": "Ladataan esikatselua…",
+    "previewDevice": "Esikatselun koko",
+    "device": {
+      "mobile": "Mobiili",
+      "desktop": "Tietokone"
+    },
+    "preview": "Esikatsele",
+    "backToEditing": "Takaisin muokkaukseen",
+    "previewSub": "Näin asiakkaat näkevät diilin. Mitään ei tallenneta ennen kuin lähetät sen tarkistettavaksi.",
+    "submitting": "Lähetetään…"
   },
   "admin": {
     "title": "Ylläpito",
@@ -863,7 +882,8 @@
     "reasonRequired": "Kirjoita syy, jotta yritys voi korjata diilin.",
     "invalidDealReference": "Valitse käytössä oleva kategoria ja kaupunki.",
     "invalidTransition": "Diili on jo tarkistettu. Päivitä sivu.",
-    "tooManyPhotos": "Voit lisätä enintään 8 kuvaa."
+    "tooManyPhotos": "Voit lisätä enintään 8 kuvaa.",
+    "referenceTooLow": "Normaalihinnan on oltava hintaa korkeampi."
   },
   "voucherCheck": {
     "title": "Lahjakortin tarkistus",
