@@ -31,7 +31,10 @@ export const dealInputSchema = z.object({
   zip: z.string().trim().regex(/^\d{5}$/, { message: "invalidZip" }),
   vatBps: vatBpsSchema,
   referencePriceCents: centsSchema.nullable().default(null),
+  /** Cover photo, shown first and on cards. */
   imageUrl: z.string().trim().min(1, { message: "required" }),
+  /** Further photos after the cover, in display order. Site paths only (uploads or bundled images), never other sites. */
+  galleryUrls: z.array(z.string().trim().regex(/^\/(?!\/)/, { message: "required" })).max(7, { message: "tooManyPhotos" }).default([]),
   options: z.array(dealOptionInputSchema).min(1).max(6),
 });
 export type DealInput = z.infer<typeof dealInputSchema>;

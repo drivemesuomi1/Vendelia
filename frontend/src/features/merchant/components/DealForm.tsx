@@ -12,6 +12,7 @@ import { ApiError } from "@/lib/api-client";
 import { formatMoney, formatPct, loc } from "@/lib/format";
 import { useAppData } from "@/lib/meta-context";
 import { createDeal, resizeImage, updateDeal, uploadImage } from "../api";
+import { PhotoManager } from "./PhotoManager";
 import { splitPrice } from "@/features/portal-demo/money";
 
 const toCents = (euros: string) => Math.round(parseFloat(euros.replace(",", ".")) * 100);
@@ -56,14 +57,14 @@ export function DealForm({
     zip: src?.zip ?? "",
     vatBps: src?.vatBps ?? 2550,
     reference: toEuros(src?.referencePriceCents),
-    imageUrl: src?.imageUrl ?? "",
   });
+  // Cover photo first, then the gallery in display order.
+  const [photos, setPhotos] = useState<string[]>(src ? [src.imageUrl, ...(src.galleryUrls ?? [])].filter(Boolean) : []);
   const [options, setOptions] = useState<OptionRow[]>(
     src?.options.map((o) => ({ id: o.id, label: o.label?.fi ?? "", price: toEuros(o.priceCents) })) ?? [{ label: "", price: "" }],
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const set = <K extends keyof typeof f>(k: K, v: (typeof f)[K]) => setF((p) => ({ ...p, [k]: v }));
   const err = (k: string) => (errors[k] ? t(`errors.${errors[k]}`) : undefined);
 
@@ -88,7 +89,8 @@ export function DealForm({
       zip: f.zip,
       vatBps: f.vatBps,
       referencePriceCents: ref,
-      imageUrl: f.imageUrl,
+      imageUrl: photos[0] ?? "",
+      galleryUrls: photos.slice(1),
       options: options.map((o) => ({ id: o.id, label: o.label ? { fi: o.label, sv: "", en: "" } : null, priceCents: toCents(o.price) || 0 })),
     };
     const parsed = dealInputSchema.safeParse(raw);
@@ -120,17 +122,8 @@ export function DealForm({
     }
   }
 
-  async function onFile(file: File | undefined) {
-    if (!file) return;
-    setUploading(true);
-    try {
-      set("imageUrl", onSave ? await resizeImage(file) : (await uploadImage(file)).url);
-    } catch (e2) {
-      setErrors((p) => ({ ...p, imageUrl: e2 instanceof ApiError ? e2.code : "network" }));
-    } finally {
-      setUploading(false);
-    }
-  }
+  // Browser demo mode keeps resized photos as data URLs; otherwise each file is stored and its URL returned.
+  const uploadPhoto = async (file: File) => (onSave ? resizeImage(file) : (await uploadImage(file)).url);
 
   const L = ({ k, label, cls = "" }: { k: keyof SplitDTO; label: string; cls?: string }) =>
     split ? <div className={`summary-line ${cls}`}><span>{label}</span><span>{k === "commissionCents" || k === "commissionVatCents" ? "−" : ""}{formatMoney(split[k], locale)}</span></div> : null;
@@ -181,20 +174,21 @@ export function DealForm({
         <fieldset className="stack">
           <legend className="label" style={{ marginBottom: 8 }}>{t("business.options")}</legend>
           {options.map((o, i) => (
-            <div className="form-grid two" key={o.id ?? i} style={{ alignItems: "end" }}>
-              <Field id={`ol-${i}`} label={t("business.optionLabel")} hint={i === 0 && options.length === 1 ? t("business.optionLabelHint") : undefined}>
+            <div className="opt-row" key={o.id ?? i}>
+              <Field id={`ol-${i}`} label={t("business.optionLabel")}>
                 <TextInput id={`ol-${i}`} value={o.label} placeholder={t("business.optionPlaceholder")} onChange={(e) => setOptions((p) => p.map((x, k) => (k === i ? { ...x, label: e.target.value } : x)))} />
               </Field>
-              <div className="row" style={{ alignItems: "end" }}>
-                <Field id={`op-${i}`} label={t("business.priceInclVat")} required error={err(`options.${i}.priceCents`)}>
+              <Field id={`op-${i}`} label={t("business.priceInclVat")} required error={err(`options.${i}.priceCents`)}>
+                <div className="input-action">
                   <TextInput id={`op-${i}`} inputMode="decimal" value={o.price} placeholder="35,00" onChange={(e) => setOptions((p) => p.map((x, k) => (k === i ? { ...x, price: e.target.value } : x)))} error={err(`options.${i}.priceCents`)} />
-                </Field>
-                {options.length > 1 && (
-                  <button type="button" className="btn btn-ghost" aria-label={t("business.removeOption")} onClick={() => setOptions((p) => p.filter((_, k) => k !== i))}><Icon name="trash" /></button>
-                )}
-              </div>
+                  {options.length > 1 && (
+                    <button type="button" className="btn btn-ghost btn-icon" aria-label={t("business.removeOption")} title={t("business.removeOption")} onClick={() => setOptions((p) => p.filter((_, k) => k !== i))}><Icon name="trash" /></button>
+                  )}
+                </div>
+              </Field>
             </div>
           ))}
+          {options.length === 1 && <p className="hint">{t("business.optionLabelHint")}</p>}
           {options.length < 6 && (
             <button type="button" className="btn btn-secondary btn-sm" style={{ alignSelf: "flex-start" }} onClick={() => setOptions((p) => [...p, { label: "", price: "" }])}>
               <Icon name="plus" />{t("business.addOption")}
@@ -224,13 +218,11 @@ export function DealForm({
         <Field id="how" label={t("business.howTo")} required error={err("howTo.fi")} hint={t("business.howToHint")}>
           <TextArea id="how" value={f.howTo} onChange={(e) => set("howTo", e.target.value)} error={err("howTo.fi")} />
         </Field>
-        <Field id="img" label={t("business.photo")} required error={err("imageUrl")} hint={t("business.photoHint")}>
-          <input id="img" className="input" type="file" accept="image/jpeg,image/png,image/webp" style={{ paddingTop: 11 }} onChange={(e) => onFile(e.target.files?.[0])} />
+        <Field id="img" label={t("business.photos")} required>
+          <PhotoManager photos={photos} onChange={setPhotos} upload={uploadPhoto} error={errors.imageUrl ?? errors["galleryUrls"] ?? Object.entries(errors).find(([k]) => k.startsWith("galleryUrls."))?.[1]} />
         </Field>
-        {uploading && <p className="hint">{t("business.uploading")}</p>}
-        {f.imageUrl && <img src={f.imageUrl} alt="" style={{ maxWidth: 240, borderRadius: 8 }} />}
         <div className="row wrap-row">
-          <button className="btn btn-primary" type="submit" disabled={busy || uploading}>{t("business.submitReview")}</button>
+          <button className="btn btn-primary" type="submit" disabled={busy}>{t("business.submitReview")}</button>
         </div>
       </div>
 

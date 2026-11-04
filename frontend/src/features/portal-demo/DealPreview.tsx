@@ -17,6 +17,7 @@ export function DealPreview({ input, businessName }: { input: DealInput; busines
   return (
     <div className="dp">
       {input.imageUrl && <img className="dp-img" src={input.imageUrl} alt="" />}
+      {input.galleryUrls?.length > 0 && <div className="dp-gallery">{input.galleryUrls.map((src) => <img key={src} src={src} alt="" loading="lazy" />)}</div>}
       <div>
         <p className="muted small">{[businessName, category, city].filter(Boolean).join(" · ")}</p>
         <h3 className="dp-title">{input.title.fi}</h3>

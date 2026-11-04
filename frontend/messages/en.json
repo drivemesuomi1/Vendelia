@@ -322,7 +322,7 @@
     "howTo": "How to use (steps, one per line)",
     "howToHint": "The second line is printed on the voucher as the booking instruction.",
     "photo": "Photo",
-    "photoHint": "Use real photos of your premises or service. JPG, PNG or WebP, max 5 MB.",
+    "photoHint": "Add up to 8 photos of your premises or service (JPG, PNG or WebP). The first one is the cover. Drop files here or choose them.",
     "uploading": "Uploading photo…",
     "submitReview": "Submit for review",
     "submitted": "Submitted. We'll review the deal within one working day.",
@@ -408,7 +408,18 @@
     "viewLive": "View on site",
     "optionCount": "{n} options",
     "liveSince": "live since {date}",
-    "dismissFeedback": "Dismiss feedback"
+    "dismissFeedback": "Dismiss feedback",
+    "photos": "Photos",
+    "cover": "Cover",
+    "addPhotos": "Add photos",
+    "photoCount": "{n} of {m}",
+    "photoN": "Photo {n}",
+    "removePhoto": "Remove photo {n}",
+    "photoEarlier": "Move photo {n} earlier",
+    "photoLater": "Move photo {n} later",
+    "photoMoved": "Photo moved to position {n} of {m}",
+    "photoRemoved": "Photo removed",
+    "photosDragHint": "Drag photos to change the order. The first photo is the cover shown on cards and at the top of the deal."
   },
   "admin": {
     "title": "Admin",
@@ -851,7 +862,8 @@
     "merchantPasswordLength": "Use at least 12 characters and no more than 72 UTF-8 bytes.",
     "reasonRequired": "Write a reason so the business can fix the deal.",
     "invalidDealReference": "Choose an available category and city.",
-    "invalidTransition": "This deal has already been reviewed. Refresh the page."
+    "invalidTransition": "This deal has already been reviewed. Refresh the page.",
+    "tooManyPhotos": "You can add up to 8 photos."
   },
   "voucherCheck": {
     "title": "Voucher check",

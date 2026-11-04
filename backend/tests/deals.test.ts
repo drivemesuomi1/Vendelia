@@ -52,12 +52,13 @@ it('business creates and edits deals, admin reviews them, approved deals go publ
     assert.equal(res.statusCode, 200, `${name} login`);
     return String(res.headers['set-cookie']).split(';')[0]!;
   };
+  let gallery: string[] = [];
   const deal = (overrides: Record<string, unknown> = {}) => ({
     title: { fi: 'Testiaamiainen kahdelle', sv: '', en: 'Test breakfast for two' },
     description: { fi: 'Runsas aamiainen.', sv: '', en: '' }, restrictions: { fi: 'Ma-pe', sv: '', en: '' },
     inclusions: { fi: ['Kahvi'], sv: [], en: [] }, terms: { fi: ['Varaus'], sv: [], en: [] }, howTo: { fi: ['Näytä koodi'], sv: [], en: [] },
     categoryId: 'food', cityId: 'espoo', area: 'Tapiola', street: 'Tapiontori 1', zip: '02100', vatBps: 1350,
-    referencePriceCents: 3500, imageUrl: '/deals/cleava/kotisiivous.webp',
+    referencePriceCents: 3500, imageUrl: '/deals/cleava/kotisiivous.webp', galleryUrls: gallery,
     options: [{ label: { fi: 'Aamiainen', sv: '', en: '' }, priceCents: 2990 }], ...overrides,
   });
   try {
@@ -86,7 +87,15 @@ it('business creates and edits deals, admin reviews them, approved deals go publ
     assert.equal((await app.inject({ url: '/api/deal-images/00000000-0000-4000-8000-0000000000ff' })).statusCode, 404);
     assert.equal((await app.inject({ url: '/api/meta' })).headers['cache-control'], 'no-store');
 
+    // Extra photos: only site paths are accepted, and the order is kept.
+    const more = async () => (await as(a, 'POST', '/api/merchant/uploads', { contentType: 'image/jpeg', data: jpeg.toString('base64') })).json().url as string;
+    const [photo2, photo3] = [await more(), await more()];
+    const outside = await as(a, 'POST', '/api/merchant/deals', deal({ imageUrl, galleryUrls: ['https://evil.example/x.png'] }));
+    assert.equal(outside.statusCode, 400); assert.ok(outside.json().fields['galleryUrls.0']);
+    assert.equal((await as(a, 'POST', '/api/merchant/deals', deal({ imageUrl, galleryUrls: Array.from({ length: 8 }, (_, i) => `/p${i}`) }))).statusCode, 400);
+
     // Create: pending, owned, not public.
+    gallery = [photo2, photo3, photo2, imageUrl]; // repeats and the cover are dropped
     const created = await as(a, 'POST', '/api/merchant/deals', deal({ imageUrl }));
     assert.equal(created.statusCode, 201);
     const { id, slug } = created.json(); assert.equal(created.json().status, 'pending');
@@ -98,7 +107,7 @@ it('business creates and edits deals, admin reviews them, approved deals go publ
     assert.equal((await as(b, 'GET', `/api/merchant/deals/${id}`)).statusCode, 404);
     assert.equal((await as(b, 'PUT', `/api/merchant/deals/${id}`, deal())).statusCode, 404);
     const own = (await as(a, 'GET', `/api/merchant/deals/${id}`)).json().deal;
-    assert.equal(own.input.title.en, 'Test breakfast for two'); assert.equal(own.input.area, 'Tapiola'); assert.equal(own.input.options.length, 1);
+    assert.deepEqual(own.input.galleryUrls, [photo2, photo3]); assert.equal(own.input.title.en, 'Test breakfast for two'); assert.equal(own.input.area, 'Tapiola'); assert.equal(own.input.options.length, 1);
 
     // Admin review: reason required to reject; rejected deal shows the reason to the business.
     assert.equal((await as(a, 'GET', '/api/admin/deals')).statusCode, 403);
@@ -112,7 +121,8 @@ it('business creates and edits deals, admin reviews them, approved deals go publ
     assert.equal(rejected.statusCode, 200); assert.equal(rejected.json().deal.status, 'rejected');
     assert.equal((await as(a, 'GET', '/api/merchant/deal-cards')).json().deals.find((c: { id: string }) => c.id === id).reviewNote, 'Add a real photo');
 
-    // Edit: back to review, note cleared, prices logged, removed options switched off.
+    // Edit: back to review, note cleared, prices logged, removed options switched off, photos reordered.
+    gallery = [photo3, photo2];
     const optionId = own.input.options[0].id;
     const edited = await as(a, 'PUT', `/api/merchant/deals/${id}`, deal({ imageUrl, options: [
       { id: optionId, label: { fi: 'Aamiainen', sv: '', en: '' }, priceCents: 2790 },
@@ -120,7 +130,7 @@ it('business creates and edits deals, admin reviews them, approved deals go publ
     ] }));
     assert.equal(edited.statusCode, 200); assert.equal(edited.json().status, 'pending');
     const afterEdit = (await as(a, 'GET', `/api/merchant/deals/${id}`)).json().deal;
-    assert.equal(afterEdit.reviewNote, null); assert.equal(afterEdit.input.options.length, 2);
+    assert.deepEqual(afterEdit.input.galleryUrls, [photo3, photo2]); assert.equal(afterEdit.reviewNote, null); assert.equal(afterEdit.input.options.length, 2);
     assert.equal((await sql`SELECT count(*)::int n FROM public.deal_option_price_history h JOIN public.deal_options o ON o.id = h.option_id WHERE o.deal_id = ${id}`)[0]!.n, 3);
     await as(a, 'PUT', `/api/merchant/deals/${id}`, deal({ imageUrl, options: [{ id: optionId, label: null, priceCents: 2790 }] }));
     assert.deepEqual((await sql`SELECT active FROM public.deal_options WHERE deal_id = ${id} ORDER BY sort_order, price_cents`).map(r => r.active).sort(), [false, true]);
@@ -132,7 +142,7 @@ it('business creates and edits deals, admin reviews them, approved deals go publ
     assert.equal(liveCard.status, 'live'); assert.equal(liveCard.reviewNote, 'Great photo, thanks');
     assert.ok((await publicSlugs()).includes(slug));
     const detail = await app.inject({ url: `/api/deals/${slug}` });
-    assert.equal(detail.statusCode, 200); assert.equal(detail.json().imageUrl, imageUrl); assert.equal(detail.json().options.length, 1);
+    assert.equal(detail.statusCode, 200); assert.equal(detail.json().imageUrl, imageUrl); assert.deepEqual(detail.json().gallery, [photo3, photo2]); assert.equal(detail.json().options.length, 1);
     assert.equal((await as(admin, 'POST', `/api/admin/deals/${id}/review`, { decision: 'approve' })).statusCode, 409);
     assert.equal((await sql`SELECT reviewed_by FROM public.deals WHERE id = ${id}`)[0]!.reviewed_by, ids.admin);
     await as(a, 'PUT', `/api/merchant/deals/${id}`, deal({ imageUrl }));

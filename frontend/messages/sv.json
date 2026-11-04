@@ -322,7 +322,7 @@
     "howTo": "Så använder du (steg, en per rad)",
     "howToHint": "Den andra raden visas på presentkortet som bokningsanvisning.",
     "photo": "Bild",
-    "photoHint": "Använd riktiga bilder av dina lokaler eller din tjänst. JPG, PNG eller WebP, högst 5 MB.",
+    "photoHint": "Lägg till upp till 8 bilder på din lokal eller tjänst (JPG, PNG eller WebP). Den första är omslaget. Släpp filer här eller välj dem.",
     "uploading": "Laddar upp bilden…",
     "submitReview": "Skicka för granskning",
     "submitted": "Skickat. Vi granskar erbjudandet inom en vardag.",
@@ -408,7 +408,18 @@
     "viewLive": "Visa på webbplatsen",
     "optionCount": "{n} alternativ",
     "liveSince": "till salu sedan {date}",
-    "dismissFeedback": "Dölj återkoppling"
+    "dismissFeedback": "Dölj återkoppling",
+    "photos": "Bilder",
+    "cover": "Omslag",
+    "addPhotos": "Lägg till bilder",
+    "photoCount": "{n} av {m}",
+    "photoN": "Bild {n}",
+    "removePhoto": "Ta bort bild {n}",
+    "photoEarlier": "Flytta bild {n} tidigare",
+    "photoLater": "Flytta bild {n} senare",
+    "photoMoved": "Bilden flyttad till plats {n} av {m}",
+    "photoRemoved": "Bilden borttagen",
+    "photosDragHint": "Dra bilderna för att ändra ordningen. Den första bilden är omslaget som visas på korten och överst i erbjudandet."
   },
   "admin": {
     "title": "Administration",
@@ -851,7 +862,8 @@
     "merchantPasswordLength": "Använd minst 12 tecken och högst 72 UTF-8-byte.",
     "reasonRequired": "Skriv en orsak så att företaget kan rätta erbjudandet.",
     "invalidDealReference": "Välj en tillgänglig kategori och stad.",
-    "invalidTransition": "Erbjudandet har redan granskats. Uppdatera sidan."
+    "invalidTransition": "Erbjudandet har redan granskats. Uppdatera sidan.",
+    "tooManyPhotos": "Du kan lägga till högst 8 bilder."
   },
   "voucherCheck": {
     "title": "Kontroll av presentkort",

@@ -322,7 +322,7 @@
     "howTo": "Näin hyödynnät (vaiheet, yksi per rivi)",
     "howToHint": "Toinen rivi näytetään lahjakortissa ajanvarausohjeena.",
     "photo": "Kuva",
-    "photoHint": "Käytä aitoja kuvia tiloistasi tai palvelustasi. JPG, PNG tai WebP, enintään 5 Mt.",
+    "photoHint": "Lisää enintään 8 kuvaa toimipaikastasi tai palvelustasi (JPG, PNG tai WebP). Ensimmäinen on kansikuva. Pudota tiedostot tähän tai valitse ne.",
     "uploading": "Ladataan kuvaa…",
     "submitReview": "Lähetä tarkastettavaksi",
     "submitted": "Lähetetty. Tarkistamme diilin yhden arkipäivän kuluessa.",
@@ -408,7 +408,18 @@
     "viewLive": "Näytä sivustolla",
     "optionCount": "{n} vaihtoehtoa",
     "liveSince": "myynnissä {date} alkaen",
-    "dismissFeedback": "Piilota palaute"
+    "dismissFeedback": "Piilota palaute",
+    "photos": "Kuvat",
+    "cover": "Kansikuva",
+    "addPhotos": "Lisää kuvia",
+    "photoCount": "{n} / {m}",
+    "photoN": "Kuva {n}",
+    "removePhoto": "Poista kuva {n}",
+    "photoEarlier": "Siirrä kuvaa {n} aiemmaksi",
+    "photoLater": "Siirrä kuvaa {n} myöhemmäksi",
+    "photoMoved": "Kuva siirretty paikalle {n} / {m}",
+    "photoRemoved": "Kuva poistettu",
+    "photosDragHint": "Vedä kuvia muuttaaksesi järjestystä. Ensimmäinen kuva on kansikuva, joka näkyy korteissa ja diilin yläosassa."
   },
   "admin": {
     "title": "Ylläpito",
@@ -851,7 +862,8 @@
     "merchantPasswordLength": "Käytä vähintään 12 merkkiä ja enintään 72 UTF-8-tavua.",
     "reasonRequired": "Kirjoita syy, jotta yritys voi korjata diilin.",
     "invalidDealReference": "Valitse käytössä oleva kategoria ja kaupunki.",
-    "invalidTransition": "Diili on jo tarkistettu. Päivitä sivu."
+    "invalidTransition": "Diili on jo tarkistettu. Päivitä sivu.",
+    "tooManyPhotos": "Voit lisätä enintään 8 kuvaa."
   },
   "voucherCheck": {
     "title": "Lahjakortin tarkistus",

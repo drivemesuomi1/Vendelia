@@ -18,13 +18,18 @@ export function slugFor(title: string) {
   return base ? `${base}-${suffix}` : `deal-${suffix}`;
 }
 
+/** Photos after the cover in display order, without repeats or the cover itself. */
+function galleryOf(input: DealInput) {
+  return [...new Set(input.galleryUrls)].filter(url => url !== input.imageUrl);
+}
+
 interface DealRow {
   id: string; slug: string; status: DealStatus; review_note: string | null;
   submitted_at: string | null; reviewed_at: string | null; created_at: string;
   title: DealInput['title']; description: DealInput['description']; restrictions: DealInput['restrictions'];
   inclusions: DealInput['inclusions']; terms: DealInput['terms']; how_to: DealInput['howTo'];
   category_id: string; city_id: string; area: { fi?: string } | null; street: string | null; zip: string | null;
-  vat_bps: number; reference_price_cents: number | null; image_url: string;
+  vat_bps: number; reference_price_cents: number | null; image_url: string; gallery_urls: string[] | null;
   options: { id: string; label: DealInput['options'][number]['label']; priceCents: number }[];
   merchant_id: string; merchant_name: string; merchant_status: AdminDealDTO['merchantStatus'];
 }
@@ -41,7 +46,7 @@ function toRecord(row: DealRow): DealRecordDTO {
       inclusions: row.inclusions ?? emptyList, terms: row.terms ?? emptyList, howTo: row.how_to ?? emptyList,
       categoryId: row.category_id, cityId: row.city_id, area: row.area?.fi ?? '',
       street: row.street ?? '', zip: row.zip ?? '', vatBps: row.vat_bps,
-      referencePriceCents: row.reference_price_cents, imageUrl: row.image_url,
+      referencePriceCents: row.reference_price_cents, imageUrl: row.image_url, galleryUrls: row.gallery_urls ?? [],
       options: row.options.map(o => ({ id: o.id, label: o.label, priceCents: o.priceCents })),
     },
   };
@@ -55,7 +60,7 @@ export class DealRepository {
     return this.sql<DealRow[]>`
       SELECT d.id, d.slug, d.status, d.review_note, d.submitted_at, d.reviewed_at, d.created_at,
         d.title, d.description, d.restrictions, d.inclusions, d.terms, d.how_to, d.category_id, d.city_id,
-        d.area, d.street, d.zip, d.vat_bps, d.reference_price_cents, d.image_url,
+        d.area, d.street, d.zip, d.vat_bps, d.reference_price_cents, d.image_url, d.gallery_urls,
         d.merchant_id, m.display_name AS merchant_name, m.status AS merchant_status,
         coalesce((SELECT jsonb_agg(jsonb_build_object('id', o.id, 'label', o.label, 'priceCents', o.price_cents)
           ORDER BY o.sort_order, o.id) FROM public.deal_options o WHERE o.deal_id = d.id AND o.active), '[]'::jsonb) AS options
@@ -98,6 +103,11 @@ export class DealRepository {
       VALUES (${optionId}, ${priceCents}, now(), 'platform')`;
   }
 
+  /** A text[] built from JSON text (the Drizzle-wrapped client cannot infer array parameter types); order is kept. */
+  private textArray(values: string[]) {
+    return this.sql`ARRAY(SELECT e FROM jsonb_array_elements_text(${json(values)}::jsonb) WITH ORDINALITY AS t(e, n) ORDER BY n)`;
+  }
+
   private fields(input: DealInput) {
     return {
       category_id: input.categoryId, city_id: input.cityId,
@@ -105,6 +115,7 @@ export class DealRepository {
       inclusions: json(input.inclusions), terms: json(input.terms), how_to: json(input.howTo),
       area: json({ fi: input.area, sv: '', en: '' }), street: input.street, zip: input.zip,
       vat_bps: input.vatBps, reference_price_cents: input.referencePriceCents, image_url: input.imageUrl,
+      gallery_urls: this.textArray(galleryOf(input)),
     };
   }
 
