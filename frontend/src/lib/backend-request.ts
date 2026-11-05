@@ -41,7 +41,7 @@ export async function backendRequest(path: string, options: BackendRequest = {})
   if (backend) {
     return fetch(`${backend}${path}`, {
       method: options.method ?? "GET", headers, body: options.body,
-      cache: "no-store", signal: AbortSignal.timeout(15000),
+      cache: "no-store", redirect: "manual", signal: AbortSignal.timeout(15000),
     });
   }
 
@@ -72,7 +72,8 @@ export async function handleApiRequest(request: Request): Promise<Response> {
     }
     const method = request.method as Method;
     const body = method === "GET" || method === "HEAD" ? undefined : await request.arrayBuffer();
-    if (body && body.byteLength > 1024 * 1024) {
+    const bodyLimit = url.pathname === "/api/merchant/uploads" ? 1_450_000 : 1024 * 1024;
+    if (body && body.byteLength > bodyLimit) {
       return Response.json({ error: "invalid_request", message: "Request body is too large" }, { status: 413 });
     }
     const response = await backendRequest(url.pathname + url.search, {

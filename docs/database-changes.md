@@ -19,6 +19,21 @@ The owner's schema exports reviewed on 2026-10-31 contained these seven tables:
 | `backend/sql/migrations/004_merchant_contact_and_classification.sql` | Business contact name and primary city/category references | Adds three nullable columns to `merchants`; existing values preserved |
 | `backend/sql/migrations/005_merchant_members.sql` | Links business users to merchants, with member role, active flag, RLS and access restrictions | None |
 | `backend/sql/migrations/006_merchant_account_provisioning.sql` | Private recovery journal for optional admin business-account creation; no passwords | None |
+| `backend/sql/migrations/007_deal_review.sql` | Legacy `deal_images` bytes table with merchant FK and restricted access | Review note, submission/review timestamps, reviewer FK and queue index on `deals` |
+
+## Deal image Storage transition
+
+New business photo uploads now go to a public Supabase Storage bucket, configured
+with `SUPABASE_STORAGE_BUCKET` (currently `Vendelia Main`) and the existing server
+secret. No new table migration is needed. The running application no longer
+reads or writes `deal_images`; the owner is retaining its rows in Supabase for
+now. The old `/api/deal-images/:id` endpoint returns 410 without a database query.
+New cover/gallery paths use `/api/deal-images/storage/<merchant>/<image>` and
+redirect to Storage. The owner completed the one-off image-copy migration; its
+command/script have been retired. Other environments must complete reference
+migration before deploying this cleanup. See [image storage](deal-image-storage.md).
+Migration 007 remains historical; no drop migration is included, and replaying
+007 with the current migration runner can recreate the table if it is absent.
 
 The exports were taken before migration 001. This document records compatibility
 and code requirements, not a live deployment ledger. Verify each target database

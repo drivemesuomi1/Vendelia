@@ -1,4 +1,5 @@
 import { it } from 'node:test';
+import { randomUUID } from 'node:crypto';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import postgres from 'postgres';
@@ -29,6 +30,8 @@ it('business creates and edits deals, admin reviews them, approved deals go publ
     '005_merchant_members.sql', '006_merchant_account_provisioning.sql', '007_deal_review.sql', '007_deal_review.sql']) {
     await sql.begin(async tx => { await tx.unsafe('SET LOCAL client_min_messages=warning;\n' + await fixture(`../sql/migrations/${name}`)); });
   }
+  // The running app no longer depends on migration 007's legacy bytes table.
+  await sql`DROP TABLE public.deal_images`;
   const merchantA = (await sql`SELECT id FROM public.merchants`)[0]!.id as string;
   const merchantB = '00000000-0000-4000-8000-000000000010';
   await sql`INSERT INTO public.merchants(id,business_id,company_name,display_name,status) VALUES (${merchantB},'1234567-1','B Oy','Business B','active')`;
@@ -39,6 +42,11 @@ it('business creates and edits deals, admin reviews them, approved deals go publ
   }
   await sql`INSERT INTO public.merchant_members(user_id,merchant_id) VALUES (${ids.a},${merchantA}),(${ids.b},${merchantB})`;
   const app = buildApp(sql, {
+    // Storage is mocked; deal integration tests never write to a remote bucket.
+    dealImages: {
+      upload: async (merchantId) => `/api/deal-images/storage/${merchantId}/${randomUUID()}`,
+      publicUrl: (merchantId, imageId) => `https://test.supabase.co/storage/v1/object/public/test/${merchantId}/${imageId}`,
+    },
     auth: authConfig({ SUPABASE_URL: 'https://test.supabase.co', SUPABASE_PUBLISHABLE_KEY: 'test' }),
     passwordProvider: { verify: async (email, password) => {
       const name = email.split('@')[0] as keyof typeof ids;
@@ -74,17 +82,17 @@ it('business creates and edits deals, admin reviews them, approved deals go publ
     assert.equal(invalid.statusCode, 400); assert.ok(invalid.json().fields.zip); assert.ok(invalid.json().fields.options);
     assert.equal((await as(a, 'POST', '/api/merchant/deals', deal({ cityId: 'nowhere' }))).statusCode, 400);
 
-    // Photo upload: type must match the bytes; served publicly with a long cache.
+    // Photo upload: type must match the bytes; the website redirects to Storage.
     const jpeg = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01, 0xff, 0xd9]);
     assert.equal((await as(a, 'POST', '/api/merchant/uploads', { contentType: 'image/png', data: jpeg.toString('base64') })).statusCode, 400);
     const upload = await as(a, 'POST', '/api/merchant/uploads', { contentType: 'image/jpeg', data: jpeg.toString('base64') });
     assert.equal(upload.statusCode, 201);
     const imageUrl = upload.json().url as string;
-    assert.match(imageUrl, /^\/api\/deal-images\/[0-9a-f-]{36}$/);
+    assert.match(imageUrl, /^\/api\/deal-images\/storage\/[0-9a-f-]{36}\/[0-9a-f-]{36}$/);
     const photo = await app.inject({ url: imageUrl });
-    assert.equal(photo.statusCode, 200); assert.equal(photo.headers['content-type'], 'image/jpeg');
-    assert.match(String(photo.headers['cache-control']), /immutable/); assert.deepEqual(photo.rawPayload, jpeg);
-    assert.equal((await app.inject({ url: '/api/deal-images/00000000-0000-4000-8000-0000000000ff' })).statusCode, 404);
+    assert.equal(photo.statusCode, 302);
+    assert.ok(String(photo.headers.location).startsWith('https://test.supabase.co/storage/v1/object/public/test/'));
+    assert.equal((await app.inject({ url: '/api/deal-images/00000000-0000-4000-8000-0000000000ff' })).statusCode, 410);
     assert.equal((await app.inject({ url: '/api/meta' })).headers['cache-control'], 'no-store');
 
     // Extra photos: only site paths are accepted, and the order is kept.

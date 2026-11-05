@@ -100,3 +100,26 @@ it("rejects a frontend BACKEND_URL instead of recursively proxying to itself", a
   expect(result.status).toBe(503);
   expect(fetcher).not.toHaveBeenCalled();
 });
+
+it("preserves Storage redirects through a separately hosted backend", async () => {
+  vi.stubEnv("BACKEND_URL", "https://api.example.com");
+  const location = "https://example.supabase.co/storage/v1/object/public/bucket/image";
+  const fetcher = vi.fn().mockResolvedValue(new Response(null, { status: 302, headers: { location } }));
+  vi.stubGlobal("fetch", fetcher);
+  const { handleApiRequest } = await import("../../src/lib/backend-request");
+  const result = await handleApiRequest(new Request("https://www.vendelia.fi/api/deal-images/storage/merchant/image"));
+  expect(result.status).toBe(302);
+  expect(result.headers.get("location")).toBe(location);
+  expect(fetcher).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({ redirect: "manual" }));
+});
+
+it("allows base64 expansion for a 1 MiB image only on the upload endpoint", async () => {
+  const { handleApiRequest } = await import("../../src/lib/backend-request");
+  const body = JSON.stringify({ contentType: "image/jpeg", data: Buffer.alloc(1024 * 1024).toString("base64") });
+  const result = await handleApiRequest(new Request("https://www.vendelia.fi/api/merchant/uploads", { method: "POST", body }));
+  expect(result.status).toBe(200);
+  expect(inject).toHaveBeenCalledTimes(1);
+  const oversized = await handleApiRequest(new Request("https://www.vendelia.fi/api/merchant/uploads", { method: "POST", body: "x".repeat(1_450_001) }));
+  expect(oversized.status).toBe(413);
+  expect(inject).toHaveBeenCalledTimes(1);
+});

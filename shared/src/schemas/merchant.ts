@@ -92,5 +92,6 @@ export interface AdminDealDTO extends DealRecordDTO {
 /** Photo upload from the business portal: base64 bytes of an image already resized in the browser. */
 export const dealImageUploadSchema = z.object({
   contentType: z.enum(['image/jpeg', 'image/png', 'image/webp']),
-  data: z.string().min(4).max(1_000_000),
+  // Base64 expansion for a 1 MiB decoded image.
+  data: z.string().min(4).max(1_398_104),
 });

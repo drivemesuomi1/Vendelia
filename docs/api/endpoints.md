@@ -48,7 +48,9 @@ revoked in the database on logout. `/api/admin/*` requires an active admin profi
 | GET/POST | `/api/merchant/deals` | List / create (goes to review) |
 | GET/PUT | `/api/merchant/deals/:id` | Read / update (back to review) |
 | POST | `/api/merchant/commission-preview` | `{ priceCents, vatBps }` → split |
-| POST | `/api/merchant/uploads` | Multipart image (jpg/png/webp, 5 MB) → `{ url }` |
+| POST | `/api/merchant/uploads` | Merchant session; JSON `{ contentType, data }` (base64 JPEG/PNG/WebP, decoded max 1 MiB) → `{ url }`; uploads to public Supabase Storage |
+| GET | `/api/deal-images/storage/:merchantId/:imageId` | Public redirect to Supabase Storage object; UUID path components |
+| GET | `/api/deal-images/:id` | Retired legacy URL; HTTP 410 (`image_retired`), no database access |
 | POST | `/api/merchant/vouchers/lookup` | `{ code }` → valid / not_found / other_merchant / redeemed / refunded / expired |
 | POST | `/api/merchant/vouchers/redeem` | `{ code }` — authenticated; returns 501 until recording is implemented |
 | GET | `/api/merchant/payouts` | Statement for the current period + pending payout + history |

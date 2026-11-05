@@ -5,6 +5,7 @@ import { MerchantService } from "./modules/merchants/service";
 import { merchantRoutes, merchantPortalRoutes } from "./modules/merchants/routes";
 import { DealRepository } from "./modules/deals/repository";
 import { dealRoutes } from "./modules/deals/routes";
+import { SupabaseDealImageStorage, type DealImageStorage } from "./modules/deals/storage";
 import { authConfig, sessionToken, type AuthConfig } from "./modules/auth/config";
 import { AuthRepository } from "./modules/auth/repository";
 import { AuthService } from "./modules/auth/service";
@@ -26,6 +27,7 @@ import { orderConfig, platformConfig, type OrderConfig, type PlatformConfig } fr
 export function buildApp(database: Sql, options: {
   config?: PlatformConfig; orders?: OrderConfig; mailer?: Mailer; logger?: boolean;
   auth?: AuthConfig; passwordProvider?: PasswordProvider; userProvisioner?: UserProvisioner;
+  dealImages?: DealImageStorage;
 } = {}) {
   const app = Fastify({ logger: options.logger ?? false });
   const authSettings = options.auth ?? authConfig();
@@ -79,7 +81,8 @@ export function buildApp(database: Sql, options: {
     options.userProvisioner ?? new SupabaseUserProvisioner(authSettings.url, process.env.SUPABASE_SECRET_KEY?.trim() ?? ''));
   const merchantMail = { siteUrl: ordersConfig.siteUrl, supportEmail: ordersConfig.mail.replyTo };
   app.register(merchantRoutes, { service: new MerchantService(merchantRepository, provisioning, mailer, merchantMail), auth: authService });
-  app.register(dealRoutes, { repository: new DealRepository(database), auth: authService, origins: authSettings.origins });
+  app.register(dealRoutes, { repository: new DealRepository(database), auth: authService, origins: authSettings.origins,
+    images: options.dealImages ?? new SupabaseDealImageStorage() });
   app.register(authRoutes, { service: authService, config: authSettings });
   app.register(healthRoutes, { database });
   app.register(catalogueRoutes, { service });

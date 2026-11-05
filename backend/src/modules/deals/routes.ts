@@ -4,6 +4,7 @@ import { HttpProblem } from '../../errors';
 import { sessionToken } from '../auth/config';
 import type { AuthService } from '../auth/service';
 import type { DealRepository } from './repository';
+import type { DealImageStorage } from './storage';
 
 const STATUSES: DealStatus[] = ['draft', 'pending', 'live', 'rejected'];
 
@@ -24,7 +25,7 @@ function validationProblem(issues: { path: (string | number)[]; message: string 
  * Business portal deal workflow (create, edit, own list, photo upload), admin review, and public deal photos.
  * The merchant comes only from the verified session. /api/admin/* is already guarded by the app-wide admin hook.
  */
-export async function dealRoutes(app: FastifyInstance, { repository, auth, origins }: { repository: DealRepository; auth: AuthService; origins: string[] }) {
+export async function dealRoutes(app: FastifyInstance, { repository, auth, origins, images }: { repository: DealRepository; auth: AuthService; origins: string[]; images: DealImageStorage }) {
   const merchantOf = async (request: FastifyRequest) => {
     if (!['GET', 'HEAD'].includes(request.method) && request.headers.origin && !origins.includes(request.headers.origin)) {
       throw new HttpProblem(403, 'forbidden');
@@ -62,21 +63,26 @@ export async function dealRoutes(app: FastifyInstance, { repository, auth, origi
     return repository.update(merchantId, id, parsed.data);
   });
 
-  app.post('/api/merchant/uploads', { bodyLimit: 1_100_000 }, async (request, reply) => {
+  app.post('/api/merchant/uploads', { bodyLimit: 1_450_000 }, async (request, reply) => {
     const merchantId = await merchantOf(request);
     const parsed = dealImageUploadSchema.safeParse(request.body);
     if (!parsed.success) throw new HttpProblem(400, 'unsupported_file_type');
     const data = Buffer.from(parsed.data.data, 'base64');
     if (!data.length || data.length > 1_048_576 || !sniff(data, parsed.data.contentType)) throw new HttpProblem(400, 'unsupported_file_type');
-    const id = await repository.addImage(merchantId, parsed.data.contentType, data);
-    return reply.code(201).send({ url: `/api/deal-images/${id}` });
+    const url = await images.upload(merchantId, parsed.data.contentType, data);
+    return reply.code(201).send({ url });
   });
 
-  // Public: photos of live deals appear on the home page. The id is random and the bytes never change.
+  // Stable site paths preserve shared gallery validation; the CDN serves the actual bytes.
+  app.get<{ Params: { merchantId: string; imageId: string } }>('/api/deal-images/storage/:merchantId/:imageId', async (request, reply) => {
+    const url = images.publicUrl(dealId(request.params.merchantId), dealId(request.params.imageId));
+    return reply.header('cache-control', 'public, max-age=300').redirect(url);
+  });
+
+  // Retired PostgreSQL image URLs fail cleanly without touching the retained legacy table.
   app.get<{ Params: { id: string } }>('/api/deal-images/:id', async (request, reply) => {
-    const image = await repository.image(dealId(request.params.id));
-    if (!image) throw new HttpProblem(404, 'not_found');
-    return reply.header('content-type', image.content_type).header('cache-control', 'public, max-age=31536000, immutable').send(image.data);
+    dealId(request.params.id);
+    return reply.code(410).send({ error: 'image_retired', message: 'This image URL has been retired' });
   });
 
   app.get<{ Querystring: { status?: string; merchantId?: string } }>('/api/admin/deals', async request => {

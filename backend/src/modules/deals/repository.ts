@@ -209,15 +209,4 @@ export class DealRepository {
     throw new HttpProblem(exists.length ? 409 : 404, exists.length ? 'invalidTransition' : 'deal_not_found');
   }
 
-  async addImage(merchantId: string, contentType: string, data: Buffer) {
-    const [row] = await this.sql<{ id: string }[]>`
-      INSERT INTO public.deal_images (merchant_id, content_type, data) VALUES (${merchantId}, ${contentType}, ${data}) RETURNING id`;
-    return row!.id;
-  }
-
-  async image(id: string) {
-    const [row] = await this.sql<{ content_type: string; data: Buffer }[]>`
-      SELECT content_type, data FROM public.deal_images WHERE id = ${id}`;
-    return row ?? null;
-  }
 }

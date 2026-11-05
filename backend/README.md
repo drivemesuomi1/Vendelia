@@ -2,6 +2,11 @@
 
 Fastify API backed by the existing Supabase Postgres catalogue tables.
 
+Deal photo uploads now use **Supabase Storage**. Set `SUPABASE_STORAGE_BUCKET`
+to the exact public bucket ID (`Vendelia Main`) and configure the existing server
+secret. Legacy image URLs return 410; the app no longer queries `deal_images`. See
+[image storage setup and migration](../docs/deal-image-storage.md).
+
 ## Structure
 
 ```text
@@ -29,6 +34,10 @@ src/
       service.ts                 Business use cases and duplicate handling
       provisioning.ts            Retry-safe Auth/profile/membership setup
       repository.ts              Merchant SQL and reference validation
+    deals/
+      routes.ts                  Business deal submission, admin review and image endpoints
+      repository.ts              Deal/option SQL; images are served through Storage
+      storage.ts                 Server-only Supabase Storage uploads and public URLs
     health/routes.ts             Database health endpoint
     orders/
       routes.ts                  Checkout, guest order/PDF access and voucher lookup
