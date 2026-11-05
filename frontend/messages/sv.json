@@ -263,6 +263,23 @@
     "businessSubmit": "Skapa företagskonto"
   },
   "business": {
+    "qrScanner": {
+      "open": "Skanna QR-kod",
+      "title": "Skanna ett presentkort",
+      "close": "Stäng skannern",
+      "instructions": "Rikta kameran mot QR-koden på kundens presentkort. Skanningen kontrollerar koden; du bekräftar inlösningen separat.",
+      "camera": "Kamera för presentkortsskanning",
+      "scanning": "Håll QR-koden inom ramen",
+      "starting": "Startar kameran…",
+      "privacy": "Kamerabilder behandlas på din enhet och laddas inte upp. Kameran stängs av när du stänger fönstret eller ett presentkort upptäcks.",
+      "retry": "Försök med kameran igen",
+      "manual": "Ange koden manuellt",
+      "unsupported": "Kameraskanning kräver HTTPS eller localhost och en webbläsare med kameraåtkomst. Du kan ange koden manuellt.",
+      "denied": "Kameraåtkomst nekades. Tillåt kameran i webbläsarens inställningar eller ange koden manuellt.",
+      "missing": "Ingen kamera hittades på enheten. Ange presentkortskoden manuellt.",
+      "unavailable": "Kameran kunde inte startas eller användas. Stäng andra appar som använder den och försök igen, eller ange koden manuellt.",
+      "invalid": "QR-koden känns inte igen som ett Vendelia-presentkort. Rikta kameran mot presentkortets QR-kod."
+    },
     "payoutPreview": {
       "nav": "Utbetalningar",
       "eyebrow": "Företagets intäkter",

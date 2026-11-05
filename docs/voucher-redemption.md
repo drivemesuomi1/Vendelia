@@ -108,3 +108,45 @@ Both integration cases need fresh dedicated databases, respectively
 never set these to production. Run files directly with `node --import tsx` to
 inspect individual test counts. This review executed both against temporary
 local PostgreSQL databases; no live Supabase data was changed.
+
+## Optional camera QR scanning
+
+Business -> Redeem voucher now offers **Scan QR code** alongside manual entry.
+The scanner opens a shared native Dialog, requests video only (preferring the
+rear camera), reads the voucher, closes the camera and performs the existing
+merchant-scoped lookup. The merchant must still explicitly confirm redemption.
+No backend, database migration, new credential or QR generation change is needed.
+
+- `frontend/src/features/merchant/components/VoucherQrScanner.tsx` owns camera
+  lifecycle, scan feedback, permission errors and retry/manual fallback.
+- `frontend/src/features/merchant/voucher-qr.ts` parses exact voucher codes and
+  approved voucher-page URLs, and provides camera-track cleanup.
+- The `jsqr` dependency is dynamically imported when scanning starts. It decodes
+  image pixels locally, avoiding reliance on the limited native BarcodeDetector
+  API. Camera images are never uploaded, stored or logged; only the extracted
+  voucher code is sent to the existing authenticated lookup API.
+- Accepted QR content: a valid raw code or an absolute `/fi|sv|en/voucher/<code>`
+  URL on the current site origin, `https://www.vendelia.fi` or
+  `https://vendelia.fi`. Other origins, routes and malformed codes are rejected.
+  Scanned URLs are parsed as data and never navigated to.
+- The camera stops after a valid scan, dialog close/Escape/backdrop dismissal,
+  unmount, page hide or hiding the browser tab. If permission resolves after close,
+  the resulting tracks are stopped too.
+- No automatic redemption occurs. The backend still enforces ownership, state,
+  expiry and single use. Changing the manual code clears previous lookup results.
+- Permission denied, no camera, unsupported browser/insecure context and camera
+  failures have translated guidance in Finnish, Swedish and English.
+
+Camera access requires HTTPS or localhost plus browser permission. A phone opening
+an ordinary HTTP LAN address will generally need an HTTPS test deployment instead.
+Use the existing Vercel HTTPS deployment for device testing. Manual code entry
+remains available if camera scanning cannot be used.
+
+`frontend/tests/unit/voucher-qr.test.ts` checks accepted/rejected payloads, decodes
+an actual generated voucher QR matrix, and verifies camera-track cleanup. Physical
+camera permissions, focus and device behavior require a manual phone/laptop test:
+open scanner -> allow camera -> show voucher -> verify code -> confirm redemption.
+Also test denying permission and closing the scanner while permission is pending.
+
+References: [jsQR usage](https://github.com/cozmo/jsQR) and
+[MediaDevices.getUserMedia](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia).

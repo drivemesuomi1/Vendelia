@@ -11,6 +11,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { ApiError } from "@/lib/api-client";
 import { formatDate, formatMoney, itemTitle } from "@/lib/format";
 import { lookupVoucher, redeemVoucher } from "../api";
+import { VoucherQrScanner } from './VoucherQrScanner';
 
 /** Check a code, then mark it used. The backend redeems only the business's own active, unexpired vouchers, once. */
 export function RedeemPanel() {
@@ -21,6 +22,7 @@ export function RedeemPanel() {
   const [redeemed, setRedeemed] = useState<RedeemLookupDTO | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [scanning, setScanning] = useState(false);
 
   async function check(e: FormEvent) {
     e.preventDefault();
@@ -38,6 +40,7 @@ export function RedeemPanel() {
   }, []);
 
   async function lookup(value: string) {
+    setResult(null);
     setRedeemed(null);
     setError(null);
     const c = value.trim().toUpperCase();
@@ -82,10 +85,12 @@ export function RedeemPanel() {
     <div className="card pad stack">
       <form onSubmit={check} className="stack">
         <Field id="rc" label={t("business.enterCode")} error={error ?? undefined}>
-          <TextInput id="rc" className="input mono" value={code} onChange={(e) => setCode(e.target.value)} autoComplete="off" autoCapitalize="characters" placeholder="VND-XXXX-XXXX" style={{ letterSpacing: ".05em", textTransform: "uppercase" }} error={error ?? undefined} />
+          <TextInput id="rc" className="input mono" value={code} disabled={busy} onChange={(e) => { setCode(e.target.value); setResult(null); setRedeemed(null); setError(null); }} autoComplete="off" autoCapitalize="characters" placeholder="VND-XXXX-XXXX" style={{ letterSpacing: ".05em", textTransform: "uppercase" }} error={error ?? undefined} />
         </Field>
         <button className="btn btn-primary btn-block" type="submit" disabled={busy}>{t("business.checkCode")}</button>
+        <button className="btn btn-secondary btn-block" type="button" disabled={busy} onClick={() => { setResult(null); setRedeemed(null); setError(null); setScanning(true); }}><Icon name="scan" />{t('business.qrScanner.open')}</button>
       </form>
+      {scanning && <VoucherQrScanner onClose={() => setScanning(false)} onCode={value => { setScanning(false); setCode(value); void lookup(value); }} />}
       <div aria-live="polite">
         {result?.result === "valid" && (
           <div className="card pad stack" style={{ boxShadow: "none" }}>

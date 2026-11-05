@@ -263,6 +263,23 @@
     "businessSubmit": "Create business account"
   },
   "business": {
+    "qrScanner": {
+      "open": "Scan QR code",
+      "title": "Scan a voucher",
+      "close": "Close scanner",
+      "instructions": "Point your camera at the QR code on the customer’s voucher. Scanning checks the code; you will confirm redemption separately.",
+      "camera": "Voucher scanning camera",
+      "scanning": "Keep the QR code inside the frame",
+      "starting": "Starting camera…",
+      "privacy": "Camera images are processed on your device and are not uploaded. The camera stops when you close this window or a voucher is detected.",
+      "retry": "Try camera again",
+      "manual": "Enter code manually",
+      "unsupported": "Camera scanning requires HTTPS or localhost and a browser with camera access. You can enter the code manually.",
+      "denied": "Camera permission was denied. Allow camera access in your browser settings, or enter the code manually.",
+      "missing": "No camera was found on this device. Enter the voucher code manually.",
+      "unavailable": "The camera could not be started or used. Close other apps using it and try again, or enter the code manually.",
+      "invalid": "This QR code is not a recognised Vendelia voucher. Point the camera at the voucher’s QR code."
+    },
     "payoutPreview": {
       "nav": "Payouts",
       "eyebrow": "Business earnings",

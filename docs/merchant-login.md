@@ -142,6 +142,10 @@ replaces the current browser's website session.
 | `frontend/src/features/merchant/components/MerchantDashboard.tsx` | Database deal cards, review feedback and create/edit forms |
 | `frontend/src/app/[locale]/(business)/business/` | Server session checks on the layout and individual pages |
 
+Business redemption also supports optional camera QR scanning with manual fallback.
+Scanning only checks the voucher; confirmation remains separate. See
+[QR scanner setup and testing](voucher-redemption.md#optional-camera-qr-scanning).
+
 ## Remaining work and tests
 
 Merchant deal creation/editing, Storage uploads, admin review and business

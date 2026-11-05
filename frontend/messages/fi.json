@@ -263,6 +263,23 @@
     "businessSubmit": "Luo yritystili"
   },
   "business": {
+    "qrScanner": {
+      "open": "Skannaa QR-koodi",
+      "title": "Skannaa lahjakortti",
+      "close": "Sulje skanneri",
+      "instructions": "Suuntaa kamera asiakkaan lahjakortin QR-koodiin. Skannaus tarkistaa koodin; vahvistat lunastuksen erikseen.",
+      "camera": "Lahjakortin skannauskamera",
+      "scanning": "Pidä QR-koodi kehyksen sisällä",
+      "starting": "Käynnistetään kameraa…",
+      "privacy": "Kamerakuvat käsitellään laitteellasi eikä niitä lähetetä palvelimelle. Kamera sammuu, kun suljet ikkunan tai lahjakortti tunnistetaan.",
+      "retry": "Yritä kameraa uudelleen",
+      "manual": "Syötä koodi käsin",
+      "unsupported": "Kameraskannaus vaatii HTTPS-yhteyden tai localhostin ja kameran käyttöä tukevan selaimen. Voit syöttää koodin käsin.",
+      "denied": "Kameran käyttölupa evättiin. Salli kameran käyttö selaimen asetuksissa tai syötä koodi käsin.",
+      "missing": "Laitteesta ei löytynyt kameraa. Syötä lahjakortin koodi käsin.",
+      "unavailable": "Kameraa ei voitu käynnistää tai käyttää. Sulje muut kameraa käyttävät sovellukset ja yritä uudelleen tai syötä koodi käsin.",
+      "invalid": "Tätä QR-koodia ei tunnistettu Vendelian lahjakortiksi. Suuntaa kamera lahjakortin QR-koodiin."
+    },
     "payoutPreview": {
       "nav": "Tilitykset",
       "eyebrow": "Yrityksen tuotot",
