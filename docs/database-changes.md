@@ -65,6 +65,13 @@ Apply 005 then 006 and configure the server secret for that flow; see
 [account provisioning](merchant-account-provisioning.md). Business-only creation
 remains available with the option unchecked.
 
+## Merchant payout preview
+
+The business Payouts page now reads existing redeemed voucher/order/item rows.
+There are no payout-table writes or new migrations. Test vouchers are included
+for review; current commission rates determine estimates. See
+[payout preview architecture and limits](merchant-payout-preview.md).
+
 ## Purchase relationships
 
 - Every new table has an auto-generated UUID `id` primary key.
@@ -125,7 +132,9 @@ LIMIT 10;
 
 One line with quantity two produces two vouchers. With payment bypass enabled,
 expect `test_unpaid` and `is_test = true`. Verify the emailed/downloaded PDF and QR
-origin as well. Signed-in merchant redemption returns 501 until the recording transaction is implemented.
+origin as well. Merchant redemption now persists `status` and `redeemed_at` on
+the existing voucher row; admin voucher views read existing order/item/merchant
+relationships. No new migration is needed. See [voucher workflow](voucher-redemption.md).
 
 ## Team change procedure
 
@@ -145,7 +154,7 @@ origin as well. Signed-in merchant redemption returns 501 until the recording tr
 
 Shared profiles now have a migration with `customer`, `merchant` and `admin` roles.
 Login is connected to Supabase Auth and profiles; public registration remains pending.
-Merchant membership and scoped business reads are implemented. Deal editing,
-recording redemption and real payments remain later work. Legacy browser demo
+Merchant membership, deal editing/admin review and recording redemption are
+implemented. Real payments and settlement remain later work. Legacy browser demo
 records and admin sample financial data are not Supabase records. The large `docs/domain/database.dbml` is a future design, not a migration
 or a description of every table currently deployed.

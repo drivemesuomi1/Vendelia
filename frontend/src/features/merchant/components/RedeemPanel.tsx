@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import Link from 'next/link';
 import { VOUCHER_CODE_RE, type RedeemLookupDTO } from "@vendelia/shared";
 import { Field, TextInput } from "@/components/ui/Field";
 import { Icon } from "@/components/ui/Icon";
@@ -105,6 +106,7 @@ export function RedeemPanel() {
         {redeemed && (
           <Notice icon="checkc">
             <p>{t("business.redeemedNote", { code: redeemed.code, amount: formatMoney(redeemed.payoutCents ?? 0, locale) })}</p>
+            <Link className="row-link" href={`/${locale}/business/payouts`}>{t('business.payoutPreview.nav')} →</Link>
           </Notice>
         )}
       </div>

@@ -109,14 +109,33 @@ it('merchant login, membership revocation, suspension and deal/voucher ownership
     assert.equal(otherBusiness.statusCode, 409); assert.equal(otherBusiness.json().error, 'redeem_other_merchant');
     assert.equal((await redeem(cookie, { origin: 'https://evil.example' })).statusCode, 403);
     assert.equal((await sql`SELECT status FROM public.vouchers WHERE code='VND-ABCD-EFGH'`)[0]!.status, 'active');
-    const done = await redeem(cookie);
+    assert.equal((await app.inject({ method: 'POST', url: '/api/merchant/vouchers/redeem', payload: { code: 'VND-ABCD-EFGH' } })).statusCode, 401);
+    assert.equal((await redeem(cookieOf(admin))).statusCode, 403);
+    // Two tills racing must yield exactly one success; the other observes the saved used state.
+    const racing = await Promise.all([redeem(cookie), redeem(cookie)]);
+    assert.deepEqual(racing.map(r => r.statusCode).sort(), [200, 409]);
+    const done = racing.find(r => r.statusCode === 200)!;
     assert.equal(done.statusCode, 200); assert.equal(done.json().result, 'redeemed'); assert.equal(done.json().payoutCents, 7565);
     assert.ok(done.json().redeemedAt);
+    const [saved] = await sql`SELECT status, redeemed_at FROM public.vouchers WHERE code='VND-ABCD-EFGH'`;
+    assert.equal(saved!.status, 'redeemed'); assert.ok(saved!.redeemed_at);
+    // Earnings preview uses existing redeemed rows, never a client-supplied business ID.
+    assert.equal((await app.inject({ url: '/api/merchant/payouts' })).statusCode, 401);
+    assert.equal((await app.inject({ url: '/api/merchant/payouts', headers: { cookie: cookieOf(admin) } })).statusCode, 403);
+    const preview = (await app.inject({ url: `/api/merchant/payouts?merchantId=${other}`, headers: { cookie } })).json();
+    assert.equal(preview.preview, true); assert.equal(preview.hasMore, false); assert.equal(preview.rows.length, 1);
+    assert.equal(preview.rows[0].code, 'VND-ABCD-EFGH'); assert.equal(preview.rows[0].test, true);
+    assert.equal(preview.rows[0].payoutCents, 7565); assert.equal(preview.rows[0].feeCents, 1335);
+    assert.equal(preview.rows[0].orderNumber, 'VD-ABCDEF'); assert.equal(preview.rows[0].email, undefined);
+    assert.equal((await app.inject({ url: `/api/merchant/payouts?merchantId=${original}`, headers: { cookie: secondCookie } })).json().rows.length, 0);
     const again = await redeem(cookie);
     assert.equal(again.statusCode, 409); assert.equal(again.json().error, 'redeem_redeemed');
     assert.equal((await lookup(cookie)).json().result, 'redeemed');
     await sql`UPDATE public.vouchers SET status='active', redeemed_at=NULL, issued_at=now() - interval '2 days', expires_at=now() - interval '1 day' WHERE code='VND-ABCD-EFGH'`;
     assert.equal((await redeem(cookie)).json().error, 'redeem_expired');
+    await sql`UPDATE public.vouchers SET status='refunded', refunded_at=now(), expires_at=now()+interval '1 day' WHERE code='VND-ABCD-EFGH'`;
+    assert.equal((await redeem(cookie)).json().error, 'redeem_refunded');
+    assert.equal((await app.inject({ url: '/api/merchant/payouts', headers: { cookie } })).json().rows.length, 0);
     await app.inject({ method: 'POST', url: '/api/auth/logout', headers: { cookie }, payload: {} });
     assert.equal((await read()).statusCode, 401);
     await sql`DELETE FROM public.merchant_members WHERE user_id=${ids.b}`;

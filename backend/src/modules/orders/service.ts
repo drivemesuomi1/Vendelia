@@ -3,7 +3,7 @@ import type { Sql } from "postgres";
 import {
   TEST_PAYMENT_METHOD, uuidSchema, voucherCodeSchema, voucherQrPayload,
   type AdminVoucherDTO, type CheckoutInput, type CreateOrderResponse, type Locale, type LocalizedList, type LocalizedText,
-  type OrderDTO, type PaymentMethod, type RedeemLookupDTO, type VoucherDTO, type VoucherStatus,
+  type OrderDTO, type PaymentMethod, type RedeemLookupDTO, type VoucherDTO, type VoucherStatus, type MerchantPayoutPreviewDTO,
 } from "@vendelia/shared";
 import type { OrderConfig, PlatformConfig } from "../../config";
 import { HttpProblem } from "../../errors";
@@ -227,6 +227,32 @@ export class OrderService {
     return { redeemed: true, voucher: { ...voucher, payoutCents: payoutCents(row.price_cents, row.vat_bps, this.policy) } };
   }
 
+  /** Current-rate earnings preview for the session's merchant, with no buyer contact information. */
+  async merchantPayoutPreview(merchantId: string): Promise<MerchantPayoutPreviewDTO> {
+    const rows = await this.sql<{
+      code: string; title: LocalizedText; option_label: LocalizedText | null; slug: string; number: string;
+      redeemed_at: string; issued_at: string; is_test: boolean; price_cents: number; vat_bps: number;
+    }[]>`
+      SELECT v.code, oi.title, oi.option_label, d.slug, o.number,
+        to_json(v.redeemed_at) AS redeemed_at, to_json(v.issued_at) AS issued_at,
+        (v.is_test OR o.is_test) AS is_test, v.price_cents, oi.vat_bps
+      FROM public.vouchers v
+      JOIN public.order_items oi ON oi.id = v.order_item_id
+      JOIN public.orders o ON o.id = v.order_id
+      JOIN public.deals d ON d.id = v.deal_id
+      WHERE v.merchant_id = ${merchantId} AND v.status = 'redeemed' AND v.redeemed_at IS NOT NULL
+      ORDER BY v.redeemed_at DESC, v.id DESC LIMIT 201`;
+    return {
+      preview: true, commissionBps: this.policy.commissionBps, commissionVatBps: this.policy.commissionVatBps,
+      hasMore: rows.length > 200,
+      rows: rows.slice(0, 200).map(r => ({
+        code: r.code, title: r.title, optionLabel: r.option_label, dealSlug: r.slug, orderNumber: r.number,
+        redeemedAt: iso(r.redeemed_at), issuedAt: iso(r.issued_at), test: r.is_test, vatBps: r.vat_bps,
+        ...voucherSplit(r.price_cents, r.vat_bps, this.policy),
+      })),
+    };
+  }
+
   /** Full detail of one voucher for admins (support questions, disputes). */
   async adminVoucher(rawCode: string): Promise<AdminVoucherDTO | null> {
     const parsed = voucherCodeSchema.safeParse(rawCode);
@@ -390,7 +416,14 @@ function howToText(list: LocalizedList): LocalizedText | null {
 
 /** What the business receives for one voucher: commission is charged on the VAT-exclusive price, with VAT on it. */
 function payoutCents(grossCents: number, vatBps: number, policy: PlatformConfig) {
-  const net = Math.round((grossCents * 10000) / (10000 + vatBps));
-  const commission = Math.round((net * policy.commissionBps) / 10000);
-  return grossCents - commission - Math.round((commission * policy.commissionVatBps) / 10000);
+  return voucherSplit(grossCents, vatBps, policy).payoutCents;
+}
+
+function voucherSplit(grossCents: number, vatBps: number, policy: PlatformConfig) {
+  const netCents = Math.round((grossCents * 10000) / (10000 + vatBps));
+  const commissionCents = Math.round((netCents * policy.commissionBps) / 10000);
+  const commissionVatCents = Math.round((commissionCents * policy.commissionVatBps) / 10000);
+  const feeCents = commissionCents + commissionVatCents;
+  return { grossCents, netCents, saleVatCents: grossCents - netCents, commissionCents,
+    commissionVatCents, feeCents, payoutCents: grossCents - feeCents };
 }

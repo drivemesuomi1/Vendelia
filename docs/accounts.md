@@ -183,8 +183,10 @@ and purchase tables; the current privileged Supabase connection supports this.
 
 The business portal now authenticates merchant profiles through Supabase Auth
 and requires an active merchant membership. Its dashboard lists only the linked
-business's saved deals. See [merchant login](merchant-login.md). Deal creation/editing
-and recording redemption remain pending; real routes no longer save browser demo deals. Admin business creation,
+business's saved deals. See [merchant login](merchant-login.md). Deal creation/editing,
+admin review and merchant redemption are implemented; real routes do not save
+browser demo deals. Admin voucher lookup and recent issued/used lists are also
+database-backed; see [voucher workflow](voucher-redemption.md). Admin business creation,
 list/detail and status use `merchants` (migration 004). Optional account provisioning
 now creates business Auth users and links using migrations 005/006; see
 [business setup](admin-businesses.md). Other admin demo workflows

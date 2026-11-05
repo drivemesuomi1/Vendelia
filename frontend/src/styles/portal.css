@@ -537,3 +537,32 @@
 .vo-code-btn{border:0;background:none;padding:0;font-size:13px;font-weight:600;color:var(--navy);letter-spacing:.03em;cursor:pointer}
 .vo-code-btn:hover{color:var(--indigo);text-decoration:underline}
 .vo-deal{display:block;max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Merchant earnings preview: real redemption rows, no transfer status implied. */
+.payout-page{display:flex;flex-direction:column;gap:22px}
+.payout-page .adm-head{margin-bottom:0;gap:18px;flex-wrap:wrap}
+.payout-eyebrow{margin:0 0 8px;text-transform:uppercase;letter-spacing:.12em;font-size:11px;font-weight:650;color:var(--navy-50)}
+.payout-overview{display:grid;grid-template-columns:minmax(280px,1.05fr) minmax(0,1.65fr);gap:20px}
+.payout-projection{padding:26px;border-radius:18px;background:linear-gradient(120deg,#17223b,#292764);color:#fff;box-shadow:0 8px 24px #17223b0a}
+.payout-projection>.row{margin-bottom:20px}.payout-projection .chip{border:1px solid #ffffff40;background:#ffffff12;color:#fff}
+.payout-symbol{display:inline-flex;padding:11px;background:#ffffff12;border:1px solid #ffffff20;border-radius:12px}
+.payout-amount{display:block;font-size:clamp(32px,3.4vw,46px);letter-spacing:-.04em;line-height:1.2;margin:10px 0;font-variant-numeric:tabular-nums}
+.payout-projection-note{font-size:13px;color:#d2d9e9;max-width:360px;line-height:1.6}
+.payout-schedule{display:flex;align-items:center;gap:9px;border-top:1px solid #ffffff25;padding-top:17px;margin-top:20px;font-size:12px;color:#d2d9e9}
+.payout-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.payout-metric{display:flex;flex-direction:column;justify-content:center;gap:12px;padding:23px 18px}
+.payout-metric strong{font-size:clamp(23px,2.4vw,32px);letter-spacing:-.035em;font-variant-numeric:tabular-nums}
+.payout-test-note{display:flex;align-items:flex-start;gap:9px;margin:0;font-size:12px;color:var(--navy-50)}
+.payout-test-note .icon,.payout-footer .icon{flex-shrink:0}
+.payout-table-header{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.payout-search{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:10px;padding:9px 12px;max-width:100%;color:var(--navy-50)}
+.payout-search input{border:0;background:transparent;color:inherit;min-width:0;width:230px;font:inherit;font-size:13px;outline:none}.payout-search:focus-within{outline:2px solid var(--indigo);outline-offset:2px}
+.payout-table td{vertical-align:middle}.payout-table .num{white-space:nowrap;font-variant-numeric:tabular-nums}
+.payout-code{background:none;border:0;padding:0;text-align:left;font:inherit;font-size:13px;font-weight:650;color:var(--indigo);cursor:pointer}
+.payout-code:hover{text-decoration:underline}.payout-deal{display:block;max-width:280px;font-size:12px;color:var(--navy-50);margin:5px 0 7px}.payout-table .chip{font-size:10px;padding:2px 7px}
+.payout-estimate{display:block;font-size:10px;color:var(--navy-50);margin-top:5px}.payout-expanded>td{background:#f8f8fb;padding:24px!important}
+.payout-breakdown{display:grid;grid-template-columns:1fr 1.4fr;gap:30px}.payout-breakdown h3{margin:0 0 8px}.payout-breakdown .facts>div{grid-template-columns:1fr 1fr}.payout-breakdown dd{text-align:right}
+.payout-detail-total{font-weight:650}.payout-loading{padding:40px;text-align:center;color:var(--navy-50)}
+.payout-footer{display:flex;align-items:flex-start;gap:10px;color:var(--navy-50);font-size:12px;line-height:1.7}.payout-footer p{margin:0;max-width:850px}
+@media(max-width:1100px){.payout-overview{grid-template-columns:1fr}.payout-metric{min-height:140px}}
+@media(max-width:600px){.payout-metrics{grid-template-columns:1fr}.payout-metric{min-height:0;padding:18px;gap:6px}.payout-projection{padding:22px}.payout-search{width:100%}.payout-search input{width:100%}.payout-breakdown{grid-template-columns:1fr;gap:18px}.payout-table{min-width:760px}}

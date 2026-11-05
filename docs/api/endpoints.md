@@ -2,7 +2,7 @@
 
 Base: `http://127.0.0.1:4000` (the frontend proxies `/api/*`). JSON in/out. Errors: `{ error, message, fields? }` —
 `error` and `fields` values are translation keys (`frontend/messages/*.json` → `errors.*`).
-Auth: httpOnly session cookie `vd_session`. Roles: `customer`, `merchant`, `admin` (admin passes every role check).
+Auth: httpOnly session cookie `vd_session`. Roles: `customer`, `merchant`, `admin` (admin access is explicit; merchant operations require a linked merchant account).
 
 ## Authentication implementation status
 
@@ -15,9 +15,12 @@ admin role. See [account setup](../accounts.md).
 The remaining authentication/merchant endpoints below are a planned contract,
 not implemented signup functionality. Merchant ownership uses migration 005;
 see [merchant login](../merchant-login.md). Merchant voucher lookup now requires
-a linked business session; recording redemption remains 501. Website sessions
+a linked business session; recording redemption atomically updates the owned voucher. Website sessions
 are separate from Supabase Auth tokens, expire after eight hours, and are
 revoked in the database on logout. `/api/admin/*` requires an active admin profile.
+
+For the implemented business/admin voucher workflow and current limits, see
+[voucher redemption](../voucher-redemption.md).
 
 ## Public
 | Method | Path | Purpose |
@@ -52,8 +55,8 @@ revoked in the database on logout. `/api/admin/*` requires an active admin profi
 | GET | `/api/deal-images/storage/:merchantId/:imageId` | Public redirect to Supabase Storage object; UUID path components |
 | GET | `/api/deal-images/:id` | Retired legacy URL; HTTP 410 (`image_retired`), no database access |
 | POST | `/api/merchant/vouchers/lookup` | `{ code }` → valid / not_found / other_merchant / redeemed / refunded / expired |
-| POST | `/api/merchant/vouchers/redeem` | `{ code }` — authenticated; returns 501 until recording is implemented |
-| GET | `/api/merchant/payouts` | Statement for the current period + pending payout + history |
+| POST | `/api/merchant/vouchers/redeem` | `{ code }` — linked merchant only; atomically marks an owned active, unexpired voucher used; refuses repeated use with 409 |
+| GET | `/api/merchant/payouts` | Implemented read-only earnings preview from the latest 200 owned redeemed vouchers; includes labelled test vouchers; no transfers or payout history |
 
 ## Admin
 
@@ -65,6 +68,8 @@ See [admin business setup](../admin-businesses.md). Other admin routes below rem
 planned unless otherwise documented.
 
 | GET | `/api/admin/deals?status` | Review queue |
+| GET | `/api/admin/vouchers?view=bought\|used` | Admin-only latest 25 issued or redeemed vouchers from the database |
+| GET | `/api/admin/vouchers/:code` | Admin-only voucher, buyer, order and business details |
 |---|---|---|
 | POST | `/api/admin/deals/:id/review` | `{ decision: approve|reject, note? }` |
 | GET/POST | `/api/admin/merchants` | List / create business records, with optional new login provisioning |

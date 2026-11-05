@@ -43,6 +43,13 @@ export async function orderRoutes(app: FastifyInstance, { service, auth, origins
     return service.lookupForMerchant(parsed.data.code, user.merchant.id);
   });
 
+  app.get('/api/merchant/payouts', async request => {
+    const user = await auth.current(sessionToken(request.headers.cookie));
+    if (!user) throw new HttpProblem(401, 'invalidLogin');
+    if (user.role !== 'merchant' || !user.merchant) throw new HttpProblem(403, 'forbidden');
+    return service.merchantPayoutPreview(user.merchant.id);
+  });
+
   // Admin voucher views; /api/admin/* is guarded by the app-wide admin hook.
   app.get<{ Querystring: { view?: string } }>("/api/admin/vouchers", async (request) => {
     const view = request.query.view === "used" ? "used" : "bought";

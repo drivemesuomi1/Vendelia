@@ -242,6 +242,28 @@ export interface AdminVoucherDTO {
   };
 }
 
+/** Read-only earnings preview; no payout transfer or settled balance is recorded. */
+export interface MerchantPayoutEntryDTO extends SplitDTO {
+  code: string;
+  title: LocalizedText;
+  optionLabel: LocalizedText | null;
+  dealSlug: string;
+  orderNumber: string;
+  redeemedAt: string;
+  issuedAt: string;
+  test: boolean;
+  vatBps: number;
+}
+
+export interface MerchantPayoutPreviewDTO {
+  preview: true;
+  commissionBps: number;
+  commissionVatBps: number;
+  rows: MerchantPayoutEntryDTO[];
+  /** Only the latest 200 redeemed vouchers are returned and included in screen totals. */
+  hasMore: boolean;
+}
+
 export interface StatementRowDTO {
   dealId: string;
   title: LocalizedText;

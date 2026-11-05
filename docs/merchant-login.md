@@ -134,26 +134,25 @@ replaces the current browser's website session.
 | `GET /api/auth/me` | Returns the profile with its authorized business, or null |
 | `GET /api/merchant/deals` | Lists only the business from the verified session; ignores supplied merchant IDs |
 | `POST /api/merchant/vouchers/lookup` | Requires merchant login; rejects codes belonging to other businesses |
-| `POST /api/merchant/vouchers/redeem` | Requires merchant login but still returns 501; does not mark a voucher used |
+| `POST /api/merchant/vouchers/redeem` | Requires merchant login; atomically redeems an owned active, unexpired voucher once |
 | `backend/src/modules/auth/repository.ts` | Membership and current-business checks for merchant profiles |
 | `backend/src/modules/auth/service.ts` and `routes.ts` | Role-specific login audiences and shared session flow |
 | `backend/src/modules/merchants/repository.ts` and `routes.ts` | SQL scoped to the session's merchant UUID |
 | `frontend/src/features/merchant/components/BusinessGate.tsx` | Real login screen and business shell; no demo-store identity |
-| `frontend/src/features/merchant/components/MerchantDashboard.tsx` | Saved deal list, status counts and pending-feature notice |
+| `frontend/src/features/merchant/components/MerchantDashboard.tsx` | Database deal cards, review feedback and create/edit forms |
 | `frontend/src/app/[locale]/(business)/business/` | Server session checks on the layout and individual pages |
 
 ## Remaining work and tests
 
-This change connects login and safe business reads. It does not implement deal
-creation/editing, uploads, account self-service, email invitations, payouts or
-recording redemptions. Create/edit routes display a pending-feature notice instead
-of silently saving browser-only deals. Voucher validity checks remain available
-for the logged-in business; recording a redemption is still unavailable. Public
-voucher verification remains public and unchanged.
+Merchant deal creation/editing, Storage uploads, admin review and business
+redemption are implemented. The business verifies the code when providing the
+service; the admin portal provides read-only voucher lookup and recent issued/used
+lists. See [voucher workflow and limits](voucher-redemption.md). Real payment
+processing, settlement and account self-service remain separate work.
 
-Legacy components under `features/portal-demo/` are retained as design references,
-but the real business routes do not use their login or deal storage. Admin deal
-review and finance demo screens are separate pending integrations.
+Legacy components under `features/portal-demo/` remain design references. Real
+business routes use verified server sessions and persisted deals. Admin finance
+screens still include demo data.
 
 `backend/tests/merchant-auth.test.ts` covers role/link checks, migration replay,
 business isolation, membership deactivation, suspension, logout and voucher

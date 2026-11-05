@@ -77,8 +77,12 @@ Implemented:
 - `GET /api/orders/:id` and `GET /api/orders/:id/pdf`: require `x-order-token`.
 - `GET /api/vouchers/:code`: public voucher validity lookup.
 - `GET /api/merchant/deals`: current merchant's saved deals only.
+- `GET /api/merchant/payouts`: read-only current-rate earnings preview; no payout records or transfers.
+  See [payout preview](../docs/merchant-payout-preview.md).
 - `POST /api/merchant/vouchers/lookup`: authenticated, own-business voucher check.
-- `POST /api/merchant/vouchers/redeem`: requires merchant login but still returns 501.
+- `POST /api/merchant/vouchers/redeem`: requires a linked merchant; redeems an owned active, unexpired voucher once.
+- `GET /api/admin/vouchers?view=bought|used` and `GET /api/admin/vouchers/:code`: admin-only database voucher views.
+  See [voucher workflow](../docs/voucher-redemption.md).
 
 Configure `.env` from `.env.example`, then run `npm run dev -w backend` from the
 repo root. `npm run db:check -w backend` exercises the API against the configured
@@ -98,7 +102,6 @@ Admin business records require migration 004; see [business setup](../docs/admin
 Merchant login and ownership require migration 005; see [merchant login](../docs/merchant-login.md).
 Optional admin account provisioning requires 006 and SUPABASE_SECRET_KEY; see
 [provisioning setup](../docs/merchant-account-provisioning.md).
-Public registration, deal creation/editing/review writes, real payments, recording redemption and settlement
-still need implementations. The broader contract is [API endpoints](../docs/api/endpoints.md);
+Public registration, real payment processing and settlement still need implementations. The broader contract is [API endpoints](../docs/api/endpoints.md);
 it includes planned endpoints, not just implemented ones.
 Shared schemas and response types are in `shared/src`.
