@@ -438,7 +438,12 @@
     "preview": "Esikatsele",
     "backToEditing": "Takaisin muokkaukseen",
     "previewSub": "Näin asiakkaat näkevät diilin. Mitään ei tallenneta ennen kuin lähetät sen tarkistettavaksi.",
-    "submitting": "Lähetetään…"
+    "submitting": "Lähetetään…",
+    "optionN": "Vaihtoehto {n}",
+    "breakdownFor": "Näytetään: {name}",
+    "allOptions": "Tilitys vaihtoehdoittain",
+    "testVoucher": "Testiseteli, ei maksettu",
+    "redeemNoUndo": "Lunastusta ei voi perua. Tee se, kun annat palvelun."
   },
   "admin": {
     "title": "Ylläpito",

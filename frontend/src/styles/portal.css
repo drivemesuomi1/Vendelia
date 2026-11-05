@@ -347,6 +347,18 @@
 .opt-toggle small{font-size:12.5px;line-height:1.4}
 .opt-section{display:flex;flex-direction:column;gap:var(--s2);padding:16px;border:1px solid var(--line);border-left:3px solid var(--indigo);border-radius:10px;background:#fff}
 .breakdown-side{position:sticky;top:24px;align-self:start}
+.breakdown-for{margin:-6px 0 0;font-size:12.5px;color:var(--navy-70)}
+.payout-list{display:flex;flex-direction:column;gap:6px;padding-top:14px;border-top:1px solid var(--line)}
+.payout-list h3{font-size:13px;font-weight:600}
+.payout-list ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;order:2}
+.payout-list li button{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;width:100%;padding:7px 8px;margin:0 -8px;width:calc(100% + 16px);border:0;border-radius:8px;background:none;text-align:left;font-size:13px;cursor:pointer}
+.payout-list li button:hover{background:var(--soft)}
+.payout-list li.is-shown button{background:var(--info-bg)}
+.payout-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.payout-gross{color:var(--navy-70);font-variant-numeric:tabular-nums}
+.payout-net{min-width:68px;text-align:right;font-variant-numeric:tabular-nums}
+.payout-head{order:1;display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;margin:0;font-size:11.5px;color:var(--navy-50)}
+.payout-head span:last-child{min-width:68px;text-align:right}
 /* Deal editor: the form, or the full preview in its place */
 .editor-form[hidden]{display:none}
 .preview-panel{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--a-radius);background:#fff;box-shadow:var(--a-shadow);overflow:hidden}

@@ -438,7 +438,12 @@
     "preview": "Preview",
     "backToEditing": "Back to editing",
     "previewSub": "This is how customers will see the deal. Nothing is saved until you submit it for review.",
-    "submitting": "Submitting…"
+    "submitting": "Submitting…",
+    "optionN": "Option {n}",
+    "breakdownFor": "Showing: {name}",
+    "allOptions": "Payout for each option",
+    "testVoucher": "Test voucher, not paid",
+    "redeemNoUndo": "Redeeming can't be undone. Do it when you provide the service."
   },
   "admin": {
     "title": "Admin",

@@ -208,6 +208,25 @@ export class OrderService {
     return loaded ? this.pdfFor(loaded) : null;
   }
 
+  /**
+   * Marks one of the business's own vouchers as used. A single conditional UPDATE does it, so the voucher must
+   * still be active and unexpired at that moment and two tills cannot both redeem it. Refusals return why,
+   * with the same results as the lookup. The payout uses the current commission, like the portal's payout box.
+   */
+  async redeemForMerchant(rawCode: string, merchantId: string): Promise<{ redeemed: boolean; voucher: RedeemLookupDTO }> {
+    const parsed = voucherCodeSchema.safeParse(rawCode);
+    if (!parsed.success) return { redeemed: false, voucher: { code: rawCode.trim().toUpperCase(), result: 'not_found' } };
+    const [row] = await this.sql<{ price_cents: number; vat_bps: number }[]>`
+      UPDATE public.vouchers v SET status = 'redeemed', redeemed_at = now()
+      FROM public.order_items oi
+      WHERE oi.id = v.order_item_id AND v.code = ${parsed.data} AND v.merchant_id = ${merchantId}
+        AND v.status = 'active' AND v.expires_at > now()
+      RETURNING v.price_cents, oi.vat_bps`;
+    const voucher = await this.lookupForMerchant(parsed.data, merchantId);
+    if (!row) return { redeemed: false, voucher };
+    return { redeemed: true, voucher: { ...voucher, payoutCents: payoutCents(row.price_cents, row.vat_bps, this.policy) } };
+  }
+
   /** Business lookup is scoped to the merchant from the verified membership. */
   async lookupForMerchant(rawCode: string, merchantId: string): Promise<RedeemLookupDTO> {
     const parsed = voucherCodeSchema.safeParse(rawCode);
@@ -314,4 +333,11 @@ export class OrderService {
 function howToText(list: LocalizedList): LocalizedText | null {
   const join = (items: string[]) => items.join(" ");
   return list.fi.length ? { fi: join(list.fi), sv: join(list.sv), en: join(list.en) } : null;
+}
+
+/** What the business receives for one voucher: commission is charged on the VAT-exclusive price, with VAT on it. */
+function payoutCents(grossCents: number, vatBps: number, policy: PlatformConfig) {
+  const net = Math.round((grossCents * 10000) / (10000 + vatBps));
+  const commission = Math.round((net * policy.commissionBps) / 10000);
+  return grossCents - commission - Math.round((commission * policy.commissionVatBps) / 10000);
 }

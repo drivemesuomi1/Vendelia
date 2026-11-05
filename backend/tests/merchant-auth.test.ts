@@ -102,8 +102,21 @@ it('merchant login, membership revocation, suspension and deal/voucher ownership
     const lookup = (cookie: string) => app.inject({ method: 'POST', url: '/api/merchant/vouchers/lookup', headers: { cookie }, payload: { code: 'VND-ABCD-EFGH' } });
     assert.equal((await lookup(cookie)).json().result, 'valid');
     const wrong = (await lookup(secondCookie)).json(); assert.deepEqual(wrong, { code: 'VND-ABCD-EFGH', result: 'other_merchant' });
-    const unavailable = await app.inject({ method: 'POST', url: '/api/merchant/vouchers/redeem', headers: { cookie }, payload: { code: 'VND-ABCD-EFGH' } });
-    assert.equal(unavailable.statusCode, 501);
+    // Redemption: only the owning business, only once, never from another site.
+    const redeem = (cookie: string, headers: Record<string, string> = {}) =>
+      app.inject({ method: 'POST', url: '/api/merchant/vouchers/redeem', headers: { cookie, ...headers }, payload: { code: 'VND-ABCD-EFGH' } });
+    const otherBusiness = await redeem(secondCookie);
+    assert.equal(otherBusiness.statusCode, 409); assert.equal(otherBusiness.json().error, 'redeem_other_merchant');
+    assert.equal((await redeem(cookie, { origin: 'https://evil.example' })).statusCode, 403);
+    assert.equal((await sql`SELECT status FROM public.vouchers WHERE code='VND-ABCD-EFGH'`)[0]!.status, 'active');
+    const done = await redeem(cookie);
+    assert.equal(done.statusCode, 200); assert.equal(done.json().result, 'redeemed'); assert.equal(done.json().payoutCents, 7565);
+    assert.ok(done.json().redeemedAt);
+    const again = await redeem(cookie);
+    assert.equal(again.statusCode, 409); assert.equal(again.json().error, 'redeem_redeemed');
+    assert.equal((await lookup(cookie)).json().result, 'redeemed');
+    await sql`UPDATE public.vouchers SET status='active', redeemed_at=NULL, issued_at=now() - interval '2 days', expires_at=now() - interval '1 day' WHERE code='VND-ABCD-EFGH'`;
+    assert.equal((await redeem(cookie)).json().error, 'redeem_expired');
     await app.inject({ method: 'POST', url: '/api/auth/logout', headers: { cookie }, payload: {} });
     assert.equal((await read()).statusCode, 401);
     await sql`DELETE FROM public.merchant_members WHERE user_id=${ids.b}`;

@@ -7,5 +7,10 @@ export default async function RedeemPage({ params }: { params: Promise<{ locale:
   const user = await getSession();
   if (user?.role !== "merchant" || !user.merchant) return <BusinessGate user={null}>{null}</BusinessGate>;
   const t = getT(await resolveLocale(params));
-  return <><h1>{t("business.redeem")}</h1><p className="review-note">{t("business.redemptionPreview")}</p><div style={{ maxWidth: 560 }}><RedeemPanel /></div></>;
+  return (
+    <div className="adm">
+      <header className="adm-head"><div><h1>{t("business.redeem")}</h1><p className="muted small">{t("business.redeemIntro")}</p></div></header>
+      <div style={{ maxWidth: 560 }}><RedeemPanel /></div>
+    </div>
+  );
 }

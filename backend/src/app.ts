@@ -83,6 +83,6 @@ export function buildApp(database: Sql, options: {
   app.register(authRoutes, { service: authService, config: authSettings });
   app.register(healthRoutes, { database });
   app.register(catalogueRoutes, { service });
-  app.register(orderRoutes, { service: orders, auth: authService });
+  app.register(orderRoutes, { service: orders, auth: authService, origins: authSettings.origins });
   return app;
 }

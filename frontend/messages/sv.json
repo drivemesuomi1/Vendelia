@@ -438,7 +438,12 @@
     "preview": "Förhandsvisa",
     "backToEditing": "Tillbaka till redigering",
     "previewSub": "Så här ser kunderna erbjudandet. Inget sparas förrän du skickar det för granskning.",
-    "submitting": "Skickar…"
+    "submitting": "Skickar…",
+    "optionN": "Alternativ {n}",
+    "breakdownFor": "Visar: {name}",
+    "allOptions": "Utbetalning per alternativ",
+    "testVoucher": "Testvoucher, inte betald",
+    "redeemNoUndo": "Inlösen kan inte ångras. Gör det när du utför tjänsten."
   },
   "admin": {
     "title": "Administration",

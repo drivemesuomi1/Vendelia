@@ -103,6 +103,8 @@ export function DealForm({
   const [sectioned, setSectioned] = useState(() => !!src?.options.some((o) => o.group));
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  // The option whose breakdown the payout box shows: the one last edited (the first until then).
+  const [focusKey, setFocusKey] = useState<string | null>(null);
   const set = <K extends keyof typeof f>(k: K, v: (typeof f)[K]) => setF((p) => ({ ...p, [k]: v }));
   const err = (k: string) => (errors[k] ? t(`errors.${errors[k]}`) : undefined);
 
@@ -119,9 +121,14 @@ export function DealForm({
   };
 
   // Same rule as the backend: commission on the VAT-exclusive price, VAT on the commission.
-  const firstPrice = toCents(rows[0]?.option.price ?? "");
-  const split: SplitDTO | null = Number.isFinite(firstPrice) && firstPrice > 0
-    ? splitPrice(firstPrice, f.vatBps, meta.commissionBps, meta.commissionVatBps) : null;
+  const splitOf = (price: string): SplitDTO | null => {
+    const cents = toCents(price);
+    return Number.isFinite(cents) && cents > 0 ? splitPrice(cents, f.vatBps, meta.commissionBps, meta.commissionVatBps) : null;
+  };
+  const shown = rows.find((r) => r.option.key === focusKey) ?? rows[0];
+  const split = shown ? splitOf(shown.option.price) : null;
+  const nameOf = ({ section, option }: (typeof rows)[number], i: number) =>
+    [sectioned ? section.name.trim() : "", option.label.trim()].filter(Boolean).join(": ") || t("business.optionN", { n: i + 1 });
 
   /** The form as a deal, before validation (the preview shows it as typed). */
   function raw() {
@@ -204,7 +211,7 @@ export function DealForm({
     const i = indexOf.get(o.key)!;
     const canRemove = section.options.length > 1;
     return (
-      <div className="opt-row" key={o.key}>
+      <div className="opt-row" key={o.key} onFocusCapture={() => setFocusKey(o.key)}>
         <Field id={`ol-${o.key}`} label={t("business.optionLabel")} required={sectioned} error={err(`options.${i}.label.fi`)}>
           <TextInput id={`ol-${o.key}`} value={o.label} placeholder={t(sectioned ? "business.optionTilePlaceholder" : "business.optionPlaceholder")} onChange={(e) => editOption(o.key, { label: e.target.value })} error={err(`options.${i}.label.fi`)} />
         </Field>
@@ -231,6 +238,7 @@ export function DealForm({
   const payout = (
     <aside className="card pad stack breakdown breakdown-side" aria-labelledby="bd">
       <h2 id="bd" style={{ fontSize: 18 }}>{t("business.perVoucher")}</h2>
+      {rows.length > 1 && split && shown && <p className="breakdown-for">{t("business.breakdownFor", { name: nameOf(shown, rows.indexOf(shown)) })}</p>}
       <div aria-live="polite">
         {split ? (
           <>
@@ -248,6 +256,26 @@ export function DealForm({
           <p className="muted small">{t("business.enterPrice")}</p>
         )}
       </div>
+      {rows.length > 1 && (
+        <div className="payout-list">
+          <h3>{t("business.allOptions")}</h3>
+          <ul>
+            {rows.map((r, i) => {
+              const sp = splitOf(r.option.price);
+              return (
+                <li key={r.option.key} className={r.option === shown?.option ? "is-shown" : undefined}>
+                  <button type="button" onClick={() => setFocusKey(r.option.key)} aria-pressed={r.option === shown?.option}>
+                    <span className="payout-name">{nameOf(r, i)}</span>
+                    <span className="payout-gross">{sp ? formatMoney(sp.grossCents, locale) : "–"}</span>
+                    <b className="payout-net">{sp ? formatMoney(sp.payoutCents, locale) : "–"}</b>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="payout-head"><span /><span>{t("business.customerPays")}</span><span>{t("business.yourPayout")}</span></p>
+        </div>
+      )}
       <p className="hint">{t("business.commissionNote", { rate: formatPct(meta.commissionBps, locale) })}</p>
     </aside>
   );

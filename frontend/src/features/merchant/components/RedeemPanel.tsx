@@ -11,7 +11,7 @@ import { ApiError } from "@/lib/api-client";
 import { formatDate, formatMoney, itemTitle } from "@/lib/format";
 import { lookupVoucher, redeemVoucher } from "../api";
 
-/** Check codes for the authenticated business. Recording redemption is a separate pending workflow. */
+/** Check a code, then mark it used. The backend redeems only the business's own active, unexpired vouchers, once. */
 export function RedeemPanel() {
   const { t, locale } = useI18n();
   const toast = useToast();
@@ -90,13 +90,15 @@ export function RedeemPanel() {
           <div className="card pad stack" style={{ boxShadow: "none" }}>
             <div className="row wrap-row">
               <span className="chip teal"><Icon name="checkc" />{t("vouchers.validUnused")}</span>
+              {result.test && <span className="chip warn"><Icon name="info" />{t("business.testVoucher")}</span>}
             </div>
             <p style={{ fontWeight: 600 }}>{itemTitle(result.title!, null, result.optionLabel ?? null, locale)}</p>
             <p className="muted small">
               {t("vouchers.validUntil", { date: formatDate(result.expiresAt!, locale) })}
               {result.recipientName ? ` · ${t("vouchers.giftFor", { name: result.recipientName })}` : ""}
             </p>
-            <button className="btn btn-primary" onClick={confirm} disabled={busy}>{t("business.markRedeemed")}</button>
+            <button className="btn btn-primary" onClick={confirm} disabled={busy}><Icon name="check" />{t("business.markRedeemed")}</button>
+            <p className="hint">{t("business.redeemNoUndo")}</p>
           </div>
         )}
         {result && result.result !== "valid" && <Notice tone="warn" icon="xc"><p>{reason(result)}</p></Notice>}

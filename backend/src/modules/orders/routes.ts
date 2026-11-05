@@ -6,7 +6,7 @@ import { sessionToken } from "../auth/config";
 import { HttpProblem } from "../../errors";
 
 /** Checkout, order/voucher retrieval and voucher verification. Business rules live in the service. */
-export async function orderRoutes(app: FastifyInstance, { service, auth }: { service: OrderService; auth: AuthService }) {
+export async function orderRoutes(app: FastifyInstance, { service, auth, origins }: { service: OrderService; auth: AuthService; origins: string[] }) {
   app.post("/api/orders", async (request, reply) => {
     const parsed = checkoutSchema.safeParse(request.body);
     if (!parsed.success) {
@@ -43,12 +43,17 @@ export async function orderRoutes(app: FastifyInstance, { service, auth }: { ser
     return service.lookupForMerchant(parsed.data.code, user.merchant.id);
   });
 
-  // Recording a redemption is a separate transactional workflow and remains unavailable.
+  // Changes a voucher, so a request from another site is refused even with a valid session cookie.
   app.post("/api/merchant/vouchers/redeem", async (request, reply) => {
+    if (request.headers.origin && !origins.includes(request.headers.origin)) throw new HttpProblem(403, 'forbidden');
     const user = await auth.current(sessionToken(request.headers.cookie));
     if (!user) throw new HttpProblem(401, 'invalidLogin');
     if (user.role !== 'merchant' || !user.merchant) throw new HttpProblem(403, 'forbidden');
-    return reply.code(501).send({ error: "redeemUnavailable", message: "Recording redemptions is not available yet" });
+    const parsed = redeemLookupSchema.safeParse(request.body);
+    if (!parsed.success) return reply.code(400).send({ error: "invalidVoucherCode", message: "Invalid voucher code" });
+    const { redeemed, voucher } = await service.redeemForMerchant(parsed.data.code, user.merchant.id);
+    if (!redeemed) return reply.code(409).send({ error: `redeem_${voucher.result}`, message: "Voucher cannot be redeemed", voucher });
+    return voucher;
   });
 }
 
