@@ -27,6 +27,7 @@ export function PortalShell({ kind, children, admin, account }: { kind: "busines
           [base, t("admin.overview"), "grid"],
           [`${base}/businesses`, t("admin.merchants"), "store"],
           [`${base}/deals`, t("admin.deals"), "doc"],
+          [`${base}/vouchers`, t("admin.vouchers"), "ticket"],
           [`${base}/orders`, t("admin.orders"), "cart"],
           [`${base}/finance`, t("admin.finance.title"), "bank"],
           [`${base}/refunds`, t("admin.refunds"), "refund"],

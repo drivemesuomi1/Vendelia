@@ -216,6 +216,32 @@ export interface RedeemLookupDTO {
   payoutCents?: number;
 }
 
+/** One voucher as admins see it: what was bought, from which business, by whom, and what has happened to it. */
+export interface AdminVoucherDTO {
+  code: string;
+  status: VoucherStatus;
+  /** Issued by a test/unpaid order. */
+  test: boolean;
+  title: LocalizedText;
+  optionLabel: LocalizedText | null;
+  priceCents: number;
+  vatBps: number;
+  /** What the business receives for it, at the current commission. */
+  payoutCents: number;
+  issuedAt: string;
+  expiresAt: string;
+  cancellableUntil: string | null;
+  redeemedAt: string | null;
+  refundedAt: string | null;
+  recipientName: string | null;
+  merchant: { id: string; name: string };
+  deal: { id: string; slug: string };
+  order: {
+    id: string; number: string; status: string; email: string; name: string; phone: string | null;
+    paymentMethod: string; totalCents: number; createdAt: string; paidAt: string | null; emailStatus: string;
+  };
+}
+
 export interface StatementRowDTO {
   dealId: string;
   title: LocalizedText;

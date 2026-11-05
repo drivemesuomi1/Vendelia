@@ -508,3 +508,32 @@
   .portal-ui .side .row.between .logo .sub{font-size:13.5px}
   .portal-ui .side .row.between .logo svg{height:28px}
 }
+
+/* Admin vouchers: code search, detail card, recent lists */
+.vo-search{display:flex;gap:10px;align-items:center;padding:12px}
+.vo-search-box{flex:1;display:flex;align-items:center;gap:10px;min-height:46px;padding:0 14px;border:1px solid var(--line-strong);border-radius:8px;background:#fff;transition:border-color .15s,box-shadow .15s}
+.vo-search-box:focus-within{border-color:var(--indigo);box-shadow:0 0 0 3px var(--indigo-100)}
+.vo-search-box .icon{width:18px;height:18px;color:var(--navy-50)}
+.vo-search-box input{flex:1;min-width:0;border:0;outline:0;background:none;font-size:16px;letter-spacing:.06em;text-transform:uppercase}
+.vo-search .btn{min-height:46px;padding:0 20px}
+.vo-detail{padding:0;overflow:hidden}
+.vo-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:20px 22px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#fff,var(--soft))}
+.vo-head h2{font-size:24px;letter-spacing:.04em;margin-top:2px}
+.vo-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.vo-grid>div{padding:20px 22px;min-width:0}
+.vo-grid>div+div{border-left:1px solid var(--line)}
+.vo-grid h3{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--navy-50);margin-bottom:12px}
+@media(max-width:1100px){.vo-grid{grid-template-columns:minmax(0,1fr)}.vo-grid>div+div{border-left:0;border-top:1px solid var(--line)}}
+.vo-grid .facts>div{grid-template-columns:110px 1fr}
+.vo-timeline{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.vo-timeline li{position:relative;display:flex;flex-direction:column;gap:2px;font-size:13.5px}
+.vo-timeline li small{font-size:12.5px}
+.vo-timeline li.is-done .tl-ic{background:var(--ok-bg);border-color:transparent;color:var(--ok)}
+.vo-timeline li.is-bad .tl-ic{background:var(--bad-bg);border-color:transparent;color:var(--bad)}
+.vo-timeline li.is-next .tl-ic{border-style:dashed}
+.vo-row{cursor:pointer;transition:background .12s}
+.vo-row:hover{background:var(--soft)}
+.vo-row.is-open{background:var(--info-bg)}
+.vo-code-btn{border:0;background:none;padding:0;font-size:13px;font-weight:600;color:var(--navy);letter-spacing:.03em;cursor:pointer}
+.vo-code-btn:hover{color:var(--indigo);text-decoration:underline}
+.vo-deal{display:block;max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
