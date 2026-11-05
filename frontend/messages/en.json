@@ -820,6 +820,63 @@
       },
       "contact": "Contact",
       "dealsHint": "Open a deal to see its details, review it and leave feedback."
+    },
+    "vouchers": "Vouchers",
+    "vouchersSub": "Look up any voucher by its code, or see the latest bought and used vouchers.",
+    "vo": {
+      "code": "Voucher code",
+      "find": "Find voucher",
+      "voucher": "Voucher",
+      "what": "What was bought",
+      "history": "History",
+      "buyer": "Buyer and order",
+      "price": "Price",
+      "vat": "VAT",
+      "giftFor": "Gift for",
+      "order": "Order",
+      "name": "Name",
+      "payment": "Payment",
+      "orderTotal": "Order total",
+      "email": "Voucher email",
+      "list": "Voucher list",
+      "listHint": "Latest 25. Click a row to see the details.",
+      "loading": "Loading…",
+      "recentBought": "Recently bought",
+      "recentUsed": "Recently used",
+      "boughtAt": "Bought",
+      "usedAt": "Used",
+      "emptyBought": "No vouchers have been bought yet.",
+      "emptyUsed": "No vouchers have been used yet.",
+      "tab": {
+        "bought": "Bought",
+        "used": "Used"
+      },
+      "status": {
+        "active": "Valid",
+        "redeemed": "Used",
+        "refunded": "Refunded",
+        "expired": "Expired"
+      },
+      "ev": {
+        "bought": "Bought",
+        "cancelUntil": "Free cancellation until",
+        "used": "Used at the business",
+        "refunded": "Refunded",
+        "expired": "Expired",
+        "validUntil": "Valid until"
+      },
+      "orderStatus": {
+        "pending": "pending",
+        "paid": "paid",
+        "failed": "failed",
+        "test_unpaid": "test, not paid"
+      },
+      "emailStatus": {
+        "pending": "Not sent yet",
+        "sent": "Sent",
+        "failed": "Sending failed"
+      },
+      "payout": "Business receives"
     }
   },
   "errors": {

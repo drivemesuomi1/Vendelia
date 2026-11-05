@@ -170,6 +170,26 @@ it('business creates and edits deals, admin reviews them, approved deals go publ
       [o.group.fi, o.shortLabel.fi, o.label.fi, o.referencePriceCents]),
     [['Kotisiivous', '3 h', 'Kotisiivous: 3 h', 14700], ['Kotisiivous', '4 h', 'Kotisiivous: 4 h', null], ['Muuttosiivous', '50 m²', 'Muuttosiivous: 50 m²', 25000]]);
 
+    // Admin voucher views: full detail by code, latest bought and latest used; admins only.
+    const seededDeal = (await sql`SELECT d.id, o.id AS option_id FROM public.deals d JOIN public.deal_options o ON o.deal_id = d.id
+      WHERE d.merchant_id = ${merchantA} AND d.slug <> ${slug} ORDER BY o.price_cents LIMIT 1`)[0]!;
+    const order = (await sql`INSERT INTO public.orders(number,status,is_test,locale,email,first_name,last_name,payment_method,total_cents,access_token_hash)
+      VALUES ('VD-ADMN23','test_unpaid',true,'fi','buyer@example.com','Testi','Ostaja','test',8900,'hash') RETURNING id`)[0]!.id;
+    const item = (await sql`INSERT INTO public.order_items(order_id,line_no,deal_id,option_id,qty,unit_price_cents,total_cents,vat_bps,title,merchant_name)
+      VALUES (${order},1,${seededDeal.id},${seededDeal.option_id},1,8900,8900,2550,${JSON.stringify(fi('Kotisiivous'))}::jsonb,'A') RETURNING id`)[0]!.id;
+    await sql`INSERT INTO public.vouchers(code,qr_payload,order_id,order_item_id,deal_id,option_id,merchant_id,is_test,price_cents,expires_at)
+      VALUES ('VND-ADMN-2345','https://example.com',${order},${item},${seededDeal.id},${seededDeal.option_id},${merchantA},true,8900,now()+interval '1 month')`;
+    assert.equal((await as(a, 'GET', '/api/admin/vouchers/VND-ADMN-2345')).statusCode, 403);
+    assert.equal((await as(admin, 'GET', '/api/admin/vouchers/VND-ZZZZ-ZZZZ')).statusCode, 404);
+    const found = (await as(admin, 'GET', '/api/admin/vouchers/vnd-admn-2345')).json().voucher;
+    assert.equal(found.status, 'active'); assert.equal(found.merchant.id, merchantA); assert.equal(found.order.number, 'VD-ADMN23');
+    assert.equal(found.order.email, 'buyer@example.com'); assert.equal(found.payoutCents, 7565); assert.equal(found.redeemedAt, null);
+    assert.equal((await as(admin, 'GET', '/api/admin/vouchers?view=bought')).json().vouchers[0].code, 'VND-ADMN-2345');
+    assert.equal((await as(admin, 'GET', '/api/admin/vouchers?view=used')).json().vouchers.length, 0);
+    assert.equal((await as(a, 'POST', '/api/merchant/vouchers/redeem', { code: 'VND-ADMN-2345' })).statusCode, 200);
+    const used = (await as(admin, 'GET', '/api/admin/vouchers?view=used')).json().vouchers;
+    assert.equal(used[0].code, 'VND-ADMN-2345'); assert.equal(used[0].status, 'redeemed'); assert.ok(used[0].redeemedAt);
+
     // Suspending a business ends its portal session, so it can no longer change deals.
     await sql`UPDATE public.merchants SET status = 'suspended' WHERE id = ${merchantA}`;
     assert.equal((await as(a, 'PUT', `/api/merchant/deals/${id}`, deal({ imageUrl }))).statusCode, 401);

@@ -43,6 +43,17 @@ export async function orderRoutes(app: FastifyInstance, { service, auth, origins
     return service.lookupForMerchant(parsed.data.code, user.merchant.id);
   });
 
+  // Admin voucher views; /api/admin/* is guarded by the app-wide admin hook.
+  app.get<{ Querystring: { view?: string } }>("/api/admin/vouchers", async (request) => {
+    const view = request.query.view === "used" ? "used" : "bought";
+    return { vouchers: await service.adminVouchers(view) };
+  });
+  app.get<{ Params: { code: string } }>("/api/admin/vouchers/:code", async (request) => {
+    const voucher = await service.adminVoucher(request.params.code);
+    if (!voucher) throw new HttpProblem(404, "voucher_not_found");
+    return { voucher };
+  });
+
   // Changes a voucher, so a request from another site is refused even with a valid session cookie.
   app.post("/api/merchant/vouchers/redeem", async (request, reply) => {
     if (request.headers.origin && !origins.includes(request.headers.origin)) throw new HttpProblem(403, 'forbidden');

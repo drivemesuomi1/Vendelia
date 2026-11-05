@@ -2,7 +2,7 @@ import { createHash, randomBytes, randomInt } from "node:crypto";
 import type { Sql } from "postgres";
 import {
   TEST_PAYMENT_METHOD, uuidSchema, voucherCodeSchema, voucherQrPayload,
-  type CheckoutInput, type CreateOrderResponse, type Locale, type LocalizedList, type LocalizedText,
+  type AdminVoucherDTO, type CheckoutInput, type CreateOrderResponse, type Locale, type LocalizedList, type LocalizedText,
   type OrderDTO, type PaymentMethod, type RedeemLookupDTO, type VoucherDTO, type VoucherStatus,
 } from "@vendelia/shared";
 import type { OrderConfig, PlatformConfig } from "../../config";
@@ -225,6 +225,59 @@ export class OrderService {
     const voucher = await this.lookupForMerchant(parsed.data, merchantId);
     if (!row) return { redeemed: false, voucher };
     return { redeemed: true, voucher: { ...voucher, payoutCents: payoutCents(row.price_cents, row.vat_bps, this.policy) } };
+  }
+
+  /** Full detail of one voucher for admins (support questions, disputes). */
+  async adminVoucher(rawCode: string): Promise<AdminVoucherDTO | null> {
+    const parsed = voucherCodeSchema.safeParse(rawCode);
+    if (!parsed.success) return null;
+    const [row] = await this.adminVouchersWhere(this.sql`v.code = ${parsed.data}`, this.sql`v.issued_at DESC`, 1);
+    return row ?? null;
+  }
+
+  /** The latest vouchers bought, or the latest redeemed, across all businesses. */
+  adminVouchers(view: 'bought' | 'used', limit = 25): Promise<AdminVoucherDTO[]> {
+    return view === 'used'
+      ? this.adminVouchersWhere(this.sql`v.redeemed_at IS NOT NULL`, this.sql`v.redeemed_at DESC`, limit)
+      : this.adminVouchersWhere(this.sql`true`, this.sql`v.issued_at DESC`, limit);
+  }
+
+  private async adminVouchersWhere(where: ReturnType<Sql>, order: ReturnType<Sql>, limit: number): Promise<AdminVoucherDTO[]> {
+    const rows = await this.sql<{
+      code: string; status: VoucherStatus; is_test: boolean; price_cents: number; vat_bps: number;
+      title: LocalizedText; option_label: LocalizedText | null; recipient_name: string | null;
+      issued_at: string; expires_at: string; cancellable_until: string | null; redeemed_at: string | null; refunded_at: string | null;
+      merchant_id: string; merchant_name: string; deal_id: string; slug: string;
+      order_id: string; number: string; order_status: string; email: string; first_name: string; last_name: string; phone: string | null;
+      payment_method: string; total_cents: number; created_at: string; paid_at: string | null; email_status: string;
+    }[]>`
+      SELECT v.code, v.status, v.is_test, v.price_cents, oi.vat_bps, oi.title, oi.option_label, v.recipient_name,
+        to_json(v.issued_at) AS issued_at, to_json(v.expires_at) AS expires_at, to_json(v.cancellable_until) AS cancellable_until,
+        to_json(v.redeemed_at) AS redeemed_at, to_json(v.refunded_at) AS refunded_at,
+        v.merchant_id, m.display_name AS merchant_name, v.deal_id, d.slug,
+        o.id AS order_id, o.number, o.status AS order_status, o.email, o.first_name, o.last_name, o.phone,
+        o.payment_method, o.total_cents, to_json(o.created_at) AS created_at, to_json(o.paid_at) AS paid_at, o.email_status
+      FROM public.vouchers v
+      JOIN public.order_items oi ON oi.id = v.order_item_id
+      JOIN public.orders o ON o.id = v.order_id
+      JOIN public.merchants m ON m.id = v.merchant_id
+      JOIN public.deals d ON d.id = v.deal_id
+      WHERE ${where} ORDER BY ${order} LIMIT ${limit}`;
+    return rows.map((r) => ({
+      code: r.code,
+      // An active voucher past its date is shown as expired, as the lookup does.
+      status: r.status === 'active' && Date.parse(r.expires_at) < Date.now() ? 'expired' : r.status,
+      test: r.is_test, title: r.title, optionLabel: r.option_label,
+      priceCents: r.price_cents, vatBps: r.vat_bps, payoutCents: payoutCents(r.price_cents, r.vat_bps, this.policy),
+      issuedAt: iso(r.issued_at), expiresAt: iso(r.expires_at), cancellableUntil: isoOrNull(r.cancellable_until),
+      redeemedAt: isoOrNull(r.redeemed_at), refundedAt: isoOrNull(r.refunded_at), recipientName: r.recipient_name,
+      merchant: { id: r.merchant_id, name: r.merchant_name }, deal: { id: r.deal_id, slug: r.slug },
+      order: {
+        id: r.order_id, number: r.number, status: r.order_status, email: r.email, name: `${r.first_name} ${r.last_name}`.trim(),
+        phone: r.phone, paymentMethod: r.payment_method, totalCents: r.total_cents,
+        createdAt: iso(r.created_at), paidAt: isoOrNull(r.paid_at), emailStatus: r.email_status,
+      },
+    }));
   }
 
   /** Business lookup is scoped to the merchant from the verified membership. */

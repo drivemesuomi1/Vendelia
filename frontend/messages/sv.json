@@ -820,6 +820,63 @@
       },
       "contact": "Kontakt",
       "dealsHint": "Öppna ett erbjudande för att se detaljerna, granska det och lämna återkoppling."
+    },
+    "vouchers": "Värdebevis",
+    "vouchersSub": "Sök vilket värdebevis som helst med koden, eller se de senast köpta och använda.",
+    "vo": {
+      "code": "Kod",
+      "find": "Sök värdebevis",
+      "voucher": "Värdebevis",
+      "what": "Vad som köptes",
+      "history": "Händelser",
+      "buyer": "Köpare och order",
+      "price": "Pris",
+      "vat": "Moms",
+      "giftFor": "Present till",
+      "order": "Order",
+      "name": "Namn",
+      "payment": "Betalning",
+      "orderTotal": "Ordersumma",
+      "email": "E-post med värdebevis",
+      "list": "Lista över värdebevis",
+      "listHint": "De senaste 25. Klicka på en rad för detaljer.",
+      "loading": "Laddar…",
+      "recentBought": "Senast köpta",
+      "recentUsed": "Senast använda",
+      "boughtAt": "Köpt",
+      "usedAt": "Använt",
+      "emptyBought": "Inga värdebevis har köpts ännu.",
+      "emptyUsed": "Inga värdebevis har använts ännu.",
+      "tab": {
+        "bought": "Köpta",
+        "used": "Använda"
+      },
+      "status": {
+        "active": "Giltigt",
+        "redeemed": "Använt",
+        "refunded": "Återbetalt",
+        "expired": "Utgånget"
+      },
+      "ev": {
+        "bought": "Köpt",
+        "cancelUntil": "Fri avbokning till",
+        "used": "Använt hos företaget",
+        "refunded": "Återbetalt",
+        "expired": "Utgånget",
+        "validUntil": "Giltigt till"
+      },
+      "orderStatus": {
+        "pending": "väntar",
+        "paid": "betald",
+        "failed": "misslyckades",
+        "test_unpaid": "test, inte betald"
+      },
+      "emailStatus": {
+        "pending": "Inte skickat ännu",
+        "sent": "Skickat",
+        "failed": "Sändningen misslyckades"
+      },
+      "payout": "Företaget får"
     }
   },
   "errors": {

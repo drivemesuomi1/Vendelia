@@ -820,6 +820,63 @@
       },
       "contact": "Yhteystiedot",
       "dealsHint": "Avaa diili nähdäksesi sen tiedot, tarkistaaksesi sen ja antaaksesi palautetta."
+    },
+    "vouchers": "Setelit",
+    "vouchersSub": "Hae mikä tahansa seteli koodilla tai katso viimeksi ostetut ja käytetyt setelit.",
+    "vo": {
+      "code": "Setelin koodi",
+      "find": "Hae seteli",
+      "voucher": "Seteli",
+      "what": "Mitä ostettiin",
+      "history": "Tapahtumat",
+      "buyer": "Ostaja ja tilaus",
+      "price": "Hinta",
+      "vat": "ALV",
+      "giftFor": "Lahja henkilölle",
+      "order": "Tilaus",
+      "name": "Nimi",
+      "payment": "Maksu",
+      "orderTotal": "Tilauksen summa",
+      "email": "Seteliviesti",
+      "list": "Setelilista",
+      "listHint": "Viimeiset 25. Avaa tiedot napsauttamalla riviä.",
+      "loading": "Ladataan…",
+      "recentBought": "Viimeksi ostetut",
+      "recentUsed": "Viimeksi käytetyt",
+      "boughtAt": "Ostettu",
+      "usedAt": "Käytetty",
+      "emptyBought": "Seteleitä ei ole vielä ostettu.",
+      "emptyUsed": "Seteleitä ei ole vielä käytetty.",
+      "tab": {
+        "bought": "Ostetut",
+        "used": "Käytetyt"
+      },
+      "status": {
+        "active": "Voimassa",
+        "redeemed": "Käytetty",
+        "refunded": "Hyvitetty",
+        "expired": "Vanhentunut"
+      },
+      "ev": {
+        "bought": "Ostettu",
+        "cancelUntil": "Maksuton peruutus asti",
+        "used": "Käytetty yrityksessä",
+        "refunded": "Hyvitetty",
+        "expired": "Vanhentunut",
+        "validUntil": "Voimassa asti"
+      },
+      "orderStatus": {
+        "pending": "odottaa",
+        "paid": "maksettu",
+        "failed": "epäonnistui",
+        "test_unpaid": "testi, ei maksettu"
+      },
+      "emailStatus": {
+        "pending": "Ei vielä lähetetty",
+        "sent": "Lähetetty",
+        "failed": "Lähetys epäonnistui"
+      },
+      "payout": "Yritys saa"
     }
   },
   "errors": {
