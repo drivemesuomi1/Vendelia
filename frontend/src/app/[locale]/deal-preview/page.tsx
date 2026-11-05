@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { DealPreviewReceiver } from "@/features/merchant/components/DealPreviewReceiver";
+import { siteThemeClass } from "@/lib/portal-fonts";
+import "@/styles/site-theme.css";
 
 export const metadata: Metadata = { title: "Preview", robots: { index: false, follow: false } };
 
@@ -9,7 +11,7 @@ export default function DealPreviewPage() {
     <>
       {/* No site header in the frame: sticky parts (section tabs, buy box) stick to the very top. */}
       <style>{".preview-banner{display:none}html:root{--header-h:0px}"}</style>
-      <DealPreviewReceiver />
+      <div className={siteThemeClass}><DealPreviewReceiver /></div>
     </>
   );
 }

@@ -7,3 +7,6 @@ const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-admin-mono"
 
 /** Class for the wrapper of a portal: scopes the portal palette (styles/portal.css) and fonts. */
 export const portalClass = `pui ${geist.variable} ${geistMono.variable}`;
+
+/** Same typeface for the customer site's theme scope (styles/site-theme.css), without the portal layout rules. */
+export const siteThemeClass = `site-theme ${geist.variable} ${geistMono.variable}`;

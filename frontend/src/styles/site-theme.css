@@ -1,0 +1,36 @@
+/*
+ * Customer site in the portal look: neutral light-grey canvas (no warm tint), white surfaces with crisp 1px borders, charcoal text,
+ * Geist type, flatter shadows and tighter radii, with the brand indigo kept as the accent. Only design tokens and a
+ * few component refinements change, inside .site-theme, so every shop component picks them up.
+ */
+.site-theme{
+  --navy:#1C1C21; --navy-70:#51515A; --navy-50:#74747C;
+  --line:#E4E4E7; --line-strong:#D4D4D8; --soft:#F7F7F8; --hover:#F0F0F2;
+  --radius:12px; --radius-sm:8px; --radius-lg:16px;
+  --shadow:0 1px 2px rgba(20,20,25,.04);
+  --shadow-lg:0 1px 2px rgba(20,20,25,.04),0 18px 44px -22px rgba(20,20,25,.24);
+  --font:var(--font-admin),"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  font-family:var(--font);color:var(--navy);background:var(--soft);min-height:100vh;
+  letter-spacing:-.006em;-webkit-font-smoothing:antialiased
+}
+.site-theme h1,.site-theme h2,.site-theme .price{letter-spacing:-.025em}
+.site-theme .mono,.site-theme .code{font-family:var(--font-admin-mono),ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:0}
+.site-theme .price,.site-theme .num{font-variant-numeric:tabular-nums}
+
+/* Surfaces */
+.site-theme .card{border-color:var(--line);box-shadow:var(--shadow)}
+.site-theme header.site{background:rgba(255,255,255,.86);border-bottom-color:var(--line)}
+body.scrolled .site-theme header.site{box-shadow:0 10px 28px -20px rgba(20,20,25,.3)}
+.site-theme footer.site{border-top-color:var(--line)}
+
+/* Controls */
+.site-theme .btn{border-radius:8px;transition:background .12s,border-color .12s,color .12s,transform .08s}
+.site-theme .btn:active{transform:scale(.98)}
+.site-theme .btn-secondary{background:#fff;border-color:var(--line-strong);color:var(--navy)}
+.site-theme .btn-secondary:hover{background:var(--soft);border-color:#BCBCC2}
+.site-theme .btn-ghost{color:var(--navy-70)}
+.site-theme .btn-ghost:hover{background:var(--hover);color:var(--navy)}
+.site-theme .input,.site-theme .select{border-color:var(--line-strong);border-radius:8px}
+.site-theme .input:hover,.site-theme .select:hover{border-color:#BCBCC2}
+.site-theme .chip{border-radius:999px}
+.site-theme .langsw-btn{border-color:var(--line-strong)}
