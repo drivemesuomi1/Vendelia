@@ -242,6 +242,23 @@ export interface AdminVoucherDTO {
   };
 }
 
+/** Order status as shown to admins: "refunded" when every voucher of a paid order was refunded, "test" for bypass orders. */
+export type AdminOrderStatus = "paid" | "pending" | "failed" | "refunded" | "test";
+
+/** One order in the admin order list. */
+export interface AdminOrderDTO {
+  id: string;
+  number: string;
+  status: AdminOrderStatus;
+  email: string;
+  paymentMethod: string;
+  totalCents: number;
+  createdAt: string;
+  paidAt: string | null;
+  /** Order lines, as snapshotted at purchase. */
+  items: { qty: number; title: LocalizedText; optionLabel: LocalizedText | null; merchantName: string }[];
+}
+
 /** Read-only earnings preview; no payout transfer or settled balance is recorded. */
 export interface MerchantPayoutEntryDTO extends SplitDTO {
   code: string;

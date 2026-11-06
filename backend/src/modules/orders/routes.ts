@@ -50,7 +50,8 @@ export async function orderRoutes(app: FastifyInstance, { service, auth, origins
     return service.merchantPayoutPreview(user.merchant.id);
   });
 
-  // Admin voucher views; /api/admin/* is guarded by the app-wide admin hook.
+  // Admin order, refund and voucher views; /api/admin/* is guarded by the app-wide admin hook.
+  app.get("/api/admin/orders", async () => ({ orders: await service.adminOrders() }));
   app.get('/api/admin/refunds', async () => service.adminRefunds());
   app.post('/api/admin/refunds', async (request, reply) => {
     const parsed = redeemLookupSchema.safeParse(request.body);
