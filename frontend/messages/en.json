@@ -628,7 +628,7 @@
     "financeSub": "Sales, commission, VAT and payouts to businesses",
     "dealsSub": "Deals submitted by businesses. Approve to publish or reject with a reason.",
     "demo": "Demo data",
-    "demoHint": "Business records, deal review, vouchers and support refund records use the database. Finance and other unfinished screens may include demo data.",
+    "demoHint": "Business records, deal review, vouchers, finance and support refund records use the database. Other unfinished screens may include demo data.",
     "range": "{n} days",
     "rangeLabel": "Period",
     "kpiTitle": "Key figures",
@@ -645,6 +645,8 @@
     "recentOrders": "Recent orders",
     "activity": "Recent activity",
     "ordersSearch": "Search by order, email or deal",
+    "vouchersSearch": "Search by code, deal, business or email",
+    "vouchersNoResults": "No matching vouchers.",
     "noResults": "No matching orders.",
     "kpi": {
       "gross": "Gross sales",
@@ -739,7 +741,20 @@
       "title": "Finance",
       "revenueTrend": "Vendelia revenue per week",
       "monthly": "Monthly statement",
-      "payouts": "Payouts to businesses"
+      "payouts": "Earned by businesses",
+      "payoutsHint": "From redeemed vouchers at the current commission. Transfers are not recorded yet, so nothing here is marked as paid.",
+      "redeemed": "Redeemed",
+      "owed": "Owed",
+      "open": "Unused",
+      "openOwed": "Owed when used",
+      "lastRedeemed": "Last redemption",
+      "vouchers": "Vouchers",
+      "includeTest": "Include test orders",
+      "rates": "Commission {commission}, VAT on commission {vat}",
+      "salesRule": "Sales are vouchers on paid orders, by purchase date; refunded vouchers are left out.",
+      "refundedNote": "{n} refunded vouchers ({amount}) are not counted as sales.",
+      "noPayouts": "No vouchers sold yet.",
+      "onlyTest": "No paid orders yet. Turn on “Include test orders” to see test purchases."
     },
     "mb": {
       "title": "Manage businesses",
@@ -947,13 +962,17 @@
       "loading": "Loading…",
       "recentBought": "Recently bought",
       "recentUsed": "Recently used",
+      "recentRefunded": "Recently refunded",
       "boughtAt": "Bought",
       "usedAt": "Used",
+      "refundedAt": "Refunded",
       "emptyBought": "No vouchers have been bought yet.",
       "emptyUsed": "No vouchers have been used yet.",
+      "emptyRefunded": "No vouchers have been refunded yet.",
       "tab": {
         "bought": "Bought",
-        "used": "Used"
+        "used": "Used",
+        "refunded": "Refunded"
       },
       "status": {
         "active": "Valid",

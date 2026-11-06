@@ -281,6 +281,36 @@ export interface MerchantPayoutPreviewDTO {
   hasMore: boolean;
 }
 
+/** One Helsinki calendar day of sold (paid, not refunded) vouchers, split per voucher at the current rates. */
+export interface AdminFinanceDayDTO extends SplitDTO {
+  /** YYYY-MM-DD, Europe/Helsinki. */
+  date: string;
+  vouchers: number;
+}
+
+/** What each business has earned from its vouchers. Settlement is not recorded, so nothing here is "paid". */
+export interface AdminFinanceMerchantDTO {
+  merchantId: string;
+  name: string;
+  /** Redeemed vouchers: the business has delivered, so this is owed to it. */
+  redeemedVouchers: number;
+  redeemedPayoutCents: number;
+  /** Sold, still valid and unused: owed only once redeemed. */
+  openVouchers: number;
+  openPayoutCents: number;
+  lastRedeemedAt: string | null;
+}
+
+export interface AdminFinanceDTO {
+  commissionBps: number;
+  commissionVatBps: number;
+  includesTest: boolean;
+  /** Oldest first; only days with sales. Covers about the last 13 months. */
+  days: AdminFinanceDayDTO[];
+  merchants: AdminFinanceMerchantDTO[];
+  refunded: { vouchers: number; grossCents: number };
+}
+
 export interface StatementRowDTO {
   dealId: string;
   title: LocalizedText;

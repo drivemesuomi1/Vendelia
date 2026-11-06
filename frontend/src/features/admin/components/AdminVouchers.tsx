@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import type { AdminVoucherDTO } from "@vendelia/shared";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { Notice } from "@/components/ui/Notice";
@@ -10,8 +10,14 @@ import { api, ApiError } from "@/lib/api-client";
 import { formatMoney, formatPct, itemTitle } from "@/lib/format";
 import { dateTime } from "../format";
 
-const VIEWS = ["bought", "used"] as const;
+const VIEWS = ["bought", "used", "refunded"] as const;
 type View = (typeof VIEWS)[number];
+/** Translation keys and the date shown for each list. */
+const VIEW_TEXT: Record<View, { title: string; empty: string; dateCol: string; date: (v: AdminVoucherDTO) => string | null }> = {
+  bought: { title: "admin.vo.recentBought", empty: "admin.vo.emptyBought", dateCol: "admin.vo.boughtAt", date: (v) => v.issuedAt },
+  used: { title: "admin.vo.recentUsed", empty: "admin.vo.emptyUsed", dateCol: "admin.vo.usedAt", date: (v) => v.redeemedAt },
+  refunded: { title: "admin.vo.recentRefunded", empty: "admin.vo.emptyRefunded", dateCol: "admin.vo.refundedAt", date: (v) => v.refundedAt },
+};
 
 /**
  * Admin voucher lookup: enter a code to see everything about it (what was bought, the business, the buyer and its
@@ -26,6 +32,7 @@ export function AdminVouchers() {
   const [view, setView] = useState<View>("bought");
   const [lists, setLists] = useState<Partial<Record<View, AdminVoucherDTO[]>>>({});
   const [listError, setListError] = useState<string | null>(null);
+  const [q, setQ] = useState("");
 
   async function open(raw: string) {
     const value = raw.trim().toUpperCase();
@@ -63,7 +70,18 @@ export function AdminVouchers() {
 
   const submit = (e: FormEvent) => { e.preventDefault(); void open(code); };
   const when = (iso: string | null) => (iso ? dateTime(iso, locale) : "–");
-  const rows = lists[view];
+  const loaded = lists[view];
+  const rows = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    if (!loaded || !needle) return loaded;
+    return loaded.filter((v) =>
+      v.code.toLowerCase().includes(needle)
+      || itemTitle(v.title, null, v.optionLabel, locale).toLowerCase().includes(needle)
+      || v.merchant.name.toLowerCase().includes(needle)
+      || v.order.number.toLowerCase().includes(needle)
+      || v.order.email.toLowerCase().includes(needle)
+      || (v.order.name ?? "").toLowerCase().includes(needle));
+  }, [loaded, q, locale]);
 
   return (
     <div className="stack" style={{ gap: 20 }}>
@@ -81,17 +99,25 @@ export function AdminVouchers() {
 
       <section className="panel">
         <div className="panel-h">
-          <div><h2>{t(view === "used" ? "admin.vo.recentUsed" : "admin.vo.recentBought")}</h2><p className="muted">{t("admin.vo.listHint")}</p></div>
+          <div><h2>{t(VIEW_TEXT[view].title)}</h2><p className="muted">{t("admin.vo.listHint")}</p></div>
+        </div>
+        <div className="toolbar">
+          <label className="search-box">
+            <Icon name="search" />
+            <span className="sr-only">{t("admin.vouchersSearch")}</span>
+            <input className="input" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("admin.vouchersSearch")} />
+          </label>
           <div className="seg" role="group" aria-label={t("admin.vo.list")}>
             {VIEWS.map((v) => <button key={v} type="button" aria-pressed={view === v} onClick={() => setView(v)}>{t(`admin.vo.tab.${v}`)}</button>)}
           </div>
         </div>
         {listError ? <Notice tone="danger" icon="xc">{t(`errors.${listError}`)}</Notice>
           : !rows ? <p className="muted small">{t("admin.vo.loading")}</p>
+          : !rows.length && q.trim() && loaded?.length ? <p className="muted empty-row">{t("admin.vouchersNoResults")}</p>
           : !rows.length ? (
             <div className="empty-state">
               <span className="attn-ic indigo"><Icon name="ticket" /></span>
-              <h3>{t(view === "used" ? "admin.vo.emptyUsed" : "admin.vo.emptyBought")}</h3>
+              <h3>{t(VIEW_TEXT[view].empty)}</h3>
             </div>
           ) : (
             <div className="table-wrap">
@@ -102,7 +128,7 @@ export function AdminVouchers() {
                     <th>{t("admin.col.deal")}</th>
                     <th>{t("admin.merchant")}</th>
                     <th className="num">{t("admin.vo.price")}</th>
-                    <th>{t(view === "used" ? "admin.vo.usedAt" : "admin.vo.boughtAt")}</th>
+                    <th>{t(VIEW_TEXT[view].dateCol)}</th>
                     <th>{t("business.colStatus")}</th>
                   </tr>
                 </thead>
@@ -113,7 +139,7 @@ export function AdminVouchers() {
                       <td><span className="vo-deal">{itemTitle(v.title, null, v.optionLabel, locale)}</span></td>
                       <td>{v.merchant.name}</td>
                       <td className="num">{formatMoney(v.priceCents, locale)}</td>
-                      <td>{when(view === "used" ? v.redeemedAt : v.issuedAt)}</td>
+                      <td>{when(VIEW_TEXT[view].date(v))}</td>
                       <td><StatusChip voucher={v} /></td>
                     </tr>
                   ))}

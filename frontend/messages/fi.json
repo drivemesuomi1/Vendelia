@@ -628,7 +628,7 @@
     "financeSub": "Myynti, provisiot, ALV ja tilitykset yrityksille",
     "dealsSub": "Yritysten lähettämät diilit. Hyväksy julkaistavaksi tai hylkää perustellen.",
     "demo": "Esimerkkidata",
-    "demoHint": "Yritystiedot, tarjousten tarkistus, lahjakortit ja tukihyvitysten kirjaukset käyttävät tietokantaa. Talous- ja muut keskeneräiset näkymät voivat sisältää esimerkkitietoja.",
+    "demoHint": "Yritystiedot, tarjousten tarkistus, lahjakortit, talous ja tukihyvitysten kirjaukset käyttävät tietokantaa. Muut keskeneräiset näkymät voivat sisältää esimerkkitietoja.",
     "range": "{n} pv",
     "rangeLabel": "Aikajakso",
     "kpiTitle": "Avainluvut",
@@ -645,6 +645,8 @@
     "recentOrders": "Viimeisimmät tilaukset",
     "activity": "Viimeisimmät tapahtumat",
     "ordersSearch": "Hae tilausnumerolla, sähköpostilla tai diilillä",
+    "vouchersSearch": "Hae koodilla, diilillä, yrityksellä tai sähköpostilla",
+    "vouchersNoResults": "Ei vastaavia lahjakortteja.",
     "noResults": "Ei hakua vastaavia tilauksia.",
     "kpi": {
       "gross": "Bruttomyynti",
@@ -739,7 +741,20 @@
       "title": "Talous",
       "revenueTrend": "Vendelian tulot viikoittain",
       "monthly": "Kuukausiraportti",
-      "payouts": "Tilitykset yrityksille"
+      "payouts": "Yritysten ansiot",
+      "payoutsHint": "Käytetyistä lahjakorteista nykyisellä provisiolla. Tilisiirtoja ei vielä kirjata, joten mitään ei ole merkitty maksetuksi.",
+      "redeemed": "Käytetyt",
+      "owed": "Maksettavaa",
+      "open": "Käyttämättä",
+      "openOwed": "Maksettavaa käytettäessä",
+      "lastRedeemed": "Viimeisin käyttö",
+      "vouchers": "Lahjakortit",
+      "includeTest": "Näytä myös testitilaukset",
+      "rates": "Provisio {commission}, provision ALV {vat}",
+      "salesRule": "Myynti on maksettujen tilausten lahjakortit ostopäivän mukaan; hyvitetyt lahjakortit eivät ole mukana.",
+      "refundedNote": "{n} hyvitettyä lahjakorttia ({amount}) ei lasketa myynniksi.",
+      "noPayouts": "Lahjakortteja ei ole vielä myyty.",
+      "onlyTest": "Maksettuja tilauksia ei vielä ole. Valitse ”Näytä myös testitilaukset” nähdäksesi testiostot."
     },
     "mb": {
       "title": "Yritysten hallinta",
@@ -947,13 +962,17 @@
       "loading": "Ladataan…",
       "recentBought": "Viimeksi ostetut",
       "recentUsed": "Viimeksi käytetyt",
+      "recentRefunded": "Viimeksi hyvitetyt",
       "boughtAt": "Ostettu",
       "usedAt": "Käytetty",
+      "refundedAt": "Hyvitetty",
       "emptyBought": "Seteleitä ei ole vielä ostettu.",
       "emptyUsed": "Seteleitä ei ole vielä käytetty.",
+      "emptyRefunded": "Seteleitä ei ole vielä hyvitetty.",
       "tab": {
         "bought": "Ostetut",
-        "used": "Käytetyt"
+        "used": "Käytetyt",
+        "refunded": "Hyvitetyt"
       },
       "status": {
         "active": "Voimassa",

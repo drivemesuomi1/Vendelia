@@ -628,7 +628,7 @@
     "financeSub": "Försäljning, provisioner, moms och utbetalningar till företag",
     "dealsSub": "Erbjudanden från företagen. Godkänn för publicering eller avvisa med motivering.",
     "demo": "Exempeldata",
-    "demoHint": "Företagsuppgifter, erbjudandegranskning, presentkort och registrerade supportåterbetalningar använder databasen. Ekonomi och andra ofärdiga vyer kan innehålla exempeldata.",
+    "demoHint": "Företagsuppgifter, erbjudandegranskning, presentkort, ekonomi och registrerade supportåterbetalningar använder databasen. Andra ofärdiga vyer kan innehålla exempeldata.",
     "range": "{n} d",
     "rangeLabel": "Period",
     "kpiTitle": "Nyckeltal",
@@ -645,6 +645,8 @@
     "recentOrders": "Senaste beställningar",
     "activity": "Senaste händelser",
     "ordersSearch": "Sök på ordernummer, e-post eller erbjudande",
+    "vouchersSearch": "Sök på kod, erbjudande, företag eller e-post",
+    "vouchersNoResults": "Inga matchande presentkort.",
     "noResults": "Inga matchande beställningar.",
     "kpi": {
       "gross": "Bruttoförsäljning",
@@ -739,7 +741,20 @@
       "title": "Ekonomi",
       "revenueTrend": "Vendelias intäkter per vecka",
       "monthly": "Månadsrapport",
-      "payouts": "Utbetalningar till företag"
+      "payouts": "Intjänat av företag",
+      "payoutsHint": "Från inlösta presentkort med nuvarande provision. Överföringar registreras inte ännu, så inget här är markerat som betalt.",
+      "redeemed": "Inlösta",
+      "owed": "Att betala",
+      "open": "Oanvända",
+      "openOwed": "Att betala vid inlösen",
+      "lastRedeemed": "Senaste inlösen",
+      "vouchers": "Presentkort",
+      "includeTest": "Visa även testbeställningar",
+      "rates": "Provision {commission}, moms på provision {vat}",
+      "salesRule": "Försäljning är presentkort på betalda beställningar, enligt köpdatum; återbetalda presentkort räknas inte.",
+      "refundedNote": "{n} återbetalda presentkort ({amount}) räknas inte som försäljning.",
+      "noPayouts": "Inga presentkort sålda ännu.",
+      "onlyTest": "Inga betalda beställningar ännu. Välj ”Visa även testbeställningar” för att se testköp."
     },
     "mb": {
       "title": "Hantera företag",
@@ -947,13 +962,17 @@
       "loading": "Laddar…",
       "recentBought": "Senast köpta",
       "recentUsed": "Senast använda",
+      "recentRefunded": "Senast återbetalda",
       "boughtAt": "Köpt",
       "usedAt": "Använt",
+      "refundedAt": "Återbetalt",
       "emptyBought": "Inga värdebevis har köpts ännu.",
       "emptyUsed": "Inga värdebevis har använts ännu.",
+      "emptyRefunded": "Inga värdebevis har återbetalats ännu.",
       "tab": {
         "bought": "Köpta",
-        "used": "Använda"
+        "used": "Använda",
+        "refunded": "Återbetalda"
       },
       "status": {
         "active": "Giltigt",

@@ -2,7 +2,7 @@ import { createHash, randomBytes, randomInt } from "node:crypto";
 import type { Sql } from "postgres";
 import {
   TEST_PAYMENT_METHOD, uuidSchema, voucherCodeSchema, voucherQrPayload,
-  type AdminOrderDTO, type AdminVoucherDTO, type CheckoutInput, type CreateOrderResponse, type Locale, type LocalizedList, type LocalizedText,
+  type AdminFinanceDayDTO, type AdminFinanceDTO, type AdminFinanceMerchantDTO, type AdminOrderDTO, type AdminVoucherDTO, type CheckoutInput, type CreateOrderResponse, type Locale, type LocalizedList, type LocalizedText,
   type OrderDTO, type PaymentMethod, type RedeemLookupDTO, type VoucherDTO, type VoucherStatus, type MerchantPayoutPreviewDTO,
 } from "@vendelia/shared";
 import type { OrderConfig, PlatformConfig } from "../../config";
@@ -310,11 +310,85 @@ export class OrderService {
     }));
   }
 
-  /** The latest vouchers bought, or the latest redeemed, across all businesses. */
-  adminVouchers(view: 'bought' | 'used', limit = 25): Promise<AdminVoucherDTO[]> {
-    return view === 'used'
-      ? this.adminVouchersWhere(this.sql`v.redeemed_at IS NOT NULL`, this.sql`v.redeemed_at DESC`, limit)
-      : this.adminVouchersWhere(this.sql`true`, this.sql`v.issued_at DESC`, limit);
+  /**
+   * Platform money from the database: sold vouchers per Helsinki day (last ~13 months), what each business has earned,
+   * and refunds. A sale is a voucher on a paid order that was not refunded; test orders only when `includeTest`.
+   * Each voucher is split on its own (same rounding as the business payout view), at the current commission rates.
+   */
+  async adminFinance(includeTest: boolean): Promise<AdminFinanceDTO> {
+    const sold = includeTest
+      ? this.sql`(o.status = 'paid' OR o.status = 'test_unpaid')`
+      : this.sql`(o.status = 'paid' AND NOT o.is_test AND NOT v.is_test)`;
+    const [dayRows, merchantRows, [refunded]] = await Promise.all([
+      this.sql<{ day: string; vat_bps: number; price_cents: number; n: number }[]>`
+        SELECT to_char((v.issued_at AT TIME ZONE 'Europe/Helsinki')::date, 'YYYY-MM-DD') AS day,
+          oi.vat_bps, v.price_cents, count(*)::int AS n
+        FROM public.vouchers v
+        JOIN public.order_items oi ON oi.id = v.order_item_id
+        JOIN public.orders o ON o.id = v.order_id
+        WHERE ${sold} AND v.status <> 'refunded' AND v.issued_at >= now() - interval '400 days'
+        GROUP BY 1, 2, 3 ORDER BY 1`,
+      this.sql<{ merchant_id: string; name: string; state: 'redeemed' | 'open'; vat_bps: number; price_cents: number; n: number; last_redeemed_at: string | null }[]>`
+        SELECT v.merchant_id, m.display_name AS name,
+          CASE WHEN v.status = 'redeemed' THEN 'redeemed' ELSE 'open' END AS state,
+          oi.vat_bps, v.price_cents, count(*)::int AS n, to_json(max(v.redeemed_at)) AS last_redeemed_at
+        FROM public.vouchers v
+        JOIN public.order_items oi ON oi.id = v.order_item_id
+        JOIN public.orders o ON o.id = v.order_id
+        JOIN public.merchants m ON m.id = v.merchant_id
+        WHERE ${sold} AND (v.status = 'redeemed' OR (v.status = 'active' AND v.expires_at > now()))
+        GROUP BY 1, 2, 3, 4, 5`,
+      this.sql<{ n: number; gross: number }[]>`
+        SELECT count(*)::int AS n, coalesce(sum(v.price_cents), 0)::int AS gross
+        FROM public.vouchers v JOIN public.orders o ON o.id = v.order_id
+        WHERE v.status = 'refunded' AND ${includeTest ? this.sql`true` : this.sql`NOT o.is_test AND NOT v.is_test`}`,
+    ]);
+
+    const days = new Map<string, AdminFinanceDayDTO>();
+    for (const r of dayRows) {
+      const day = days.get(r.day) ?? { date: r.day, vouchers: 0, grossCents: 0, netCents: 0, saleVatCents: 0,
+        commissionCents: 0, commissionVatCents: 0, feeCents: 0, payoutCents: 0 };
+      const split = voucherSplit(r.price_cents, r.vat_bps, this.policy);
+      for (const k of ['grossCents', 'netCents', 'saleVatCents', 'commissionCents', 'commissionVatCents', 'feeCents', 'payoutCents'] as const) {
+        day[k] += split[k] * r.n;
+      }
+      day.vouchers += r.n;
+      days.set(r.day, day);
+    }
+
+    const merchants = new Map<string, AdminFinanceMerchantDTO>();
+    for (const r of merchantRows) {
+      const m = merchants.get(r.merchant_id) ?? { merchantId: r.merchant_id, name: r.name, redeemedVouchers: 0,
+        redeemedPayoutCents: 0, openVouchers: 0, openPayoutCents: 0, lastRedeemedAt: null };
+      const payout = payoutCents(r.price_cents, r.vat_bps, this.policy) * r.n;
+      if (r.state === 'redeemed') {
+        m.redeemedVouchers += r.n;
+        m.redeemedPayoutCents += payout;
+        const last = isoOrNull(r.last_redeemed_at);
+        if (last && (!m.lastRedeemedAt || last > m.lastRedeemedAt)) m.lastRedeemedAt = last;
+      } else {
+        m.openVouchers += r.n;
+        m.openPayoutCents += payout;
+      }
+      merchants.set(r.merchant_id, m);
+    }
+
+    return {
+      commissionBps: this.policy.commissionBps, commissionVatBps: this.policy.commissionVatBps, includesTest: includeTest,
+      days: [...days.values()],
+      merchants: [...merchants.values()].sort((a, b) => b.redeemedPayoutCents - a.redeemedPayoutCents || b.openPayoutCents - a.openPayoutCents),
+      refunded: { vouchers: refunded?.n ?? 0, grossCents: refunded?.gross ?? 0 },
+    };
+  }
+
+  /** The latest vouchers bought, redeemed or refunded, across all businesses. */
+  adminVouchers(view: 'bought' | 'used' | 'refunded', limit = 25): Promise<AdminVoucherDTO[]> {
+    if (view === 'used') return this.adminVouchersWhere(this.sql`v.redeemed_at IS NOT NULL`, this.sql`v.redeemed_at DESC`, limit);
+    // Same rule as the refunds list: only vouchers whose status is refunded.
+    if (view === 'refunded') {
+      return this.adminVouchersWhere(this.sql`v.status = 'refunded' AND v.refunded_at IS NOT NULL`, this.sql`v.refunded_at DESC, v.id DESC`, limit);
+    }
+    return this.adminVouchersWhere(this.sql`true`, this.sql`v.issued_at DESC`, limit);
   }
 
   private async adminVouchersWhere(where: ReturnType<Sql>, order: ReturnType<Sql>, limit: number): Promise<AdminVoucherDTO[]> {
