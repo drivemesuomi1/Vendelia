@@ -2,7 +2,7 @@ import { createHash, randomBytes, randomInt } from "node:crypto";
 import type { Sql } from "postgres";
 import {
   TEST_PAYMENT_METHOD, uuidSchema, voucherCodeSchema, voucherQrPayload,
-  type AdminVoucherDTO, type CheckoutInput, type CreateOrderResponse, type Locale, type LocalizedList, type LocalizedText,
+  type AdminOrderDTO, type AdminVoucherDTO, type CheckoutInput, type CreateOrderResponse, type Locale, type LocalizedList, type LocalizedText,
   type OrderDTO, type PaymentMethod, type RedeemLookupDTO, type VoucherDTO, type VoucherStatus, type MerchantPayoutPreviewDTO,
 } from "@vendelia/shared";
 import type { OrderConfig, PlatformConfig } from "../../config";
@@ -259,6 +259,33 @@ export class OrderService {
     if (!parsed.success) return null;
     const [row] = await this.adminVouchersWhere(this.sql`v.code = ${parsed.data}`, this.sql`v.issued_at DESC`, 1);
     return row ?? null;
+  }
+
+  /** The latest orders across all businesses, newest first, with their lines. */
+  async adminOrders(limit = 500): Promise<AdminOrderDTO[]> {
+    const rows = await this.sql<{
+      id: string; number: string; status: string; email: string; payment_method: string; total_cents: number;
+      created_at: string; paid_at: string | null; vouchers: number; refunded: number;
+      items: { qty: number; title: LocalizedText; option_label: LocalizedText | null; merchant_name: string }[];
+    }[]>`
+      SELECT o.id, o.number, o.status, o.email, o.payment_method, o.total_cents,
+        to_json(o.created_at) AS created_at, to_json(o.paid_at) AS paid_at,
+        (SELECT count(*)::int FROM public.vouchers v WHERE v.order_id = o.id) AS vouchers,
+        (SELECT count(*)::int FROM public.vouchers v WHERE v.order_id = o.id AND v.status = 'refunded') AS refunded,
+        coalesce((SELECT jsonb_agg(jsonb_build_object('qty', oi.qty, 'title', oi.title, 'option_label', oi.option_label,
+          'merchant_name', oi.merchant_name) ORDER BY oi.line_no)
+          FROM public.order_items oi WHERE oi.order_id = o.id), '[]'::jsonb) AS items
+      FROM public.orders o
+      ORDER BY o.created_at DESC LIMIT ${limit}`;
+    return rows.map((r) => ({
+      id: r.id, number: r.number,
+      status: r.status === 'test_unpaid' ? 'test'
+        : r.status === 'paid' && r.vouchers > 0 && r.refunded === r.vouchers ? 'refunded'
+        : r.status as 'paid' | 'pending' | 'failed',
+      email: r.email, paymentMethod: r.payment_method, totalCents: r.total_cents,
+      createdAt: iso(r.created_at), paidAt: isoOrNull(r.paid_at),
+      items: r.items.map((i) => ({ qty: i.qty, title: i.title, optionLabel: i.option_label, merchantName: i.merchant_name })),
+    }));
   }
 
   /** The latest vouchers bought, or the latest redeemed, across all businesses. */

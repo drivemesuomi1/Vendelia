@@ -1,42 +1,56 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type { AdminOrderDTO, AdminOrderStatus } from "@vendelia/shared";
 import { Icon } from "@/components/ui/Icon";
+import { Notice } from "@/components/ui/Notice";
 import { useI18n } from "@/i18n/I18nProvider";
+import { api, ApiError } from "@/lib/api-client";
 import { formatMoney, loc } from "@/lib/format";
 import { ago, int } from "../format";
-import type { AdminDemoData, DemoOrder } from "../mock-data";
 
-const STATUSES: DemoOrder["status"][] = ["paid", "pending", "failed", "refunded"];
+const STATUSES: AdminOrderStatus[] = ["paid", "pending", "failed", "refunded", "test"];
 
-/** Searchable order list with status filter and per-status counts. */
-export function OrdersTable({ data }: { data: AdminDemoData }) {
+/** Searchable list of orders from the database, with status filter and per-status counts. */
+export function OrdersTable() {
   const { t, locale } = useI18n();
+  const [orders, setOrders] = useState<AdminOrderDTO[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [q, setQ] = useState("");
-  const [status, setStatus] = useState<"" | DemoOrder["status"]>("");
-  const deal = (id: string) => data.deals.find((d) => d.id === id)!;
+  const [status, setStatus] = useState<"" | AdminOrderStatus>("");
 
+  useEffect(() => {
+    api<{ orders: AdminOrderDTO[] }>("/api/admin/orders")
+      .then((r) => setOrders(r.orders))
+      .catch((e) => setError(e instanceof ApiError ? e.code : "network"));
+  }, []);
+
+  const all = useMemo(() => orders ?? [], [orders]);
   const rows = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    return data.orders.filter(
-      (o) => (!status || o.status === status) && (!needle || o.number.toLowerCase().includes(needle) || o.email.toLowerCase().includes(needle) || loc(deal(o.dealId).title, locale).toLowerCase().includes(needle)),
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q, status, data, locale]);
+    return all.filter((o) => (!status || o.status === status) && (!needle
+      || o.number.toLowerCase().includes(needle)
+      || o.email.toLowerCase().includes(needle)
+      || o.items.some((i) => loc(i.title, locale).toLowerCase().includes(needle) || i.merchantName.toLowerCase().includes(needle))));
+  }, [all, q, status, locale]);
 
-  const paid = data.orders.filter((o) => o.status === "paid");
+  const paid = all.filter((o) => o.status === "paid");
+  const paidCents = paid.reduce((a, o) => a + o.totalCents, 0);
   const tiles = [
-    [t("admin.kpi.orders"), int(data.orders.length, locale)],
-    [t("admin.ostatus.paid"), formatMoney(paid.reduce((a, o) => a + o.totalCents, 0), locale)],
-    [t("admin.kpi.aov"), formatMoney(Math.round(paid.reduce((a, o) => a + o.totalCents, 0) / Math.max(paid.length, 1)), locale)],
-    [t("admin.ostatus.failed"), int(data.orders.filter((o) => o.status === "failed").length, locale)],
+    [t("admin.kpi.orders"), int(all.length, locale)],
+    [t("admin.ostatus.paid"), formatMoney(paidCents, locale)],
+    [t("admin.kpi.aov"), formatMoney(Math.round(paidCents / Math.max(paid.length, 1)), locale)],
+    [t("admin.ostatus.failed"), int(all.filter((o) => o.status === "failed").length, locale)],
   ];
+  const method = (m: string) =>
+    m === "mobilepay" ? "MobilePay" : m === "card" ? t("checkout.card") : m === "bank" ? t("checkout.bank") : m === "test" ? t("admin.ostatus.test") : m;
 
   return (
     <>
+      {error && <Notice tone="warn" icon="info">{t(`errors.${error}`)}</Notice>}
       <section className="adm-kpis four">
         {tiles.map(([l, v]) => (
-          <div className="kpi-tile" key={l}><p className="kt-label">{l}</p><p className="kt-value">{v}</p></div>
+          <div className="kpi-tile" key={l}><p className="kt-label">{l}</p><p className="kt-value">{orders ? v : "–"}</p></div>
         ))}
       </section>
       <section className="panel" style={{ marginTop: "var(--s3)" }}>
@@ -50,7 +64,7 @@ export function OrdersTable({ data }: { data: AdminDemoData }) {
             <button type="button" aria-pressed={status === ""} onClick={() => setStatus("")}>{t("admin.tab.all")}</button>
             {STATUSES.map((s) => (
               <button key={s} type="button" aria-pressed={status === s} onClick={() => setStatus(s)}>
-                {t(`admin.ostatus.${s}`)} <small>{data.orders.filter((o) => o.status === s).length}</small>
+                {t(`admin.ostatus.${s}`)} <small>{all.filter((o) => o.status === s).length}</small>
               </button>
             ))}
           </div>
@@ -68,22 +82,27 @@ export function OrdersTable({ data }: { data: AdminDemoData }) {
               </tr>
             </thead>
             <tbody>
-              {rows.map((o) => {
-                const d = deal(o.dealId);
-                return (
-                  <tr key={o.number}>
-                    <td><b className="mono">{o.number}</b><small className="muted block">{ago(o.minutesAgo, locale)}</small></td>
-                    <td>{o.qty} × {loc(d.title, locale)}<small className="muted block">{data.merchants.find((m) => m.id === d.merchantId)?.name}</small></td>
-                    <td>{o.email}</td>
-                    <td>{o.method === "mobilepay" ? "MobilePay" : t(o.method === "card" ? "checkout.card" : "checkout.bank")}</td>
-                    <td><span className={`st st-${o.status}`}>{t(`admin.ostatus.${o.status}`)}</span></td>
-                    <td className="num"><b>{formatMoney(o.totalCents, locale)}</b></td>
-                  </tr>
-                );
-              })}
+              {rows.map((o) => (
+                <tr key={o.id}>
+                  <td><b className="mono">{o.number}</b><small className="muted block">{ago((Date.now() - Date.parse(o.createdAt)) / 60000, locale)}</small></td>
+                  <td>
+                    {o.items.map((i, n) => (
+                      <div key={n}>
+                        {i.qty} × {loc(i.title, locale)}{i.optionLabel ? ` – ${loc(i.optionLabel, locale)}` : ""}
+                        <small className="muted block">{i.merchantName}</small>
+                      </div>
+                    ))}
+                  </td>
+                  <td>{o.email}</td>
+                  <td>{method(o.paymentMethod)}</td>
+                  <td><span className={`st st-${o.status}`}>{t(`admin.ostatus.${o.status}`)}</span></td>
+                  <td className="num"><b>{formatMoney(o.totalCents, locale)}</b></td>
+                </tr>
+              ))}
             </tbody>
           </table>
-          {rows.length === 0 && <p className="muted empty-row">{t("admin.noResults")}</p>}
+          {!orders && !error && <p className="muted empty-row">{t("admin.vo.loading")}</p>}
+          {orders && rows.length === 0 && <p className="muted empty-row">{t("admin.noResults")}</p>}
         </div>
       </section>
     </>

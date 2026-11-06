@@ -674,7 +674,8 @@
       "paid": "Paid",
       "pending": "Pending",
       "failed": "Failed",
-      "refunded": "Refunded"
+      "refunded": "Refunded",
+      "test": "Test / unpaid"
     },
     "pstatus": {
       "scheduled": "Scheduled",

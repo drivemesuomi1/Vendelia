@@ -674,7 +674,8 @@
       "paid": "Maksettu",
       "pending": "Odottaa",
       "failed": "Epäonnistui",
-      "refunded": "Hyvitetty"
+      "refunded": "Hyvitetty",
+      "test": "Testi / maksamaton"
     },
     "pstatus": {
       "scheduled": "Ajastettu",

@@ -674,7 +674,8 @@
       "paid": "Betald",
       "pending": "Väntar",
       "failed": "Misslyckad",
-      "refunded": "Återbetald"
+      "refunded": "Återbetald",
+      "test": "Test / obetalt"
     },
     "pstatus": {
       "scheduled": "Schemalagd",
