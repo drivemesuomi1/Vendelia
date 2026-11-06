@@ -84,7 +84,8 @@ updates an existing voucher row rather than creating another voucher.
 - Expired vouchers are displayed as expired at read time; this does not persist
   a status change or establish a scheduled expiry worker.
 - The recent-issued list includes test/unpaid orders; "bought" does not prove
-  payment collection. Refund display does not implement payment refunds.
+  payment collection. Support can now record unused-voucher state refunds; see the
+  [refund runbook](runbooks/refunds.md). Payment-provider refunds remain unimplemented.
 
 ## Verification
 

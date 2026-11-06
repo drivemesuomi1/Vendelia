@@ -309,6 +309,12 @@ export interface AdminMerchantRowDTO {
   createdAt: string;
 }
 
+export interface AdminRefundListDTO {
+  refunds: AdminVoucherDTO[];
+  hasMore: boolean;
+}
+
+/** Legacy demo contract; live refund screens use AdminRefundListDTO. */
 export interface AdminRefundRowDTO {
   code: string;
   title: LocalizedText;

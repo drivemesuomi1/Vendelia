@@ -72,6 +72,14 @@ There are no payout-table writes or new migrations. Test vouchers are included
 for review; current commission rates determine estimates. See
 [payout preview architecture and limits](merchant-payout-preview.md).
 
+## Admin support refunds
+
+Admin support refunds now atomically update existing `vouchers.status` and
+`refunded_at` columns; used/refunded vouchers are rejected. The refund history
+reads saved order/item/business relationships. No SQL migration is required.
+Order status, payments and accounting are unchanged. See
+[refund implementation and rollout](runbooks/refunds.md).
+
 ## Purchase relationships
 
 - Every new table has an auto-generated UUID `id` primary key.

@@ -75,6 +75,8 @@ Implemented:
 - `POST /api/cart/quote`: validates IDs/quantities and quotes current database prices.
 - `POST /api/orders`: guest test checkout, enabled only by payment bypass configuration.
 - `GET /api/orders/:id` and `GET /api/orders/:id/pdf`: require `x-order-token`.
+- `GET/POST /api/admin/refunds`: saved refund history / unused-voucher state refund (admin only; no payment transfer).
+  See [refund runbook](../docs/runbooks/refunds.md).
 - `GET /api/vouchers/:code`: public voucher validity lookup.
 - `GET /api/merchant/deals`: current merchant's saved deals only.
 - `GET /api/merchant/payouts`: read-only current-rate earnings preview; no payout records or transfers.

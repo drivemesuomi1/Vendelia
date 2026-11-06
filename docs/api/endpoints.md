@@ -76,6 +76,6 @@ planned unless otherwise documented.
 | GET | `/api/admin/merchants/:id` | Business details |
 | POST | `/api/admin/merchants/:id/status` | Activate / suspend / mark pending |
 | GET/PUT | `/api/admin/settings/commission` | `{ rateBps }` |
-| GET/POST | `/api/admin/refunds` | List / support refund `{ code }` |
+| GET/POST | `/api/admin/refunds` | Implemented: latest 100 saved refund details / `{ code }` atomically marks an unused voucher refunded; no payment-provider money movement |
 | GET | `/api/admin/audit` · `/api/admin/emails` | Audit log, email outbox |
 | POST | `/api/admin/jobs/:name/run` | `voucher-expiry`, `expiry-reminders`, `payout-run`, `dac7-report` |

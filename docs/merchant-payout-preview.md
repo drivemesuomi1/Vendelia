@@ -74,3 +74,8 @@ ledger/payout allocation model with unique voucher accounting, refund/reversal
 handling and persistent payout statuses. Extend this preview into actual payout
 batches only after the database owner approves a migration. The current page
 must not be treated as evidence that any transfer is queued or complete.
+
+Refund history is managed in the admin portal. The business payout screen does
+not display a refunded-voucher section or refund notifications. Unused-voucher
+refunds do not create payout deductions because they were never included in
+redeemed earnings.

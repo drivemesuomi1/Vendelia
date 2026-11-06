@@ -51,6 +51,13 @@ export async function orderRoutes(app: FastifyInstance, { service, auth, origins
   });
 
   // Admin voucher views; /api/admin/* is guarded by the app-wide admin hook.
+  app.get('/api/admin/refunds', async () => service.adminRefunds());
+  app.post('/api/admin/refunds', async (request, reply) => {
+    const parsed = redeemLookupSchema.safeParse(request.body);
+    if (!parsed.success) return reply.code(400).send({ error: 'invalidVoucherCode', message: 'Invalid voucher code' });
+    return { voucher: await service.refundForAdmin(parsed.data.code) };
+  });
+
   app.get<{ Querystring: { view?: string } }>("/api/admin/vouchers", async (request) => {
     const view = request.query.view === "used" ? "used" : "bought";
     return { vouchers: await service.adminVouchers(view) };

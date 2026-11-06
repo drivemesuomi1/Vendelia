@@ -136,6 +136,43 @@ it('merchant login, membership revocation, suspension and deal/voucher ownership
     await sql`UPDATE public.vouchers SET status='refunded', refunded_at=now(), expires_at=now()+interval '1 day' WHERE code='VND-ABCD-EFGH'`;
     assert.equal((await redeem(cookie)).json().error, 'redeem_refunded');
     assert.equal((await app.inject({ url: '/api/merchant/payouts', headers: { cookie } })).json().rows.length, 0);
+    // Admin support refunds: real saved state, no payment provider, no refund of used vouchers.
+    const refundCode = 'VND-RFND-ABCD';
+    const raceCode = 'VND-RACE-ABCD';
+    const twiceCode = 'VND-TWCE-ABCD';
+    const refund = (code: string, authCookie = cookieOf(admin), extra: Record<string, string> = {}) =>
+      app.inject({ method: 'POST', url: '/api/admin/refunds', headers: { cookie: authCookie, ...extra }, payload: { code } });
+    for (const newCode of [refundCode, raceCode, twiceCode, 'VND-USED-ABCD']) {
+      await sql`INSERT INTO public.vouchers(code,qr_payload,order_id,order_item_id,deal_id,option_id,merchant_id,is_test,price_cents,issued_at,expires_at)
+        VALUES (${newCode},'https://example.com',${order},${item},${deal},${option},${original},true,8900,now()-interval '30 days',now()+interval '1 day')`;
+    }
+    await sql`UPDATE public.vouchers SET status='expired', expires_at=now()-interval '1 day' WHERE code=${refundCode}`;
+    await sql`UPDATE public.vouchers SET status='redeemed', redeemed_at=now() WHERE code='VND-USED-ABCD'`;
+    assert.equal((await refund('VND-USED-ABCD')).json().error, 'refundAlreadyRedeemed');
+    assert.equal((await app.inject({ method: 'POST', url: '/api/admin/refunds', payload: { code: refundCode } })).statusCode, 401);
+    assert.equal((await refund(refundCode, cookie)).statusCode, 403);
+    assert.equal((await app.inject({ url: '/api/admin/refunds', headers: { cookie } })).statusCode, 403);
+    assert.equal((await refund(refundCode, cookieOf(admin), { origin: 'https://evil.example' })).statusCode, 403);
+    assert.equal((await refund('invalid')).statusCode, 400);
+    assert.equal((await refund('VND-ZZZZ-ZZZZ')).statusCode, 404);
+    const refunded = await refund(refundCode.toLowerCase());
+    assert.equal(refunded.statusCode, 200); assert.equal(refunded.json().voucher.status, 'refunded');
+    assert.ok(refunded.json().voucher.refundedAt);
+    assert.equal((await sql`SELECT status FROM public.vouchers WHERE code=${refundCode}`)[0]!.status, 'refunded');
+    assert.equal((await sql`SELECT status FROM public.orders WHERE id=${order}`)[0]!.status, 'test_unpaid');
+    assert.equal((await app.inject({ url: `/api/vouchers/${refundCode}` })).json().result, 'refunded');
+    const originalRefundDate = refunded.json().voucher.refundedAt;
+    assert.equal((await refund(refundCode)).json().error, 'refundAlreadyRefunded');
+    const listed = (await app.inject({ url: '/api/admin/refunds', headers: { cookie: cookieOf(admin) } })).json();
+    const listedRefund = listed.refunds.find((r: { code: string }) => r.code === refundCode);
+    assert.equal(listedRefund.refundedAt, originalRefundDate); assert.equal(listedRefund.order.email, 'buyer@example.com');
+    assert.equal(listed.hasMore, false);
+    // Refund and redemption lock the same row: exactly one wins, regardless of timing.
+    const race = await Promise.all([refund(raceCode), app.inject({ method: 'POST', url: '/api/merchant/vouchers/redeem', headers: { cookie }, payload: { code: raceCode } })]);
+    assert.deepEqual(race.map(r => r.statusCode).sort(), [200, 409]);
+    if (race[1]!.statusCode === 200) assert.equal((await refund(raceCode)).json().error, 'refundAlreadyRedeemed');
+    const duplicate = await Promise.all([refund(twiceCode), refund(twiceCode)]);
+    assert.deepEqual(duplicate.map(r => r.statusCode).sort(), [200, 409]);
     await app.inject({ method: 'POST', url: '/api/auth/logout', headers: { cookie }, payload: {} });
     assert.equal((await read()).statusCode, 401);
     await sql`DELETE FROM public.merchant_members WHERE user_id=${ids.b}`;

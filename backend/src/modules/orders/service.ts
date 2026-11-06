@@ -253,6 +253,28 @@ export class OrderService {
     };
   }
 
+  /** Support can refund an unused voucher even after cancellation/expiry; no provider money movement. */
+  async refundForAdmin(rawCode: string): Promise<AdminVoucherDTO> {
+    const parsed = voucherCodeSchema.safeParse(rawCode);
+    if (!parsed.success) throw new HttpProblem(400, 'invalidVoucherCode');
+    const [updated] = await this.sql<{ code: string }[]>`
+      UPDATE public.vouchers SET status = 'refunded', refunded_at = now()
+      WHERE code = ${parsed.data} AND status IN ('active', 'expired')
+        AND redeemed_at IS NULL AND refunded_at IS NULL
+      RETURNING code`;
+    const voucher = await this.adminVoucher(parsed.data);
+    if (!voucher) throw new HttpProblem(404, 'voucher_not_found');
+    if (!updated) throw new HttpProblem(409, voucher.status === 'redeemed' || voucher.redeemedAt
+      ? 'refundAlreadyRedeemed' : voucher.status === 'refunded' || voucher.refundedAt ? 'refundAlreadyRefunded' : 'refundNotEligible');
+    return voucher;
+  }
+
+  async adminRefunds() {
+    const rows = await this.adminVouchersWhere(this.sql`v.status = 'refunded' AND v.refunded_at IS NOT NULL`,
+      this.sql`v.refunded_at DESC, v.id DESC`, 101);
+    return { refunds: rows.slice(0, 100), hasMore: rows.length > 100 };
+  }
+
   /** Full detail of one voucher for admins (support questions, disputes). */
   async adminVoucher(rawCode: string): Promise<AdminVoucherDTO | null> {
     const parsed = voucherCodeSchema.safeParse(rawCode);

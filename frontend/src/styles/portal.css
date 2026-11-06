@@ -573,3 +573,13 @@
 .voucher-camera video{display:block;width:100%;height:100%;object-fit:cover}
 .voucher-camera-guide{position:absolute;inset:16% 24%;border:2px solid #fff;border-radius:14px;box-shadow:0 0 0 160px #17223b55;pointer-events:none}
 .voucher-camera p{position:absolute;bottom:10px;left:12px;right:12px;color:#fff;text-align:center;font-size:12px;background:#17223be6;padding:9px;border-radius:8px;margin:0}
+
+/* Database-backed support refunds: review first, then confirm a voucher state change. */
+.refund-page{display:flex;flex-direction:column;gap:22px}.refund-workspace{display:grid;grid-template-columns:minmax(280px,.85fr) minmax(0,1.3fr);gap:20px}
+.refund-entry,.refund-review{padding:26px}.refund-entry h2{margin:18px 0 8px}.refund-entry form{margin:24px 0 18px}.refund-entry .btn{align-self:flex-start}
+.refund-review>.row{gap:12px;flex-wrap:wrap}.refund-review h2{margin:0}.refund-review-empty{display:flex;align-items:center;justify-content:center;flex-direction:column;min-height:300px;text-align:center;gap:12px}.refund-review-empty .icon{width:36px;height:36px;color:var(--navy-50)}.refund-review-empty h3,.refund-review-empty p{margin:0;max-width:310px}
+.refund-confirm{margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}.refund-facts .facts{margin:16px 0}.refund-facts .facts>div{grid-template-columns:150px 1fr}.refund-facts dd{overflow-wrap:anywhere}
+.refund-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.refund-summary>.panel{padding:20px 24px;display:flex;flex-direction:column;gap:12px}.refund-summary strong{font-size:27px;letter-spacing:-.025em;font-variant-numeric:tabular-nums}.refund-summary strong.small{font-size:15px;margin-top:6px}
+.refund-history-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}.refund-limit{padding:0 24px}.refund-table td{vertical-align:middle}.refund-table .num{white-space:nowrap}.refund-table .chip{font-size:10px;padding:2px 7px}
+@media(max-width:850px){.refund-workspace{grid-template-columns:1fr}.refund-review-empty{min-height:180px}}
+@media(max-width:600px){.refund-summary{grid-template-columns:1fr}.refund-entry,.refund-review{padding:20px}.refund-table{min-width:1000px}.refund-facts .facts>div{grid-template-columns:1fr;gap:3px}}
