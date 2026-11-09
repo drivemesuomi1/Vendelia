@@ -32,7 +32,7 @@ it('merchant login, membership revocation, suspension and deal/voucher ownership
     CREATE TABLE auth.users(id uuid PRIMARY KEY, email text, email_confirmed_at timestamptz, deleted_at timestamptz, banned_until timestamptz);`);
   await sql.unsafe(await fixture('./fixtures/catalogue-schema.sql'));
   await sql.unsafe(await fixture('../sql/seed-catalogue.sql'));
-  for (const name of ['001_orders_vouchers.sql', '002_profiles.sql', '003_auth_sessions.sql', '005_merchant_members.sql', '005_merchant_members.sql']) {
+  for (const name of ['001_orders_vouchers.sql', '002_profiles.sql', '003_auth_sessions.sql', '005_merchant_members.sql', '005_merchant_members.sql', '008_order_customers.sql']) {
     await sql.begin(async tx => { await tx.unsafe('SET LOCAL client_min_messages=warning;\n' + await fixture(`../sql/migrations/${name}`)); });
   }
   const original = (await sql`SELECT id FROM public.merchants`)[0]!.id as string;

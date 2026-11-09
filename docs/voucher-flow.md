@@ -2,6 +2,13 @@
 
 Customer details → checkout → order and vouchers saved → PDF voucher emailed.
 
+Apply migration `008_order_customers.sql` before deploying account ownership.
+Signed-in checkout saves the verified session's profile UUID in `orders.customer_id`
+for any role; guest checkout saves NULL. Account voucher lists and individual PDFs
+use that UUID, with confirmed-email fallback only on unlinked guest/legacy orders.
+Contact email remains the delivery address. Existing order-token access still
+works. See [database changes](database-changes.md#order-account-ownership-008).
+
 ## What happens on checkout
 
 1. `POST /api/orders` validates the form with the shared `checkoutSchema` and prices the

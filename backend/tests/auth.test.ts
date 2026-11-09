@@ -60,7 +60,7 @@ it('auth API: role checks, hashed sessions, logout, expiry, suspension, deleted 
     CREATE TABLE auth.users(id uuid PRIMARY KEY, email text, email_confirmed_at timestamptz, deleted_at timestamptz, banned_until timestamptz);`);
   await sql.unsafe(await readFile(new URL('./fixtures/catalogue-schema.sql', import.meta.url), 'utf8'));
   await sql.unsafe(await readFile(new URL('../sql/seed-catalogue.sql', import.meta.url), 'utf8'));
-  for (const file of ['001_orders_vouchers.sql', '002_profiles.sql', '003_auth_sessions.sql']) {
+  for (const file of ['001_orders_vouchers.sql', '002_profiles.sql', '003_auth_sessions.sql', '005_merchant_members.sql', '008_order_customers.sql', '008_order_customers.sql']) {
     await sql.begin(async tx => { await tx.unsafe(await readFile(new URL(`../sql/migrations/${file}`, import.meta.url), 'utf8')); });
   }
   await sql`INSERT INTO auth.users(id,email,email_confirmed_at) VALUES (${id}, ${user.email}, now())`;
@@ -77,8 +77,10 @@ it('auth API: role checks, hashed sessions, logout, expiry, suspension, deleted 
       items: [{ dealId: 'c1ea7a00-0000-4000-8000-000000000001', optionId: 'c1ea7a00-0000-4000-8000-000000000101', qty: 1 }],
       contact: { email: user.email, firstName: 'Test', lastName: 'Buyer' }, gift: { enabled: false },
       payment: { method: 'test' }, acceptTerms: true,
+      customer_id: id,
     } });
     assert.equal(purchase.statusCode, 201);
+    assert.equal((await sql`SELECT customer_id FROM public.orders WHERE id = ${purchase.json().orderId}`)[0]!.customer_id, null);
     const initial = await login(); assert.equal(initial.statusCode, 200);
     const cookie = String(initial.headers['set-cookie']).split(';')[0]!;
     assert.match(String(initial.headers['set-cookie']), /HttpOnly; SameSite=Strict; Max-Age=28800; Secure/);
@@ -88,8 +90,42 @@ it('auth API: role checks, hashed sessions, logout, expiry, suspension, deleted 
     assert.equal((await app.inject({ url: '/api/auth/me', headers: { cookie } })).json().user.role, 'admin');
     const own = await app.inject({ url: '/api/me/vouchers', headers: { cookie } });
     assert.equal(own.statusCode, 200); assert.equal(own.json().vouchers.length, 1);
+    const merchantId = (await sql`SELECT id FROM public.merchants LIMIT 1`)[0]!.id;
+    await sql`INSERT INTO public.merchant_members(user_id,merchant_id) VALUES (${id},${merchantId})`;
+    const linkedCodes: string[] = [];
+    for (const role of ['customer', 'admin', 'merchant']) {
+      await sql`UPDATE public.profiles SET role = ${role} WHERE user_id = ${id}`;
+      const bought = await app.inject({ method: 'POST', url: '/api/orders', headers: { cookie }, payload: {
+        items: [{ dealId: 'c1ea7a00-0000-4000-8000-000000000001', optionId: 'c1ea7a00-0000-4000-8000-000000000101', qty: 1 }],
+        contact: { email: role === 'customer' ? 'delivery@example.com' : user.email, firstName: 'Test', lastName: 'Buyer' }, gift: { enabled: false },
+        payment: { method: 'test' }, acceptTerms: true,
+        customer_id: '00000000-0000-4000-8000-000000000099',
+      } });
+      assert.equal(bought.statusCode, 201, bought.body);
+      const [saved] = await sql`SELECT customer_id, status FROM public.orders WHERE id = ${bought.json().orderId}`;
+      assert.equal(saved!.customer_id, id); // The browser cannot choose the owner.
+      assert.equal(saved!.status, 'test_unpaid');
+      linkedCodes.push((await sql`SELECT code FROM public.vouchers WHERE order_id = ${bought.json().orderId}`)[0]!.code);
+      assert.equal((await app.inject({ url: `/api/orders/${bought.json().orderId}`, headers: { 'x-order-token': bought.json().accessToken } })).statusCode, 200);
+    }
+    await sql`UPDATE public.profiles SET role = 'admin' WHERE user_id = ${id}`;
+    assert.equal((await app.inject({ url: '/api/me/vouchers', headers: { cookie } })).json().vouchers.length, 4);
     await sql`UPDATE auth.users SET email = 'different@example.com' WHERE id = ${id}`;
-    assert.equal((await app.inject({ url: '/api/me/vouchers', headers: { cookie } })).json().vouchers.length, 0);
+    assert.equal((await app.inject({ url: '/api/me/vouchers', headers: { cookie } })).json().vouchers.length, 3);
+    assert.equal((await app.inject({ url: `/api/me/vouchers/${linkedCodes[0]}/pdf`, headers: { cookie } })).statusCode, 200);
+    const strangerId = '00000000-0000-4000-8000-000000000002';
+    const strangerToken = 'b'.repeat(64);
+    await sql`INSERT INTO auth.users(id,email,email_confirmed_at) VALUES (${strangerId}, ${user.email}, now())`;
+    await sql`INSERT INTO public.profiles(user_id,display_name,role) VALUES (${strangerId}, 'Other customer', 'customer')`;
+    await sql`INSERT INTO public.auth_sessions(token_hash,user_id,expires_at) VALUES (${hashSession(strangerToken)}, ${strangerId}, now() + interval '1 hour')`;
+    const strangerHeaders = { cookie: `vd_session=${strangerToken}` };
+    const visible = (await app.inject({ url: '/api/me/vouchers', headers: strangerHeaders })).json().vouchers;
+    assert.equal(visible.length, 1); // Only the unlinked guest order matches this email.
+    assert.ok(visible.every((voucher: { code: string }) => !linkedCodes.includes(voucher.code)));
+    assert.equal((await app.inject({ url: `/api/me/vouchers/${linkedCodes[0]}/pdf`, headers: strangerHeaders })).statusCode, 404);
+    assert.equal((await app.inject({ url: `/api/me/vouchers/${visible[0].code}/pdf`, headers: strangerHeaders })).statusCode, 200);
+    assert.equal((await app.inject({ method: 'POST', url: '/api/orders', headers: { cookie, origin: 'https://evil.example' }, payload: {} })).statusCode, 403);
+    await sql`DELETE FROM auth.users WHERE id = ${strangerId}`;
     await sql`UPDATE auth.users SET email = ${user.email} WHERE id = ${id}`;
     await sql`UPDATE public.profiles SET role = 'customer'`;
     assert.equal((await app.inject({ url: '/api/auth/me', headers: { cookie } })).json().user.role, 'customer');
@@ -113,6 +149,7 @@ it('auth API: role checks, hashed sessions, logout, expiry, suspension, deleted 
     assert.equal((await app.inject({ url: '/api/admin/unknown', headers: { cookie: next } })).statusCode, 401);
     const third = await login(); const last = String(third.headers['set-cookie']).split(';')[0]!;
     await sql`DELETE FROM auth.users WHERE id = ${id}`;
+    assert.equal((await sql`SELECT count(*)::int AS count FROM public.orders WHERE customer_id IS NULL`)[0]!.count, 4);
     assert.equal((await app.inject({ url: '/api/auth/me', headers: { cookie: last } })).json().user, null);
     assert.equal((await sql`SELECT * FROM public.auth_sessions`).length, 0);
     for (let i = 0; i < 5; i++) await login('limited@example.com');

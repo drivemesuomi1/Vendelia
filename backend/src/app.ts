@@ -73,7 +73,7 @@ export function buildApp(database: Sql, options: {
   app.get("/api/me/vouchers", async request => {
     const user = await authService.current(sessionToken(request.headers.cookie));
     if (!user) throw new HttpProblem(401, "invalidLogin");
-    return { vouchers: await orders.forCustomer(user.email) };
+    return { vouchers: await orders.forCustomer(user) };
   });
   app.register(merchantPortalRoutes, { repository: new MerchantRepository(database), auth: authService });
   const merchantRepository = new MerchantRepository(database);

@@ -8,6 +8,7 @@ import { HttpProblem } from "../../errors";
 /** Checkout, order/voucher retrieval and voucher verification. Business rules live in the service. */
 export async function orderRoutes(app: FastifyInstance, { service, auth, origins }: { service: OrderService; auth: AuthService; origins: string[] }) {
   app.post("/api/orders", async (request, reply) => {
+    if (request.headers.origin && !origins.includes(request.headers.origin)) throw new HttpProblem(403, 'forbidden');
     const parsed = checkoutSchema.safeParse(request.body);
     if (!parsed.success) {
       const fields: Record<string, string> = {};
@@ -15,7 +16,8 @@ export async function orderRoutes(app: FastifyInstance, { service, auth, origins
       return reply.code(400).send({ error: "invalid_request", message: "Invalid checkout details", fields });
     }
     const locale = localeSchema.catch("fi").parse(request.headers["x-locale"]);
-    return reply.code(201).send(await service.create(parsed.data, locale));
+    const user = await auth.current(sessionToken(request.headers.cookie));
+    return reply.code(201).send(await service.create(parsed.data, locale, user?.id ?? null));
   });
 
   app.get<{ Params: { id: string } }>("/api/orders/:id", async (request, reply) => {
@@ -35,7 +37,7 @@ export async function orderRoutes(app: FastifyInstance, { service, auth, origins
   app.get<{ Params: { code: string } }>("/api/me/vouchers/:code/pdf", async (request, reply) => {
     const user = await auth.current(sessionToken(request.headers.cookie));
     if (!user) throw new HttpProblem(401, "invalidLogin");
-    const pdf = await service.customerVoucherPdf(user.email, request.params.code);
+    const pdf = await service.customerVoucherPdf(user, request.params.code);
     if (!pdf) throw new HttpProblem(404, "voucher_not_found");
     return sendPdf(reply, pdf);
   });

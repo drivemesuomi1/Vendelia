@@ -50,6 +50,15 @@ A `merchant` role does not establish ownership of any business. Business users a
 and the backend checks that link on every session lookup.
 Business/company details stay in `merchants`, rather than being duplicated here.
 
+Migration `008_order_customers.sql` links signed-in purchases through
+`orders.customer_id → profiles.user_id`. Customers, admins and merchants can all
+buy using the same account. Customer voucher listing/PDF access uses that UUID,
+with confirmed-email matching only for unlinked guest/legacy orders. New checkout
+ownership comes from the verified session; contact email does not change it.
+There is no separate customer table and no new environment variable. See
+[order ownership](database-changes.md#order-account-ownership-008) for deployment
+and account-deletion behavior.
+
 Email/passwords remain in Supabase Auth. Deleting an Auth user cascades to that
 user's profile. RLS is enabled, grants are revoked from `PUBLIC`, `anon` and
 `authenticated`, and no browser policies are created. Trusted server access must

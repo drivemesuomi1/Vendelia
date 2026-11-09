@@ -26,6 +26,29 @@ The owner's schema exports reviewed on 2026-10-31 contained these seven tables:
 | `backend/sql/migrations/005_merchant_members.sql` | Links business users to merchants, with member role, active flag, RLS and access restrictions | None |
 | `backend/sql/migrations/006_merchant_account_provisioning.sql` | Private recovery journal for optional admin business-account creation; no passwords | None |
 | `backend/sql/migrations/007_deal_review.sql` | Legacy `deal_images` bytes table with merchant FK and restricted access | Review note, submission/review timestamps, reviewer FK and queue index on `deals` |
+| `backend/sql/migrations/008_order_customers.sql` | No new table | Nullable `orders.customer_id` FK to `profiles.user_id`, with index; deletion sets the link to NULL |
+
+## Order account ownership (008)
+
+The database owner reports applying the equivalent SQL manually. Migration 008
+records that change for other environments and can be rerun against that same
+definition. Apply it before deploying the corresponding backend. Existing schema
+exports predate 008; restore them and apply this migration separately.
+
+Checkout obtains `customer_id` from the verified website session, never from the
+request body. All three profile roles can buy, including test/unpaid checkout.
+Guests (including invalid/expired sessions) continue with NULL ownership and
+the existing order access token. Contact email is retained for delivery and may
+differ from the signed-in account email.
+
+Customer voucher listing and PDF downloads authorize by account UUID. For legacy
+or guest orders only (`customer_id IS NULL`), the confirmed account email may
+still match the order email. Email matching never grants access to another
+account's linked order. Linked purchases survive an account email change;
+unlinked guest purchases still depend on the current confirmed email. No automatic
+backfill/claim or new customer-only role restriction is introduced. Deleting the
+profile preserves orders with NULL ownership, so the guest-email rule applies
+again. Guest token access and existing voucher/merchant relationships are unchanged.
 
 ## Deal image Storage transition
 

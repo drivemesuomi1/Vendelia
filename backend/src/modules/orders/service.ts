@@ -3,7 +3,7 @@ import type { Sql } from "postgres";
 import {
   TEST_PAYMENT_METHOD, demoAccount, uuidSchema, voucherCodeSchema, voucherQrPayload,
   type AdminFinanceDayDTO, type AdminFinanceDTO, type AdminFinanceMerchantDTO, type AdminOrderDTO, type AdminVoucherDTO, type CheckoutInput, type CreateOrderResponse, type Locale, type LocalizedList, type LocalizedText,
-  type OrderDTO, type PaymentMethod, type RedeemLookupDTO, type VoucherDTO, type VoucherStatus, type MerchantPayoutPreviewDTO,
+  type OrderDTO, type PaymentMethod, type RedeemLookupDTO, type VoucherDTO, type VoucherStatus, type MerchantPayoutPreviewDTO, type SessionUserDTO,
 } from "@vendelia/shared";
 import type { OrderConfig, PlatformConfig } from "../../config";
 import { HttpProblem } from "../../errors";
@@ -78,7 +78,7 @@ export class OrderService {
    * Checkout. Real payments are not integrated yet, so only the temporary test checkout
    * (PAYMENT_BYPASS) can create orders: they are stored and emailed as test/unpaid.
    */
-  async create(input: CheckoutInput, locale: Locale): Promise<CreateOrderResponse> {
+  async create(input: CheckoutInput, locale: Locale, customerId: string | null = null): Promise<CreateOrderResponse> {
     if (!this.config.paymentBypass || input.payment.method !== TEST_PAYMENT_METHOD) {
       throw new HttpProblem(503, "paymentUnavailable");
     }
@@ -105,11 +105,11 @@ export class OrderService {
     const order = await this.withUniqueRetry(() => this.sql.begin(async (tx) => {
       const [created] = await tx<{ id: string; number: string }[]>`
         INSERT INTO public.orders (number, status, is_test, locale, email, first_name, last_name, phone,
-          gift_recipient_name, gift_message, newsletter, payment_method, total_cents, vat_by_rate, access_token_hash, created_at)
+          gift_recipient_name, gift_message, newsletter, payment_method, total_cents, vat_by_rate, access_token_hash, created_at, customer_id)
         VALUES (${newOrderNumber()}, 'test_unpaid', true, ${locale}, ${email}, ${input.contact.firstName},
           ${input.contact.lastName}, ${input.contact.phone || null}, ${recipient},
           ${input.gift.enabled ? input.gift.message || null : null}, ${input.newsletter},
-          ${TEST_PAYMENT_METHOD}, ${priced.totalCents}, ${JSON.stringify(priced.vatByRate)}, ${hashToken(accessToken)}, ${issuedAt})
+          ${TEST_PAYMENT_METHOD}, ${priced.totalCents}, ${JSON.stringify(priced.vatByRate)}, ${hashToken(accessToken)}, ${issuedAt}, ${customerId})
         RETURNING id, number`;
       for (const [index, line] of priced.lines.entries()) {
         const [item] = await tx<{ id: string }[]>`
@@ -190,10 +190,11 @@ export class OrderService {
     };
   }
 
-  /** Confirmed Auth email owns guest purchases made to that exact email. */
-  async forCustomer(email: string): Promise<VoucherDTO[]> {
+  /** Account ID owns linked purchases. Confirmed email can also access unlinked guest/legacy orders. */
+  async forCustomer(user: Pick<SessionUserDTO, 'id' | 'email'>): Promise<VoucherDTO[]> {
     const orders = await this.sql<{ id: string }[]>`
-      SELECT id FROM public.orders WHERE lower(email) = ${email.toLowerCase()} ORDER BY created_at DESC`;
+      SELECT id FROM public.orders WHERE customer_id = ${user.id}
+        OR (customer_id IS NULL AND lower(email) = ${user.email.toLowerCase()}) ORDER BY created_at DESC`;
     const vouchers: VoucherDTO[] = [];
     for (const order of orders) {
       const loaded = await this.load(order.id);
@@ -202,13 +203,14 @@ export class OrderService {
     return vouchers;
   }
 
-  /** One voucher's PDF for the signed-in customer who bought it (matched by the order's email), or null. */
-  async customerVoucherPdf(email: string, rawCode: string) {
+  /** Same account ownership rule as the portal; another account's linked order never falls back to email. */
+  async customerVoucherPdf(user: Pick<SessionUserDTO, 'id' | 'email'>, rawCode: string) {
     const parsed = voucherCodeSchema.safeParse(rawCode);
     if (!parsed.success) return null;
     const [row] = await this.sql<{ order_id: string }[]>`
       SELECT v.order_id FROM public.vouchers v JOIN public.orders o ON o.id = v.order_id
-      WHERE v.code = ${parsed.data} AND lower(o.email) = ${email.toLowerCase()}`;
+      WHERE v.code = ${parsed.data} AND (o.customer_id = ${user.id}
+        OR (o.customer_id IS NULL AND lower(o.email) = ${user.email.toLowerCase()}))`;
     const loaded = row ? await this.load(row.order_id) : null;
     if (!loaded) return null;
     const documents = loaded.documents.filter((d) => d.code === parsed.data);
