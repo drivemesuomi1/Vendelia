@@ -40,6 +40,7 @@ const PATHS = {
   "gift": "<rect x=\"3\" y=\"8\" width=\"18\" height=\"5\" rx=\"1\"/><path d=\"M5 13v8h14v-8M12 8v13M12 8c-1.5-3-5-4-5-1.5S10 8 12 8zm0 0c1.5-3 5-4 5-1.5S14 8 12 8z\"/>",
   "eye": "<path d=\"M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/>",
   "send": "<path d=\"M21 3 10 14\"/><path d=\"M21 3 14.5 21l-4.5-7-7-4.5z\"/>",
+  "download": "<path d=\"M12 4v11\"/><path d=\"m7 10 5 5 5-5\"/><path d=\"M5 20h14\"/>",
 } as const;
 
 export type IconName = keyof typeof PATHS;

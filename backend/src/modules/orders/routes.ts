@@ -1,5 +1,5 @@
-import type { FastifyInstance } from "fastify";
-import { checkoutSchema, localeSchema, redeemLookupSchema } from "@vendelia/shared";
+import type { FastifyInstance, FastifyReply } from "fastify";
+import { checkoutSchema, demoAccountEnabled, localeSchema, redeemLookupSchema } from "@vendelia/shared";
 import type { OrderService } from "./service";
 import type { AuthService } from "../auth/service";
 import { sessionToken } from "../auth/config";
@@ -30,6 +30,24 @@ export async function orderRoutes(app: FastifyInstance, { service, auth, origins
       .header("content-disposition", `attachment; filename="${pdf.filename}"`)
       .send(Buffer.from(pdf.bytes));
   });
+
+  // One voucher's PDF for the signed-in customer who bought it.
+  app.get<{ Params: { code: string } }>("/api/me/vouchers/:code/pdf", async (request, reply) => {
+    const user = await auth.current(sessionToken(request.headers.cookie));
+    if (!user) throw new HttpProblem(401, "invalidLogin");
+    const pdf = await service.customerVoucherPdf(user.email, request.params.code);
+    if (!pdf) throw new HttpProblem(404, "voucher_not_found");
+    return sendPdf(reply, pdf);
+  });
+
+  // Sample vouchers for the demo account page; only when the demo account is switched on.
+  if (demoAccountEnabled(process.env)) {
+    app.get<{ Params: { code: string }; Querystring: { locale?: string } }>("/api/demo/vouchers/:code/pdf", async (request, reply) => {
+      const pdf = await service.demoVoucherPdf(request.params.code, localeSchema.catch("fi").parse(request.query.locale));
+      if (!pdf) throw new HttpProblem(404, "voucher_not_found");
+      return sendPdf(reply, pdf);
+    });
+  }
 
   // Public check behind the voucher's QR code: validity only, no customer details.
   app.get<{ Params: { code: string } }>("/api/vouchers/:code", async (request) => service.lookup(request.params.code));
@@ -85,3 +103,9 @@ export async function orderRoutes(app: FastifyInstance, { service, auth, origins
 }
 
 const header = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value);
+
+function sendPdf(reply: FastifyReply, pdf: { bytes: Uint8Array; filename: string }) {
+  return reply.type("application/pdf")
+    .header("content-disposition", `attachment; filename="${pdf.filename}"`)
+    .send(Buffer.from(pdf.bytes));
+}

@@ -1,7 +1,7 @@
 import { createHash, randomBytes, randomInt } from "node:crypto";
 import type { Sql } from "postgres";
 import {
-  TEST_PAYMENT_METHOD, uuidSchema, voucherCodeSchema, voucherQrPayload,
+  TEST_PAYMENT_METHOD, demoAccount, uuidSchema, voucherCodeSchema, voucherQrPayload,
   type AdminFinanceDayDTO, type AdminFinanceDTO, type AdminFinanceMerchantDTO, type AdminOrderDTO, type AdminVoucherDTO, type CheckoutInput, type CreateOrderResponse, type Locale, type LocalizedList, type LocalizedText,
   type OrderDTO, type PaymentMethod, type RedeemLookupDTO, type VoucherDTO, type VoucherStatus, type MerchantPayoutPreviewDTO,
 } from "@vendelia/shared";
@@ -200,6 +200,37 @@ export class OrderService {
       if (loaded) vouchers.push(...this.toDto(loaded).vouchers);
     }
     return vouchers;
+  }
+
+  /** One voucher's PDF for the signed-in customer who bought it (matched by the order's email), or null. */
+  async customerVoucherPdf(email: string, rawCode: string) {
+    const parsed = voucherCodeSchema.safeParse(rawCode);
+    if (!parsed.success) return null;
+    const [row] = await this.sql<{ order_id: string }[]>`
+      SELECT v.order_id FROM public.vouchers v JOIN public.orders o ON o.id = v.order_id
+      WHERE v.code = ${parsed.data} AND lower(o.email) = ${email.toLowerCase()}`;
+    const loaded = row ? await this.load(row.order_id) : null;
+    if (!loaded) return null;
+    const documents = loaded.documents.filter((d) => d.code === parsed.data);
+    const bytes = await renderVoucherPdf(documents, this.pdfOptions(loaded.order.locale));
+    return { bytes, filename: `${voucherText(loaded.order.locale).fileName}-${parsed.data}.pdf` };
+  }
+
+  /** A sample voucher's PDF for the demo account, drawn by the same renderer as real vouchers. */
+  async demoVoucherPdf(rawCode: string, locale: Locale) {
+    const { vouchers, user } = demoAccount(this.config.siteUrl);
+    const v = vouchers.find((x) => x.code === rawCode.trim().toUpperCase());
+    if (!v) return null;
+    const city = pick(v.cityName, locale);
+    const doc: VoucherDocument = {
+      code: v.code, qrPayload: v.qrPayload, title: v.title, optionLabel: v.optionLabel, merchant: v.merchant,
+      address: `${v.street}, ${v.zip} ${city}`, serviceArea: null, cities: [city],
+      howTo: v.howToSteps, terms: v.terms, dealUrl: `${this.config.siteUrl}/${locale}/deals/${v.dealSlug}`,
+      priceCents: v.priceCents, vatBps: v.vatBps, issuedAt: v.issuedAt, expiresAt: v.expiresAt,
+      orderNumber: v.orderNumber, buyerName: user.name, recipientName: v.recipientName, giftMessage: null,
+    };
+    const bytes = await renderVoucherPdf([doc], this.pdfOptions(locale));
+    return { bytes, filename: `${voucherText(locale).fileName}-${v.code}.pdf` };
   }
 
   /** The same PDF that was emailed, for downloading from the confirmation page. */
@@ -511,11 +542,15 @@ export class OrderService {
   }
 
   private async pdfFor(loaded: NonNullable<Awaited<ReturnType<OrderService["load"]>>>) {
-    const bytes = await renderVoucherPdf(loaded.documents, {
-      locale: loaded.order.locale, validityMonths: this.policy.voucherValidityMonths,
-      refundWindowDays: this.policy.refundWindowDays, supportEmail: this.config.mail.replyTo, siteUrl: this.config.siteUrl,
-    });
+    const bytes = await renderVoucherPdf(loaded.documents, this.pdfOptions(loaded.order.locale));
     return { bytes, filename: `${voucherText(loaded.order.locale).fileName}-${loaded.order.number}.pdf` };
+  }
+
+  private pdfOptions(locale: Locale) {
+    return {
+      locale, validityMonths: this.policy.voucherValidityMonths, refundWindowDays: this.policy.refundWindowDays,
+      supportEmail: this.config.mail.replyTo, siteUrl: this.config.siteUrl,
+    };
   }
 
   /** Order numbers and voucher codes are random; on the rare clash the whole order is retried. */

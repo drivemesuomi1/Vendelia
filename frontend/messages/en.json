@@ -260,7 +260,12 @@
     "prhFound": "Name filled from the trade register – please check it.",
     "prhNone": "Company not found in the register. Enter the name yourself.",
     "businessReview": "Your account is activated once we've checked your company details, usually within one working day.",
-    "businessSubmit": "Create business account"
+    "businessSubmit": "Create business account",
+    "loginSub": "See your vouchers and orders.",
+    "loginClaim": "Your local deals, all in one place.",
+    "perkVouchers": "Every voucher you buy, ready to show",
+    "perkRefund": "Cancel unused vouchers within {days} days",
+    "perkGift": "Send vouchers as gifts"
   },
   "business": {
     "qrScanner": {
@@ -1084,5 +1089,49 @@
   "previewBanner": {
     "label": "Preview",
     "message": "Vendelia is under development and is not open for purchases yet. You may browse the site in current preview mode."
+  },
+  "account": {
+    "hello": "Hi, {name}",
+    "sections": "Account sections",
+    "tabVouchers": "Vouchers",
+    "tabOrders": "Order history",
+    "statActive": "Active vouchers",
+    "statOrders": "Orders",
+    "statSpent": "Spent",
+    "filter": "Show vouchers",
+    "filterActive": "Active",
+    "filterAll": "All",
+    "noActive": "No active vouchers",
+    "emptyText": "Vouchers you buy appear here, ready to show at the business.",
+    "noOrders": "No orders yet",
+    "price": "Price",
+    "validTo": "Valid until",
+    "usedOn": "Used",
+    "refundedOn": "Refunded",
+    "pdf": "Download PDF",
+    "items": "{n} vouchers",
+    "demoTitle": "Demo account",
+    "demoNote": "You are viewing a demo account with sample vouchers. Nothing here is real.",
+    "demoNoCancel": "Cancelling is not available in the demo account.",
+    "demoCta": "Just looking? Open the demo account",
+    "demoCtaHint": "Sample vouchers and orders, no sign-in needed",
+    "itemsOne": "1 voucher",
+    "overview": "Overview",
+    "portal": "My account",
+    "findDeals": "Find deals",
+    "figures": "Key figures",
+    "statSoon": "Expiring soon",
+    "ready": "Ready to use",
+    "readySub": "Show the QR code at the business, or download the PDF.",
+    "attnSoon": "Vouchers expiring within 14 days",
+    "attnCancel": "Vouchers you can still cancel",
+    "recentOrders": "Recent orders",
+    "vouchersSub": "Every voucher you have bought, with its code and PDF.",
+    "ordersSub": "Your purchases, newest first.",
+    "title": {
+      "overview": "My account",
+      "vouchers": "My vouchers",
+      "orders": "Order history"
+    }
   }
 }

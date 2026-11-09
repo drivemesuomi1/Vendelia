@@ -260,7 +260,12 @@
     "prhFound": "Namnet hämtades från handelsregistret – kontrollera det.",
     "prhNone": "Företaget hittades inte i registret. Skriv namnet själv.",
     "businessReview": "Ditt konto aktiveras när vi har granskat företagets uppgifter, vanligtvis inom en vardag.",
-    "businessSubmit": "Skapa företagskonto"
+    "businessSubmit": "Skapa företagskonto",
+    "loginSub": "Se dina värdebevis och beställningar.",
+    "loginClaim": "Dina lokala erbjudanden på ett ställe.",
+    "perkVouchers": "Alla värdebevis du köper, redo att visas",
+    "perkRefund": "Avboka oanvända värdebevis inom {days} dagar",
+    "perkGift": "Skicka värdebevis som present"
   },
   "business": {
     "qrScanner": {
@@ -1084,5 +1089,49 @@
   "previewBanner": {
     "label": "Förhandsvisning",
     "message": "Vendelia är under utveckling och är ännu inte öppet för köp. Du kan utforska webbplatsens nuvarande förhandsversion."
+  },
+  "account": {
+    "hello": "Hej, {name}",
+    "sections": "Kontots delar",
+    "tabVouchers": "Värdebevis",
+    "tabOrders": "Beställningshistorik",
+    "statActive": "Giltiga värdebevis",
+    "statOrders": "Beställningar",
+    "statSpent": "Spenderat",
+    "filter": "Visa värdebevis",
+    "filterActive": "Giltiga",
+    "filterAll": "Alla",
+    "noActive": "Inga giltiga värdebevis",
+    "emptyText": "Värdebevis du köper visas här, redo att visas hos företaget.",
+    "noOrders": "Inga beställningar ännu",
+    "price": "Pris",
+    "validTo": "Giltigt till",
+    "usedOn": "Använt",
+    "refundedOn": "Återbetalt",
+    "pdf": "Ladda ner PDF",
+    "items": "{n} värdebevis",
+    "demoTitle": "Demokonto",
+    "demoNote": "Du tittar på ett demokonto med exempelvärdebevis. Inget här är på riktigt.",
+    "demoNoCancel": "Avbokning är inte tillgänglig i demokontot.",
+    "demoCta": "Bara tittar? Öppna demokontot",
+    "demoCtaHint": "Exempel på värdebevis och beställningar, ingen inloggning",
+    "itemsOne": "1 värdebevis",
+    "overview": "Översikt",
+    "portal": "Mitt konto",
+    "findDeals": "Hitta erbjudanden",
+    "figures": "Nyckeltal",
+    "statSoon": "Går snart ut",
+    "ready": "Klara att använda",
+    "readySub": "Visa QR-koden hos företaget eller ladda ner PDF:en.",
+    "attnSoon": "Värdebevis som går ut inom 14 dagar",
+    "attnCancel": "Värdebevis du fortfarande kan avboka",
+    "recentOrders": "Senaste beställningar",
+    "vouchersSub": "Alla värdebevis du har köpt, med kod och PDF.",
+    "ordersSub": "Dina köp, nyaste först.",
+    "title": {
+      "overview": "Mitt konto",
+      "vouchers": "Mina värdebevis",
+      "orders": "Beställningshistorik"
+    }
   }
 }

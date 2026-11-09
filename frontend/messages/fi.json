@@ -260,7 +260,12 @@
     "prhFound": "Nimi haettu kaupparekisteristä – tarkista se.",
     "prhNone": "Yritystä ei löytynyt rekisteristä. Kirjoita nimi itse.",
     "businessReview": "Tilisi aktivoidaan, kun olemme tarkistaneet yrityksen tiedot, yleensä yhden arkipäivän kuluessa.",
-    "businessSubmit": "Luo yritystili"
+    "businessSubmit": "Luo yritystili",
+    "loginSub": "Näe setelisi ja tilauksesi.",
+    "loginClaim": "Paikalliset diilisi yhdessä paikassa.",
+    "perkVouchers": "Kaikki ostamasi setelit valmiina näytettäviksi",
+    "perkRefund": "Peru käyttämätön seteli {days} päivän sisällä",
+    "perkGift": "Lähetä setelejä lahjaksi"
   },
   "business": {
     "qrScanner": {
@@ -1084,5 +1089,49 @@
   "previewBanner": {
     "label": "Esikatselu",
     "message": "Vendelia on kehitteillä, eikä ostaminen ole vielä mahdollista. Voit tutustua sivuston nykyiseen esikatseluversioon."
+  },
+  "account": {
+    "hello": "Hei, {name}",
+    "sections": "Tilin osiot",
+    "tabVouchers": "Setelit",
+    "tabOrders": "Tilaushistoria",
+    "statActive": "Voimassa olevat setelit",
+    "statOrders": "Tilaukset",
+    "statSpent": "Käytetty",
+    "filter": "Näytä setelit",
+    "filterActive": "Voimassa",
+    "filterAll": "Kaikki",
+    "noActive": "Ei voimassa olevia seteleitä",
+    "emptyText": "Ostamasi setelit näkyvät täällä valmiina näytettäviksi yrityksessä.",
+    "noOrders": "Ei vielä tilauksia",
+    "price": "Hinta",
+    "validTo": "Voimassa asti",
+    "usedOn": "Käytetty",
+    "refundedOn": "Hyvitetty",
+    "pdf": "Lataa PDF",
+    "items": "{n} seteliä",
+    "demoTitle": "Esittelytili",
+    "demoNote": "Katselet esittelytiliä, jossa on esimerkkisetelit. Mikään täällä ei ole oikeaa.",
+    "demoNoCancel": "Peruminen ei ole käytössä esittelytilillä.",
+    "demoCta": "Pelkkä katselu? Avaa esittelytili",
+    "demoCtaHint": "Esimerkkisetelit ja -tilaukset, ei kirjautumista",
+    "itemsOne": "1 seteli",
+    "overview": "Yleiskatsaus",
+    "portal": "Oma tili",
+    "findDeals": "Etsi diilejä",
+    "figures": "Avainluvut",
+    "statSoon": "Vanhenee pian",
+    "ready": "Käyttövalmiit",
+    "readySub": "Näytä QR-koodi yrityksessä tai lataa PDF.",
+    "attnSoon": "Setelit, jotka vanhenevat 14 päivän sisällä",
+    "attnCancel": "Setelit, jotka voit vielä perua",
+    "recentOrders": "Viimeisimmät tilaukset",
+    "vouchersSub": "Kaikki ostamasi setelit koodeineen ja PDF-tiedostoineen.",
+    "ordersSub": "Ostoksesi uusimmasta alkaen.",
+    "title": {
+      "overview": "Oma tili",
+      "vouchers": "Omat setelit",
+      "orders": "Tilaushistoria"
+    }
   }
 }
