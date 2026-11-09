@@ -6,6 +6,12 @@ The database owner manages shared Supabase changes. Frontend/backend commits do
 not automatically change Supabase: neither development startup nor Vercel builds
 run the migration command.
 
+For a future move to another PostgreSQL instance, see the
+[proposed migration plan](proposed-postgresql-migration-plan.md). The schema-only
+export `backend/sql/schema-postgres.sql` excludes retired `deal_images`, but still
+needs public-schema/Auth compatibility work before it is an installation baseline.
+It is outside `migrations/`, is not run automatically, and contains no live records.
+
 The owner's schema exports reviewed on 2026-10-31 contained these seven tables:
 `cities`, `categories`, `merchants`, `deals`, `deal_options`, `deal_cities`, and
 `deal_option_price_history`. The UUID primary keys on `deals`, `deal_options` and
