@@ -170,3 +170,10 @@ body.scrolled .site-theme header.site{box-shadow:0 10px 28px -20px rgba(20,20,25
 .site-theme header.site .logo svg{height:30px}
 .site-theme header.site .logo .wordmark{font-family:var(--font-admin),var(--font);font-size:24px;font-weight:700;letter-spacing:-.045em;line-height:1;color:var(--navy);padding-bottom:1px}
 @media(max-width:400px){.site-theme header.site .logo .wordmark{font-size:21px}.site-theme header.site .logo svg{height:26px}}
+
+/* Home: same type as the header wordmark (Geist 700, tight tracking) */
+.site-theme .promo-brand{gap:9px;font-size:24px;font-weight:700;letter-spacing:-.045em}
+.site-theme .home .promo h2{font-weight:700;letter-spacing:-.045em;line-height:1.04}
+.site-theme .promo-tag{font-weight:700;letter-spacing:-.025em}
+.site-theme .home h2{font-weight:700;letter-spacing:-.04em}
+.site-theme .home .card h3,.site-theme .deal-card h3{letter-spacing:-.02em}

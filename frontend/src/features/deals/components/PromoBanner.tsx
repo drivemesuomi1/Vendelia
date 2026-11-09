@@ -22,7 +22,7 @@ export function PromoBanner({ locale, meta }: { locale: Locale; meta: MetaDTO })
   return (
     <section className="promo" aria-labelledby="promo-h">
       <div className="promo-copy">
-        <p className="promo-brand"><LogoSymbol height={32} /><span>Vendelia</span></p>
+        <p className="promo-brand"><LogoSymbol height={30} tight /><span>Vendelia</span></p>
         <h2 id="promo-h">{rest.length ? <>{head},<br />{rest.join(", ")}</> : head}</h2>
         <p className="promo-lead">{t("home.bannerLead")}</p>
         <Link className="btn btn-primary promo-cta" href={`/${locale}/deals`}>
