@@ -16,7 +16,7 @@ startup, and no PostgreSQL container is required for production.
 - `.dockerignore`: excludes local .env files, dependency/build folders, Git,
   agent/AWS directories and known local credential notes. Never add secrets to
   Docker build arguments or copy a real .env into an image.
-- `.env.docker.example`: runtime environment template; actual `.env.docker` is
+- `.env.example`: runtime environment template; actual `.env` is
   ignored by Git and Docker. It is not created/populated automatically.
 - Root `compose.yaml`: optional local/manual run of this same single service.
   The old `infra/docker-compose.yml` remains a separate development PostgreSQL
@@ -27,8 +27,8 @@ startup, and no PostgreSQL container is required for production.
 Run from the repository root:
 
 ```sh
-cp .env.docker.example .env.docker
-# Edit .env.docker with the target Supabase/SMTP/origin settings.
+cp .env.example .env
+# Edit .env with the target Supabase/SMTP/origin settings.
 docker compose up --build -d
 docker compose ps
 docker compose logs --tail=100 web
@@ -52,6 +52,12 @@ for process exit/restart. Configure monitoring/deployment health checks as neede
 Production cookies are Secure. Use an HTTPS staging domain to verify login and
 QR camera behavior; HTTP-only IP/LAN URLs are not a full production-flow test.
 A localhost smoke check verifies the container, static files and API responses.
+
+The root `.env` is for Docker Compose runtime injection. Normal `npm run dev`
+still uses `backend/.env` and any frontend environment files; this deployment
+change does not merge or move existing developer credentials. A `.env` in a
+Dokploy checkout is not automatically loaded into its running application:
+use Dokploy’s Environment editor. No real `.env` is created by this change.
 
 ## Dokploy application setup
 

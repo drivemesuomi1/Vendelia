@@ -4,7 +4,7 @@ Fastify API backed by the existing Supabase Postgres catalogue tables.
 
 For Hostinger VPS/Dokploy, the root Dockerfile serves this API inside the Next.js
 standalone container; do not start a second backend service. Runtime settings are
-provided by Dokploy or `.env.docker`, with `BACKEND_URL` empty. See the
+provided by Dokploy or `.env`, with `BACKEND_URL` empty. See the
 [Docker deployment runbook](../docs/runbooks/hostinger-dokploy.md).
 
 Deal photo uploads now use **Supabase Storage**. Set `SUPABASE_STORAGE_BUCKET`

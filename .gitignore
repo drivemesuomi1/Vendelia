@@ -1,7 +1,6 @@
 .vercel
 .env*
 !.env.example
-!.env.docker.example
 node_modules/
 .next/
 dist/

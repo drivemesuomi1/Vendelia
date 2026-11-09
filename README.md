@@ -30,7 +30,7 @@ apply migrations 002/003 and configure the Auth variables before testing.
 The root `Dockerfile` packages the complete application as one non-root Next.js
 standalone service, including the embedded Fastify API. Supabase remains external.
 Build from the repository root. For local Docker Compose, copy
-`.env.docker.example` to `.env.docker`, configure it, then run
+`.env.example` to `.env`, configure it, then run
 `docker compose up --build -d` (loopback port 3001). For Dokploy use Dockerfile
 Application mode and container port 3000. See the
 [Hostinger/Dokploy runbook](docs/runbooks/hostinger-dokploy.md) for exact settings,
