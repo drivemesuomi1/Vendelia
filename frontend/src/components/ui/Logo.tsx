@@ -15,7 +15,8 @@ export function LogoSymbol({ height = 32, tight = false }: { height?: number; ti
 export function Logo({ href, label, sub, wordmark }: { href: string; label: string; sub?: string; wordmark?: boolean }) {
   return (
     <Link className="logo" href={href} aria-label={label}>
-      <LogoSymbol />
+      {/* With the wordmark, the symbol is cropped to its artwork so the gap to the name is exact. */}
+      <LogoSymbol tight={wordmark} />
       {wordmark && <span className="wordmark" aria-hidden="true">Vendelia</span>}
       {sub && <span className="sub">{sub}</span>}
     </Link>

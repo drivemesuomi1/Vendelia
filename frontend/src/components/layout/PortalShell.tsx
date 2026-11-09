@@ -15,13 +15,15 @@ export interface PortalAccount {
   onSignOut: () => void;
 }
 
-/** Sidebar layout shared by the business portal and the admin area. */
-export function PortalShell({ kind, children, admin, account }: { kind: "business" | "admin"; children: ReactNode; admin?: { name: string; email: string }; account?: PortalAccount }) {
+/** Sidebar layout shared by the business portal, the admin area and the customer account. `base` overrides the section's root path (the demo account). */
+export function PortalShell({ kind, children, admin, account, base: baseOverride }: { kind: "business" | "admin" | "account"; children: ReactNode; admin?: { name: string; email: string }; account?: PortalAccount; base?: string }) {
   const { t, locale } = useI18n();
   const pathname = usePathname();
-  const base = `/${locale}/${kind}`;
+  const base = baseOverride ?? `/${locale}/${kind}`;
   const items: [string, string, IconName][] =
-    kind === "business"
+    kind === "account"
+      ? [[base, t("account.overview"), "grid"], [`${base}/vouchers`, t("account.tabVouchers"), "ticket"], [`${base}/orders`, t("account.tabOrders"), "doc"]]
+      : kind === "business"
       ? [[base, t("business.myDeals"), "grid"], [`${base}/deals/new`, t("business.createDeal"), "plus"], [`${base}/redeem`, t("business.redeem"), "scan"], [`${base}/payouts`, t("business.payoutPreview.nav"), "bank"]]
       : [
           [base, t("admin.overview"), "grid"],
@@ -39,10 +41,10 @@ export function PortalShell({ kind, children, admin, account }: { kind: "busines
     <div className={`portal portal-${kind} portal-ui`}>
       <aside className="side">
         <div className="row between" style={{ gap: 8 }}>
-          <Logo href={base} label={t("nav.homeLabel")} sub={kind === "business" ? t("business.portal") : t("admin.title")} />
+          <Logo href={base} label={t("nav.homeLabel")} sub={t(kind === "business" ? "business.portal" : kind === "account" ? "account.portal" : "admin.title")} />
           <LangSwitch />
         </div>
-        <nav aria-label={kind === "business" ? t("business.portal") : t("admin.title")}>
+        <nav aria-label={t(kind === "business" ? "business.portal" : kind === "account" ? "account.portal" : "admin.title")}>
           {items.map(([href, label, icon]) => (
             <Link key={href} href={href} aria-current={pathname === href || pathname === href.replace(`/${locale}`, "") ? "page" : undefined}><Icon name={icon} />{label}</Link>
           ))}

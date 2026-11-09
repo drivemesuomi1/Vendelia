@@ -59,9 +59,15 @@
 .portal-ui .side{background:var(--soft);border-right:1px solid var(--line);padding:20px 14px}
 @media(min-width:960px){.portal-ui .side{position:sticky;top:0;height:100vh;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column}}
 .portal-ui .side .logo{min-width:0}
-.portal-ui .side .logo .sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.portal-ui .side .logo{padding:2px 8px 18px}
-.portal-ui .side .logo .sub{font-size:14px;font-weight:600}
+/* Sidebar header: symbol, a hairline, the section name in capitals, and the language picker, on one centre line. */
+.portal-ui .side>.row.between{align-items:center;gap:8px;padding:2px 2px 16px 6px;margin-bottom:14px;border-bottom:1px solid var(--line)}
+.portal-ui .side .logo{padding:0;min-height:36px;gap:10px}
+.portal-ui .side .logo:hover{transform:none}
+.portal-ui .side .logo svg{height:26px}
+.portal-ui .side .logo .sub{display:flex;align-items:center;gap:10px;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--navy-70);line-height:1.25;white-space:normal;overflow:visible}
+/* Long names ("Business portal") wrap onto a second line rather than being cut off. */
+.portal-ui .side .logo .sub::before{content:"";flex:none;width:1px;height:16px;background:var(--line-strong)}
+.portal-ui .side .langsw-btn{min-height:32px;height:32px}
 .portal-ui .side nav{gap:2px}
 .portal-ui .side nav a{min-height:38px;padding:0 10px;border-radius:8px;font-size:14px;font-weight:500;color:var(--navy-70);border:1px solid transparent;transition:background .12s,color .12s}
 .portal-ui .side nav a .icon{width:18px;height:18px;color:var(--navy-50)}
@@ -504,9 +510,7 @@
   .portal-ui .side .langsw-btn{padding:0 6px 0 8px;gap:4px}
   .portal-ui .side .langsw-btn>span:not(.flag){display:none}
   .portal-ui .side .langsw-btn .langsw-chev{width:12px;height:12px}
-  .portal-ui .side .row.between .logo{flex:0 1 auto;min-width:0;gap:6px}
-  .portal-ui .side .row.between .logo .sub{font-size:13.5px}
-  .portal-ui .side .row.between .logo svg{height:28px}
+  .portal-ui .side .row.between .logo{flex:0 1 auto;min-width:0}
 }
 
 /* Admin vouchers: code search, detail card, recent lists */

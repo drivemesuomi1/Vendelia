@@ -6,3 +6,5 @@ export * from "./schemas/voucher";
 export * from "./types/api";
 
 export * from "./schemas/merchant";
+
+export * from "./demo/customer";

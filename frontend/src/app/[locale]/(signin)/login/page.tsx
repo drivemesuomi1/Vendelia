@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { demoAccountEnabled } from "@vendelia/shared";
 import { getT, resolveLocale } from "@/i18n/server";
 import { LoginForm } from "@/features/auth/components/LoginForm";
 
@@ -8,5 +9,5 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
   const { next } = await searchParams;
-  return <LoginForm next={next} />;
+  return <LoginForm next={next} demo={demoAccountEnabled(process.env)} />;
 }
