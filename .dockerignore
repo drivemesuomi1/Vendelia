@@ -1,0 +1,16 @@
+.git
+.vercel
+.aws
+.codex
+.agents
+**/node_modules
+**/.next
+**/.env*
+**/.data
+**/uploads
+**/coverage
+**/dist
+**/*.tsbuildinfo
+**/npm-debug.log*
+.admin-password.local
+scratch-admin-env.json

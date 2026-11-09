@@ -2,6 +2,11 @@
 
 Fastify API backed by the existing Supabase Postgres catalogue tables.
 
+For Hostinger VPS/Dokploy, the root Dockerfile serves this API inside the Next.js
+standalone container; do not start a second backend service. Runtime settings are
+provided by Dokploy or `.env.docker`, with `BACKEND_URL` empty. See the
+[Docker deployment runbook](../docs/runbooks/hostinger-dokploy.md).
+
 Deal photo uploads now use **Supabase Storage**. Set `SUPABASE_STORAGE_BUCKET`
 to the exact public bucket ID (`Vendelia Main`) and configure the existing server
 secret. Legacy image URLs return 410; the app no longer queries `deal_images`. See

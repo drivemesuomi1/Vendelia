@@ -5,6 +5,8 @@ import path from "node:path";
 const backend = process.env.BACKEND_URL?.trim().replace(/\/+$/, "");
 
 const nextConfig: NextConfig = {
+  // Docker builds emit a traced server; normal local/Vercel builds keep their current output.
+  output: process.env.VENDELIA_STANDALONE === "true" ? "standalone" : undefined,
   // The shared workspace package ships TypeScript source.
   transpilePackages: ["@vendelia/shared", "@vendelia/backend"],
   // Include backend workspace dependencies in the Vercel server function trace.
