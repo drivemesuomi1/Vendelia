@@ -3,7 +3,7 @@
 New merchant uploads use a public Supabase Storage bucket. Migration 007's
 `public.deal_images` table is retained in the owner's database for now, but the
 running application no longer reads or writes it. Do not edit historical migration 007.
-No new SQL migration is required for this transition. The `deals.image_url` and
+No new SQL migration  is required for this transition. The `deals.image_url` and
 `gallery_urls` columns continue storing site-relative URLs.
 
 ## Configuration
