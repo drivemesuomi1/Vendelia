@@ -21,6 +21,17 @@ const voucher: VoucherDocument = {
   orderNumber: "VD-7H3KQP", buyerName: "Testi Ostaja", recipientName: "Maija Meikäläinen", giftMessage: "Hyvää syntymäpäivää!",
 };
 
+it("uses the SMTP default for omitted/blank ports and rejects invalid explicit ports", () => {
+  for (const SMTP_PORT of [undefined, '', '   ']) {
+    assert.equal(orderConfig({ SMTP_HOST: 'smtp.example.com', SMTP_PORT }).mail.smtp!.port, 587);
+    assert.equal(orderConfig({ SMTP_PORT }).mail.smtp, null);
+  }
+  assert.equal(orderConfig({ SMTP_HOST: 'smtp.example.com', SMTP_PORT: '465' }).mail.smtp!.secure, true);
+  for (const SMTP_PORT of ['0', '65536', 'invalid', '1.5']) {
+    assert.throws(() => orderConfig({ SMTP_PORT }), /Invalid SMTP_PORT/);
+  }
+});
+
 it("generates voucher codes and order numbers in the documented formats", () => {
   const codes = new Set(Array.from({ length: 500 }, newVoucherCode));
   assert.equal(codes.size, 500);

@@ -168,3 +168,21 @@ updates can change this). Test containers/network were removed afterward; the
 local smoke-test image can be reused or removed. Full authenticated flows, SMTP,
 Supabase TLS and QR camera behavior still need verification on the HTTPS staging
 deployment. No live database, DNS or VPS deployment was modified.
+
+## Catalogue unavailable with healthy container
+
+A successful `/api/health/live` confirms only the Next process. If `/api/health`
+or `/api/meta` fails, inspect runtime logs before assuming the database is down.
+Backend initialization validates mail and other settings before its first query.
+
+A blank `SMTP_PORT` previously converted to port 0 and threw `Invalid SMTP_PORT`,
+blocking the complete embedded API, including catalogue reads. The configuration
+now defaults omitted, empty or whitespace-only ports to 587 and still rejects
+explicit invalid values. Prefer setting SMTP_PORT explicitly to your provider's
+port in Dokploy (commonly 587, or 465 with implicit TLS).
+
+An emergency `docker service update --env-add ...` affects the running service
+but does not update Dokploy's saved application configuration. Save the same
+setting in the Dokploy Environment editor so a later deployment preserves it.
+Do not print container environment values or full connection strings when
+sharing logs; check variable presence and redact credentials instead.

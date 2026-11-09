@@ -48,7 +48,8 @@ export function orderConfig(env: NodeJS.ProcessEnv = process.env): OrderConfig {
     if (value === "true" || value === "1") return true;
     throw new Error(`Invalid ${key}`);
   };
-  const port = Number(env.SMTP_PORT ?? 587);
+  // Deployment dashboards can set an optional variable to an empty string.
+  const port = Number(env.SMTP_PORT?.trim() || 587);
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error("Invalid SMTP_PORT");
   const host = env.SMTP_HOST?.trim();
   return {
