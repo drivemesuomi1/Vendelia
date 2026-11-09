@@ -161,3 +161,12 @@ body.scrolled .site-theme header.site{box-shadow:0 10px 28px -20px rgba(20,20,25
 @media(max-width:560px){.acct-ready li{grid-template-columns:48px minmax(0,1fr)}.acct-ready-actions{grid-column:2}}
 .acct .link-sm{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:500;text-decoration:none}
 .acct .link-sm .icon{width:15px;height:15px}
+
+/* Header: logo and width */
+/* The header and category bar run full width, so the logo sits near the left edge on any screen. */
+.site-theme header.site .wrap,.site-theme .catnav .wrap{max-width:none;padding-left:clamp(16px,2.5vw,40px);padding-right:clamp(16px,2.5vw,40px)}
+.site-theme header.site .logo{gap:9px;min-height:44px}
+.site-theme header.site .logo:hover{transform:none;opacity:.86}
+.site-theme header.site .logo svg{height:30px}
+.site-theme header.site .logo .wordmark{font-family:var(--font-admin),var(--font);font-size:24px;font-weight:700;letter-spacing:-.045em;line-height:1;color:var(--navy);padding-bottom:1px}
+@media(max-width:400px){.site-theme header.site .logo .wordmark{font-size:21px}.site-theme header.site .logo svg{height:26px}}
