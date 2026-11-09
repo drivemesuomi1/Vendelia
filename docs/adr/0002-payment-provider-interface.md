@@ -9,7 +9,7 @@ Checkout depends only on `PaymentProvider` (`backend/src/integrations/payments/p
 - `mock` (default): no money moves. The frontend shows a simulated bank/MobilePay step and calls
   `POST /api/payments/:orderId/mock-confirm`, which plays the role of the provider webhook.
 - `stripe`: **not implemented yet.** Planned: Stripe Connect (Express accounts), funds held on the platform
-  and transferred to the merchant after redemption; webhooks verified in `payments.routes.ts`, then `ordersService.markPaid()`.
+  and transferre d to the merchant after redemption; webhooks verified in `payments.routes.ts`, then `ordersService.markPaid()`.
 
 ## Why
 Vendelia must not hold customers' money in its own bank account (payment-institution licence risk). A licensed
