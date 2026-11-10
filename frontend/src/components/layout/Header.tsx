@@ -52,9 +52,17 @@ export function Header({ home }: { home?: boolean }) {
             <CityPicker />
             {searchForm("q1", t("nav.searchPlaceholder"), "hdr-search")}
             <nav className="nav" aria-label={t("nav.main")}>
-              <Link href={`/${locale}/account/vouchers`} title={t("nav.myVouchers")} aria-label={t("nav.myVouchers")}>
-                <Icon name="ticket" /><span className="lbl">{t("nav.myVouchers")}</span>
-              </Link>
+              {/* Account: signed in shows the person's initial and opens their account; signed out offers sign-in. */}
+              {user ? (
+                <Link className="nav-account" href={`/${locale}/account`} title={`${user.name} (${user.email})`} aria-label={t("nav.account")}>
+                  <span className="nav-avatar" aria-hidden="true">{(user.name || user.email).trim().charAt(0).toUpperCase()}</span>
+                  <span className="lbl">{t("nav.account")}</span>
+                </Link>
+              ) : (
+                <Link className="nav-account" href={`/${locale}/login`} title={t("auth.login")} aria-label={t("auth.login")}>
+                  <Icon name="user" /><span className="lbl">{t("auth.login")}</span>
+                </Link>
+              )}
               <Link href={portal.href} title={portal.label} aria-label={portal.label}>
                 <Icon name={portal.icon} /><span className="lbl">{portal.label}</span>
               </Link>

@@ -28,7 +28,8 @@
     "selected": "SELECTED",
     "categories": "Categories",
     "selectCity": "Select a city",
-    "services": "Services"
+    "services": "Services",
+    "account": "My account"
   },
   "footer": {
     "tagline": "Local experiences and services in {cities}.",
@@ -249,7 +250,7 @@
     "haveAccount": "Already have an account?",
     "createAccount": "Create account",
     "forBusinesses": "For businesses",
-    "registerTitle": "Create a customer account",
+    "registerTitle": "Create your account",
     "name": "Name",
     "businessTitle": "Sell on Vendelia",
     "businessIntro": "Create a business account. We check your details before your deals can go on sale.",
@@ -265,7 +266,11 @@
     "loginClaim": "Your local deals, all in one place.",
     "perkVouchers": "Every voucher you buy, ready to show",
     "perkRefund": "Cancel unused vouchers within {days} days",
-    "perkGift": "Send vouchers as gifts"
+    "perkGift": "Send vouchers as gifts",
+    "registerSub": "Buy vouchers, keep them in one place and cancel unused ones easily.",
+    "creating": "Creating account…",
+    "registerTerms": "By creating an account you accept the terms of use and the privacy policy.",
+    "cartReason": "Sign in or create an account to add this to your cart. We will add it for you."
   },
   "business": {
     "qrScanner": {

@@ -28,7 +28,8 @@
     "selected": "VALITTU",
     "categories": "Kategoriat",
     "selectCity": "Valitse kaupunki",
-    "services": "Palvelut"
+    "services": "Palvelut",
+    "account": "Oma tili"
   },
   "footer": {
     "tagline": "Paikallisia elämyksiä ja palveluita: {cities}.",
@@ -249,7 +250,7 @@
     "haveAccount": "Onko sinulla jo tili?",
     "createAccount": "Luo tili",
     "forBusinesses": "Yrityksille",
-    "registerTitle": "Luo asiakastili",
+    "registerTitle": "Luo tili",
     "name": "Nimi",
     "businessTitle": "Myy Vendeliassa",
     "businessIntro": "Luo yritystili. Tarkistamme tiedot ennen kuin diilisi voivat mennä myyntiin.",
@@ -265,7 +266,11 @@
     "loginClaim": "Paikalliset diilisi yhdessä paikassa.",
     "perkVouchers": "Kaikki ostamasi setelit valmiina näytettäviksi",
     "perkRefund": "Peru käyttämätön seteli {days} päivän sisällä",
-    "perkGift": "Lähetä setelejä lahjaksi"
+    "perkGift": "Lähetä setelejä lahjaksi",
+    "registerSub": "Osta seteleitä, pidä ne yhdessä paikassa ja peru käyttämättömät helposti.",
+    "creating": "Luodaan tiliä…",
+    "registerTerms": "Luomalla tilin hyväksyt käyttöehdot ja tietosuojaselosteen.",
+    "cartReason": "Kirjaudu tai luo tili lisätäksesi tämän ostoskoriin. Lisäämme sen puolestasi."
   },
   "business": {
     "qrScanner": {
