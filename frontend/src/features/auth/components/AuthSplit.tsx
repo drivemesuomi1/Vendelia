@@ -6,6 +6,7 @@ import { LangSwitch } from "@/components/layout/LangSwitch";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { LogoSymbol } from "@/components/ui/Logo";
 import { useI18n } from "@/i18n/I18nProvider";
+import { formatPct } from "@/lib/format";
 import { useAppData } from "@/lib/meta-context";
 
 const PERKS: [IconName, string][] = [["ticket", "auth.perkVouchers"], ["refund", "auth.perkRefund"], ["gift", "auth.perkGift"]];
@@ -19,10 +20,11 @@ const SLIDES = [
 const SLIDE_MS = 6000;
 
 /**
- * Full-screen split used by customer sign-in and registration: a brand panel with photos and what an account gives
- * (hidden on phones), and the form beside it. Motion stops for people who prefer reduced motion.
+ * Full-screen split used by customer sign-in, registration and the business application: a brand panel with photos
+ * and what the visitor gets (`claim`, `perks`; hidden on phones), and the form beside it. `panel={false}` drops the
+ * photo panel for a single centred column. Motion stops for people who prefer reduced motion.
  */
-export function AuthSplit({ children }: { children: ReactNode }) {
+export function AuthSplit({ children, claim = "auth.loginClaim", perks = PERKS, panel = true }: { children: ReactNode; claim?: string; perks?: [IconName, string][]; panel?: boolean }) {
   const { t, locale } = useI18n();
   const { meta } = useAppData();
   const [slide, setSlide] = useState(0);
@@ -34,8 +36,8 @@ export function AuthSplit({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <main className="signin">
-      <aside className="signin-brand" aria-hidden="true">
+    <main className={`signin${panel ? "" : " no-panel"}`}>
+      {panel && <aside className="signin-brand" aria-hidden="true">
         <div className="signin-slides">
           {SLIDES.map((s, i) => (
             <img key={s.src} src={s.src} alt="" className={i === slide ? "is-on" : undefined} style={{ objectPosition: s.position }} />
@@ -47,11 +49,11 @@ export function AuthSplit({ children }: { children: ReactNode }) {
 
         <div className="signin-copy">
           <p className="signin-eyebrow">Vendelia</p>
-          <p className="signin-claim">{t("auth.loginClaim")}</p>
+          <p className="signin-claim">{t(claim)}</p>
           <ul className="signin-perks">
-            {PERKS.map(([icon, key], i) => (
+            {perks.map(([icon, key], i) => (
               <li key={key} style={{ animationDelay: `${240 + i * 110}ms` }}>
-                <span><Icon name={icon} /></span>{t(key, { days: meta.refundWindowDays })}
+                <span><Icon name={icon} /></span>{t(key, { days: meta.refundWindowDays, rate: formatPct(meta.commissionBps, locale) })}
               </li>
             ))}
           </ul>
@@ -59,7 +61,7 @@ export function AuthSplit({ children }: { children: ReactNode }) {
             {SLIDES.map((s, i) => <span key={s.src} className={i === slide ? "is-on" : undefined} />)}
           </div>
         </div>
-      </aside>
+      </aside>}
 
       <section className="signin-main">
         <div className="signin-top">

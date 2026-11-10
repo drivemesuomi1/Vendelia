@@ -1,6 +1,6 @@
 "use client";
 
-import type { LoginInput, RegisterCustomerInput, RegisterMerchantInput } from "@vendelia/shared";
+import type { LoginInput, RegisterCustomerInput } from "@vendelia/shared";
 import { api } from "@/lib/api-client";
 
 export const login = (input: LoginInput) => api("/api/auth/login", { body: input });
@@ -8,6 +8,3 @@ export const merchantLogin = (input: LoginInput) => api("/api/auth/merchant/logi
 export const logout = () => api("/api/auth/logout", { method: "POST", body: {} });
 /** Customer sign-up with email and password only. */
 export const registerCustomer = (input: Pick<RegisterCustomerInput, "email" | "password">) => api("/api/auth/register", { body: input });
-export const registerMerchant = (input: RegisterMerchantInput) => api("/api/merchants/register", { body: input });
-export const lookupCompany = (businessId: string) =>
-  api<{ company: { businessId: string; name: string } | null }>(`/api/merchants/lookup/${encodeURIComponent(businessId)}`);
