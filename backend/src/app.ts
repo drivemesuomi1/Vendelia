@@ -79,7 +79,7 @@ export function buildApp(database: Sql, options: {
   const merchantRepository = new MerchantRepository(database);
   const provisioning = new MerchantProvisioningService(merchantRepository,
     options.userProvisioner ?? new SupabaseUserProvisioner(authSettings.url, process.env.SUPABASE_SECRET_KEY?.trim() ?? ''));
-  const merchantMail = { siteUrl: ordersConfig.siteUrl, supportEmail: ordersConfig.mail.replyTo };
+  const merchantMail = { siteUrl: ordersConfig.siteUrl, supportEmail: ordersConfig.mail.businessReplyTo };
   app.register(merchantRoutes, { service: new MerchantService(merchantRepository, provisioning, mailer, merchantMail), auth: authService });
   app.register(dealRoutes, { repository: new DealRepository(database), auth: authService, origins: authSettings.origins,
     images: options.dealImages ?? new SupabaseDealImageStorage() });

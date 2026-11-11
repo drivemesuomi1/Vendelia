@@ -230,6 +230,7 @@ footer.site{border-top:1px solid var(--line);background:#fff;margin-top:var(--s6
 .foot h4{font-size:14px;margin-bottom:12px}
 .foot a{display:block;color:var(--navy-70);text-decoration:none;padding:6px 0;font-size:15px}
 .foot a:hover{color:var(--indigo)}
+.foot-contact{margin:0 0 6px}.foot-contact small{display:block;font-size:12px;color:var(--navy-50)}.foot .foot-contact a{padding:2px 0}
 .legal{margin-top:var(--s4);padding-top:var(--s3);border-top:1px solid var(--line);font-size:13px;color:var(--navy-70);display:flex;flex-wrap:wrap;gap:var(--s2);justify-content:space-between}
 .paylogos{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .paylogos span{font-size:12px;font-weight:700;color:var(--navy-70);border:1px solid var(--line);border-radius:6px;padding:4px 8px}

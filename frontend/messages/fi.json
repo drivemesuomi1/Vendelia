@@ -39,7 +39,10 @@
     "cancelPurchase": "Peru ostos",
     "sellOn": "Myy Vendeliassa",
     "pricing": "Hinnoittelu ja tilitykset",
-    "help": "Apua"
+    "help": "Apua",
+    "customerService": "Asiakaspalvelu",
+    "businessSupport": "Yritystuki",
+    "phone": "Puhelin"
   },
   "home": {
     "bannerTitle": "Enemmän elämyksiä, vähemmän euroja",
@@ -118,7 +121,7 @@
     "mapOpen": "Avaa kartalla",
     "meetingPoint": "Kokoontuminen:",
     "refundTitle": "Peruutus ja palautus",
-    "refundBody": "Voit perua käyttämättömän lahjakortin ja saada rahat takaisin {days} päivän kuluessa ostosta Omissa lahjakorteissa tai sähköpostitse osoitteeseen tuki@vendelia.fi. Lähetämme vahvistuksen ja palautamme rahat alkuperäiselle maksutavalle. Käytettyihin lahjakortteihin sovelletaan yrityksen ehtoja ja lakisääteisiä oikeuksiasi.",
+    "refundBody": "Voit perua käyttämättömän lahjakortin ja saada rahat takaisin {days} päivän kuluessa ostosta Omissa lahjakorteissa tai sähköpostitse osoitteeseen info@vendelia.fi. Lähetämme vahvistuksen ja palautamme rahat alkuperäiselle maksutavalle. Käytettyihin lahjakortteihin sovelletaan yrityksen ehtoja ja lakisääteisiä oikeuksiasi.",
     "phone": "puh.",
     "onBehalf": "Vendelia myy lahjakortin yrityksen puolesta. Palvelun tuottaa yritys.",
     "finalPrice": "Lopullinen hinta, sis. ALV {vat}. Ei palvelu- eikä toimitusmaksuja.",
@@ -230,7 +233,7 @@
     "freeCancelUntil": "Maksuton peruutus {date} asti",
     "show": "Näytä lahjakortti",
     "cancelRefund": "Peru ja hyvitä",
-    "help": "Tarvitsetko apua ostoksen kanssa? Lähetä sähköpostia osoitteeseen tuki@vendelia.fi. Vastaamme arkisin yhden työpäivän kuluessa.",
+    "help": "Tarvitsetko apua ostoksen kanssa? Lähetä sähköpostia osoitteeseen info@vendelia.fi. Vastaamme arkisin yhden työpäivän kuluessa.",
     "voucher": "Lahjakortti",
     "cancelTitle": "Perutaanko lahjakortti?",
     "cancelBody": "Lahjakortti lakkaa toimimasta heti. {amount} palautetaan alkuperäiselle maksutavalle, yleensä 5 arkipäivän kuluessa. Lähetämme vahvistuksen sähköpostiisi.",
@@ -1128,7 +1131,7 @@
     "deal_not_found": "Diiliä ei löytynyt.",
     "order_not_found": "Tilausta ei löytynyt.",
     "api_not_configured": "Palvelu ei ole vielä käytössä.",
-    "paymentUnavailable": "Verkkomaksu ei ole juuri nyt käytettävissä, eikä sinulta veloitettu mitään. Yritä hetken kuluttua uudelleen tai kirjoita osoitteeseen tuki@vendelia.fi.",
+    "paymentUnavailable": "Verkkomaksu ei ole juuri nyt käytettävissä, eikä sinulta veloitettu mitään. Yritä hetken kuluttua uudelleen tai kirjoita osoitteeseen info@vendelia.fi.",
     "testCheckoutNotAllowed": "Testitilaus ei ole sallittu tälle sähköpostiosoitteelle.",
     "itemsUnavailable": "Osa ostoskorin tuotteista ei ole enää saatavilla. Päivitä ostoskori ja yritä uudelleen.",
     "redeemUnavailable": "Lunastuksen kirjaaminen ei ole vielä käytettävissä. Voit tarkistaa yrityksesi lahjakorttikoodit.",

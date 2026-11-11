@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { COMPANY, COMPANY_TEL } from "@vendelia/shared";
 import { Logo } from "@/components/ui/Logo";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAppData } from "@/lib/meta-context";
@@ -34,11 +35,22 @@ export function Footer() {
           </div>
           <div>
             <h4>{t("footer.help")}</h4>
-            <a href="mailto:tuki@vendelia.fi">tuki@vendelia.fi</a>
+            <p className="foot-contact">
+              <small>{t("footer.customerService")}</small>
+              <a href={`mailto:${COMPANY.customerEmail}`}>{COMPANY.customerEmail}</a>
+            </p>
+            <p className="foot-contact">
+              <small>{t("footer.businessSupport")}</small>
+              <a href={`mailto:${COMPANY.businessEmail}`}>{COMPANY.businessEmail}</a>
+            </p>
+            <p className="foot-contact">
+              <small>{t("footer.phone")}</small>
+              <a href={COMPANY_TEL}>{COMPANY.phone}</a>
+            </p>
           </div>
         </div>
         <div className="legal">
-          <span>© {new Date().getFullYear()} Vendelia Oy · {t("common.businessId")} 3666248-7</span>
+          <span>© {new Date().getFullYear()} {COMPANY.name} · {t("common.businessId")} {COMPANY.businessId}</span>
         </div>
       </div>
     </footer>

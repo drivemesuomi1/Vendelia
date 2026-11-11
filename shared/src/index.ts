@@ -8,3 +8,5 @@ export * from "./types/api";
 export * from "./schemas/merchant";
 
 export * from "./demo/customer";
+
+export * from "./company";

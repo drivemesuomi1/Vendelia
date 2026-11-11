@@ -1,6 +1,6 @@
 import { PDFDocument, rgb, StandardFonts, type PDFFont, type PDFPage, type RGB } from "pdf-lib";
 import QRCode from "qrcode";
-import type { Locale, LocalizedList, LocalizedText } from "@vendelia/shared";
+import { COMPANY, type Locale, type LocalizedList, type LocalizedText } from "@vendelia/shared";
 import { formatDate, pick, pickList, voucherText } from "./text";
 
 /** Everything printed on one voucher page, taken from the order and the deal it was bought from. */
@@ -135,9 +135,13 @@ function drawVoucher(page: PDFPage, v: VoucherDocument, f: Fonts, o: VoucherPdfO
   fy = underlined(page, `${t.support}:`, M, fy, 10, f.bold);
   text(`${t.email}: ${o.supportEmail}`, M, fy, 9.5, f.bold);
   fy -= 12;
+  text(`${t.phone}: ${COMPANY.phone}`, M, fy, 9.5, f.bold);
+  fy -= 12;
   const site = o.siteUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
   text(site, M, fy, 9.5, f.regular, C.link);
   page.drawLine({ start: { x: M, y: fy - 1.5 }, end: { x: M + f.regular.widthOfTextAtSize(site, 9.5), y: fy - 1.5 }, thickness: 0.6, color: C.link });
+  fy -= 12;
+  text(`${COMPANY.name} · ${t.businessId} ${COMPANY.businessId}`, M, fy, 9.5, f.regular);
 
   const cx = 312;
   let cy = Math.min(y - 50, 236) + 2;

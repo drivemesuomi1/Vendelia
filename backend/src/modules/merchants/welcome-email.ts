@@ -1,4 +1,5 @@
 import type { Locale } from "@vendelia/shared";
+import { companyLine } from "../vouchers/text";
 
 export interface MerchantWelcomeInput {
   locale: Locale;
@@ -56,7 +57,7 @@ export function buildMerchantWelcomeEmail(input: MerchantWelcomeInput) {
     `${t.password}: ${input.password}`,
     `${t.login}: ${input.loginUrl}`, "",
     t.keep,
-    `${t.questions} ${input.supportEmail}.`, "", t.regards,
+    `${t.questions} ${input.supportEmail}.`, "", t.regards, "", companyLine(input.locale),
   ].join("\n");
 
   const html = `<!doctype html>
@@ -72,6 +73,7 @@ ${esc(t.password)}: <b style="font-family:Courier New,monospace;font-size:16px">
 <p style="margin:0 0 12px;font-size:13px;color:#4A5468">${esc(t.keep)}<br>
 ${esc(t.questions)} <a href="mailto:${esc(input.supportEmail)}" style="color:#3B32B3">${esc(input.supportEmail)}</a>.</p>
 <p style="margin:0;white-space:pre-line">${esc(t.regards)}</p>
+<p style="margin:16px 0 0;font-size:12px;color:#6B7385">${esc(companyLine(input.locale))}</p>
 </div>
 </body></html>`;
 

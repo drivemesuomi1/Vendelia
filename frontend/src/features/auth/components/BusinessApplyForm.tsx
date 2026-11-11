@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, type FormEvent, type ReactNode } from "react";
-import { registerMerchantSchema } from "@vendelia/shared";
+import { COMPANY, registerMerchantSchema } from "@vendelia/shared";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { LogoSymbol } from "@/components/ui/Logo";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -11,7 +11,7 @@ import { useAppData } from "@/lib/meta-context";
 import { AuthSplit } from "./AuthSplit";
 
 /** Applications go to this address; Vendelia then checks the business and creates its sign-in details. */
-export const APPLY_EMAIL = "info@vendelia.fi";
+export const APPLY_EMAIL = COMPANY.businessEmail;
 
 /** The required business details from sign-up, without a password: no account is created here. */
 const applicationSchema = registerMerchantSchema.omit({ password: true });
@@ -19,7 +19,7 @@ type Key = keyof typeof applicationSchema.shape | "categoryId" | "website" | "me
 
 /**
  * "Sell on Vendelia": businesses apply by email. The form checks the details and then opens the visitor's email app
- * with a message to info@vendelia.fi, all details filled in. Nothing is stored or sent by the site itself.
+ * with a message to business support (tuki@vendelia.fi), all details filled in. Nothing is stored or sent by the site itself.
  */
 export function BusinessApplyForm() {
   const { t, locale } = useI18n();

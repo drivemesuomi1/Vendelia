@@ -9,6 +9,8 @@ export interface MailMessage {
   subject: string;
   text: string;
   html: string;
+  /** Overrides the default reply-to, e.g. business support for merchant emails. */
+  replyTo?: string;
   attachments: { filename: string; content: Uint8Array; contentType: string }[];
 }
 
@@ -24,7 +26,7 @@ export class MailNotConfiguredError extends Error {
 /** SMTP when configured; otherwise a local .eml outbox in development; otherwise an error. */
 export function createMailer(config: OrderConfig["mail"]): Mailer {
   const envelope = (message: MailMessage) => ({
-    from: config.from, replyTo: config.replyTo, to: message.to, subject: message.subject,
+    from: config.from, replyTo: message.replyTo ?? config.replyTo, to: message.to, subject: message.subject,
     text: message.text, html: message.html,
     attachments: message.attachments.map((a) => ({ filename: a.filename, content: Buffer.from(a.content), contentType: a.contentType })),
   });

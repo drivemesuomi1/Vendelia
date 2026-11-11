@@ -39,7 +39,10 @@
     "cancelPurchase": "Cancel a purchase",
     "sellOn": "Sell on Vendelia",
     "pricing": "Pricing and payouts",
-    "help": "Help"
+    "help": "Help",
+    "customerService": "Customer service",
+    "businessSupport": "Business support",
+    "phone": "Phone"
   },
   "home": {
     "bannerTitle": "More to enjoy, less to pay",
@@ -118,7 +121,7 @@
     "mapOpen": "Open in map",
     "meetingPoint": "Meeting point:",
     "refundTitle": "Cancellation and refunds",
-    "refundBody": "You can cancel an unused voucher for a full refund within {days} days of purchase in My vouchers or by emailing tuki@vendelia.fi. We send a confirmation and refund your original payment method. Used vouchers follow the business's terms and your statutory rights.",
+    "refundBody": "You can cancel an unused voucher for a full refund within {days} days of purchase in My vouchers or by emailing info@vendelia.fi. We send a confirmation and refund your original payment method. Used vouchers follow the business's terms and your statutory rights.",
     "phone": "tel.",
     "onBehalf": "Vendelia sells the voucher on behalf of the business. The business provides the service.",
     "finalPrice": "Final price, incl. VAT {vat}. No service or delivery fees.",
@@ -230,7 +233,7 @@
     "freeCancelUntil": "Free cancellation until {date}",
     "show": "Show voucher",
     "cancelRefund": "Cancel and refund",
-    "help": "Need help with a purchase? Email tuki@vendelia.fi. We reply on weekdays within one working day.",
+    "help": "Need help with a purchase? Email info@vendelia.fi. We reply on weekdays within one working day.",
     "voucher": "Voucher",
     "cancelTitle": "Cancel this voucher?",
     "cancelBody": "The voucher stops working immediately. {amount} is refunded to your original payment method, usually within 5 working days. We'll email you a confirmation.",
@@ -1128,7 +1131,7 @@
     "deal_not_found": "Deal not found.",
     "order_not_found": "Order not found.",
     "api_not_configured": "This service is not available yet.",
-    "paymentUnavailable": "Online payment isn't available right now and you have not been charged. Please try again shortly or email tuki@vendelia.fi.",
+    "paymentUnavailable": "Online payment isn't available right now and you have not been charged. Please try again shortly or email info@vendelia.fi.",
     "testCheckoutNotAllowed": "Test orders aren't allowed for this email address.",
     "itemsUnavailable": "Some items in your cart are no longer available. Update your cart and try again.",
     "redeemUnavailable": "Recording voucher redemption is not available yet. You can still check your business’s codes.",

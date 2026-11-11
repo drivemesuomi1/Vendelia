@@ -1,6 +1,6 @@
 import type { Locale } from "@vendelia/shared";
 import type { VoucherDocument } from "./pdf";
-import { formatDate, pick, voucherText } from "./text";
+import { companyLine, formatDate, pick, voucherText } from "./text";
 
 export interface VoucherEmailInput {
   locale: Locale;
@@ -29,7 +29,7 @@ export function buildVoucherEmail(input: VoucherEmailInput) {
     t.hello(input.firstName), t.thanks, "",
     ...input.vouchers.flatMap((v) => [name(v), `${t.code}: ${v.code}`, until(v), ""]),
     `${t.orderNumber}: ${input.orderNumber}`,
-    `${t.questions} ${input.supportEmail}.`, "", t.regards,
+    `${t.questions} ${input.supportEmail}.`, "", t.regards, "", companyLine(L),
   ].join("\n");
 
   const cards = input.vouchers.map((v) => `
@@ -48,6 +48,7 @@ ${cards}
 <p style="margin:0 0 12px;font-size:13px;color:#4A5468">${esc(t.orderNumber)}: ${esc(input.orderNumber)}<br>
 ${esc(t.questions)} <a href="mailto:${esc(input.supportEmail)}" style="color:#3B32B3">${esc(input.supportEmail)}</a>.</p>
 <p style="margin:0;white-space:pre-line">${esc(t.regards)}</p>
+<p style="margin:16px 0 0;font-size:12px;color:#6B7385">${esc(companyLine(L))}</p>
 </div>
 </body></html>`;
 

@@ -1,3 +1,5 @@
+import { COMPANY } from "@vendelia/shared";
+
 /** Platform policy is server configuration until a settings table is introduced. */
 export interface PlatformConfig {
   commissionBps: number;
@@ -35,6 +37,8 @@ export interface OrderConfig {
   mail: {
     from: string;
     replyTo: string;
+    /** Reply-to and contact address for emails to businesses (sign-in details). */
+    businessReplyTo: string;
     smtp: { host: string; port: number; secure: boolean; user?: string; pass?: string } | null;
     /** Without SMTP outside production, emails are written here instead of sent. */
     outboxDir: string | null;
@@ -58,8 +62,9 @@ export function orderConfig(env: NodeJS.ProcessEnv = process.env): OrderConfig {
       .split(",").map((entry) => entry.trim().toLowerCase()).filter(Boolean),
     siteUrl: (env.PUBLIC_SITE_URL?.trim() || "https://www.vendelia.fi").replace(/\/+$/, ""),
     mail: {
-      from: env.MAIL_FROM?.trim() || "Vendelia <info@vendelia.fi>",
-      replyTo: env.MAIL_REPLY_TO?.trim() || "info@vendelia.fi",
+      from: env.MAIL_FROM?.trim() || `Vendelia <${COMPANY.customerEmail}>`,
+      replyTo: env.MAIL_REPLY_TO?.trim() || COMPANY.customerEmail,
+      businessReplyTo: env.MAIL_BUSINESS_REPLY_TO?.trim() || COMPANY.businessEmail,
       smtp: host ? {
         host, port, secure: env.SMTP_SECURE ? flag("SMTP_SECURE") : port === 465,
         user: env.SMTP_USER?.trim() || undefined, pass: env.SMTP_PASS || undefined,

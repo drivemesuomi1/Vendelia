@@ -1,4 +1,4 @@
-import type { Locale, LocalizedText } from "@vendelia/shared";
+import { COMPANY, type Locale, type LocalizedText } from "@vendelia/shared";
 
 /** Texts for the voucher PDF and email. Kept here because the backend has no message files. */
 const TEXT = {
@@ -7,6 +7,7 @@ const TEXT = {
     company: "Yrityksen tiedot",
     locations: "Kaikki lunastuskohteet",
     email: "Sähköposti",
+    phone: "Puhelin",
     voucher: "LAHJAKORTTI",
     code: "Lahjakortin koodi",
     forMerchant: "Palveluntarjoajalle",
@@ -49,6 +50,7 @@ const TEXT = {
     company: "Företagsuppgifter",
     locations: "Alla inlösningsställen",
     email: "E-post",
+    phone: "Telefon",
     voucher: "PRESENTKORT",
     code: "Presentkortets kod",
     forMerchant: "För tjänsteleverantören",
@@ -91,6 +93,7 @@ const TEXT = {
     company: "Company details",
     locations: "All redemption locations",
     email: "Email",
+    phone: "Phone",
     voucher: "GIFT VOUCHER",
     code: "Voucher code",
     forMerchant: "For the service provider",
@@ -132,6 +135,10 @@ const TEXT = {
 
 export type VoucherText = (typeof TEXT)["fi"];
 export const voucherText = (locale: Locale): VoucherText => TEXT[locale];
+
+/** Sign-off line under every email: "Vendelia Oy · Y-tunnus 3666248-7 · +358 50 357 2836". */
+export const companyLine = (locale: Locale) =>
+  `${COMPANY.name} · ${TEXT[locale].businessId} ${COMPANY.businessId} · ${COMPANY.phone}`;
 
 /** Localized value with the same Finnish fallback as the site (empty sv/en fall back to fi). */
 export const pick = (text: LocalizedText | null | undefined, locale: Locale) =>

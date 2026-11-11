@@ -53,7 +53,7 @@ export class MerchantService {
         locale, businessName, email: login.email, password: login.password,
         loginUrl: `${this.mail.siteUrl}/${locale}/business`, supportEmail: this.mail.supportEmail,
       });
-      await this.mailer.send({ to: login.email, ...message, attachments: [] });
+      await this.mailer.send({ to: login.email, replyTo: this.mail.supportEmail, ...message, attachments: [] });
       return true;
     } catch (error) {
       // The error text is logged without the message body, so the password never reaches the logs.

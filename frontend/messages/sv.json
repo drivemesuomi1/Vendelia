@@ -39,7 +39,10 @@
     "cancelPurchase": "Ångra ett köp",
     "sellOn": "Sälj på Vendelia",
     "pricing": "Priser och utbetalningar",
-    "help": "Hjälp"
+    "help": "Hjälp",
+    "customerService": "Kundtjänst",
+    "businessSupport": "Företagssupport",
+    "phone": "Telefon"
   },
   "home": {
     "bannerTitle": "Mer upplevelser, färre euro",
@@ -118,7 +121,7 @@
     "mapOpen": "Öppna på kartan",
     "meetingPoint": "Mötesplats:",
     "refundTitle": "Avbeställning och återbetalning",
-    "refundBody": "Du kan avbeställa ett oanvänt presentkort och få pengarna tillbaka inom {days} dagar från köpet i Mina presentkort eller via e-post till tuki@vendelia.fi. Vi skickar en bekräftelse och återbetalar till ditt ursprungliga betalningssätt. För använda presentkort gäller företagets villkor och dina lagstadgade rättigheter.",
+    "refundBody": "Du kan avbeställa ett oanvänt presentkort och få pengarna tillbaka inom {days} dagar från köpet i Mina presentkort eller via e-post till info@vendelia.fi. Vi skickar en bekräftelse och återbetalar till ditt ursprungliga betalningssätt. För använda presentkort gäller företagets villkor och dina lagstadgade rättigheter.",
     "phone": "tfn",
     "onBehalf": "Vendelia säljer presentkortet för företagets räkning. Tjänsten tillhandahålls av företaget.",
     "finalPrice": "Slutpris, inkl. moms {vat}. Inga service- eller leveransavgifter.",
@@ -230,7 +233,7 @@
     "freeCancelUntil": "Kostnadsfri avbeställning till {date}",
     "show": "Visa presentkort",
     "cancelRefund": "Avbeställ och återbetala",
-    "help": "Behöver du hjälp med ett köp? Skicka e-post till tuki@vendelia.fi. Vi svarar på vardagar inom en arbetsdag.",
+    "help": "Behöver du hjälp med ett köp? Skicka e-post till info@vendelia.fi. Vi svarar på vardagar inom en arbetsdag.",
     "voucher": "Presentkort",
     "cancelTitle": "Avbeställa presentkortet?",
     "cancelBody": "Presentkortet slutar gälla omedelbart. {amount} återbetalas till ditt ursprungliga betalningssätt, vanligtvis inom 5 vardagar. Vi skickar en bekräftelse till din e-post.",
@@ -1128,7 +1131,7 @@
     "deal_not_found": "Erbjudandet hittades inte.",
     "order_not_found": "Beställningen hittades inte.",
     "api_not_configured": "Tjänsten är inte tillgänglig ännu.",
-    "paymentUnavailable": "Onlinebetalning är inte tillgänglig just nu och du har inte debiterats. Försök igen om en stund eller skriv till tuki@vendelia.fi.",
+    "paymentUnavailable": "Onlinebetalning är inte tillgänglig just nu och du har inte debiterats. Försök igen om en stund eller skriv till info@vendelia.fi.",
     "testCheckoutNotAllowed": "Testbeställningar är inte tillåtna för den här e-postadressen.",
     "itemsUnavailable": "Några produkter i varukorgen finns inte längre. Uppdatera varukorgen och försök igen.",
     "redeemUnavailable": "Registrering av inlösen är ännu inte tillgänglig. Du kan fortfarande kontrollera företagets koder.",
