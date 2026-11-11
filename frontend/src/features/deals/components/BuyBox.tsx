@@ -43,6 +43,8 @@ export function BuyBox({ deal, expiry, preview = false }: { deal: DealDetailDTO;
   const activeGroup = groups.find((g) => g.options.includes(option))!;
   // Keep tiles in a group the same height: reserve the struck-price line only if some option has one.
   const groupHasRef = activeGroup.options.some((o) => { const r = refOf(o); return !!r && r > o.priceCents; });
+  // Tiles fit short names ("60 min"); longer names get a one-column list so they never overlap.
+  const listTiles = activeGroup.options.some((o) => loc(o.shortLabel, locale).length > 16);
 
   return (
     <>
@@ -59,7 +61,7 @@ export function BuyBox({ deal, expiry, preview = false }: { deal: DealDetailDTO;
                 ))}
               </div>
             )}
-            <fieldset className="tiles">
+            <fieldset className={listTiles ? "tiles tiles-list" : "tiles"}>
               <legend className="sr-only">{loc(activeGroup.label, locale) || t("deal.chooseOption")}</legend>
               {activeGroup.options.map((o) => {
                 const r = refOf(o);
