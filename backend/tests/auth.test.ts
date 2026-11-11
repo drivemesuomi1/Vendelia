@@ -60,7 +60,7 @@ it('auth API: role checks, hashed sessions, logout, expiry, suspension, deleted 
     CREATE TABLE auth.users(id uuid PRIMARY KEY, email text, email_confirmed_at timestamptz, deleted_at timestamptz, banned_until timestamptz);`);
   await sql.unsafe(await readFile(new URL('./fixtures/catalogue-schema.sql', import.meta.url), 'utf8'));
   await sql.unsafe(await readFile(new URL('../sql/seed-catalogue.sql', import.meta.url), 'utf8'));
-  for (const file of ['001_orders_vouchers.sql', '002_profiles.sql', '003_auth_sessions.sql', '005_merchant_members.sql', '008_order_customers.sql', '008_order_customers.sql']) {
+  for (const file of ['001_orders_vouchers.sql', '002_profiles.sql', '003_auth_sessions.sql', '005_merchant_members.sql', '008_order_customers.sql', '008_order_customers.sql', '009_voucher_redemption_actor.sql', '009_voucher_redemption_actor.sql']) {
     await sql.begin(async tx => { await tx.unsafe(await readFile(new URL(`../sql/migrations/${file}`, import.meta.url), 'utf8')); });
   }
   await sql`INSERT INTO auth.users(id,email,email_confirmed_at) VALUES (${id}, ${user.email}, now())`;

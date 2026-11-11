@@ -29,16 +29,19 @@ export function AdminVouchers() {
   const [voucher, setVoucher] = useState<AdminVoucherDTO | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [redeemed, setRedeemed] = useState(false);
   const [view, setView] = useState<View>("bought");
   const [lists, setLists] = useState<Partial<Record<View, AdminVoucherDTO[]>>>({});
   const [listError, setListError] = useState<string | null>(null);
   const [q, setQ] = useState("");
 
   async function open(raw: string) {
+    if (busy) return;
     const value = raw.trim().toUpperCase();
     if (!value) return;
     setBusy(true);
     setError(null);
+    setRedeemed(false);
     try {
       const r = await api<{ voucher: AdminVoucherDTO }>(`/api/admin/vouchers/${encodeURIComponent(value)}`);
       setVoucher(r.voucher);
@@ -53,6 +56,19 @@ export function AdminVouchers() {
     }
   }
 
+  async function redeem() {
+    if (!voucher || busy) return;
+    setBusy(true); setError(null); setRedeemed(false);
+    try {
+      const result = await api<{ voucher: AdminVoucherDTO }>('/api/admin/vouchers/redeem', { body: { code: voucher.code } });
+      setVoucher(result.voucher); setRedeemed(true); setLists({});
+    } catch (e) {
+      setError(e instanceof ApiError ? e.code : 'network');
+      // Discard stale eligibility after a redemption/refund in another session.
+      setVoucher(null); setLists({});
+    } finally { setBusy(false); }
+  }
+
   useEffect(() => {
     const fromLink = new URLSearchParams(window.location.search).get("code");
     if (fromLink) void open(fromLink);
@@ -62,10 +78,12 @@ export function AdminVouchers() {
 
   useEffect(() => {
     if (lists[view]) return;
+    let active = true;
     setListError(null);
     api<{ vouchers: AdminVoucherDTO[] }>(`/api/admin/vouchers?view=${view}`)
-      .then((r) => setLists((p) => ({ ...p, [view]: r.vouchers })))
-      .catch((e) => setListError(e instanceof ApiError ? e.code : "network"));
+      .then((r) => { if (active) setLists((p) => ({ ...p, [view]: r.vouchers })); })
+      .catch((e) => { if (active) setListError(e instanceof ApiError ? e.code : "network"); });
+    return () => { active = false; };
   }, [view, lists]);
 
   const submit = (e: FormEvent) => { e.preventDefault(); void open(code); };
@@ -95,7 +113,8 @@ export function AdminVouchers() {
       </form>
 
       {error && <Notice tone="warn" icon="info">{t(`errors.${error}`)}</Notice>}
-      {voucher && <VoucherDetail voucher={voucher} onClose={() => { setVoucher(null); window.history.replaceState(null, "", window.location.pathname); }} />}
+      {redeemed && <Notice icon="checkc">{t('admin.vo.redemption.success')}</Notice>}
+      {voucher && <VoucherDetail key={voucher.code} voucher={voucher} busy={busy} onRedeem={redeem} onClose={() => { setVoucher(null); setRedeemed(false); window.history.replaceState(null, "", window.location.pathname); }} />}
 
       <section className="panel">
         <div className="panel-h">
@@ -165,8 +184,10 @@ function StatusChip({ voucher: v }: { voucher: AdminVoucherDTO }) {
 }
 
 /** Everything about one voucher, grouped as support needs it. */
-function VoucherDetail({ voucher: v, onClose }: { voucher: AdminVoucherDTO; onClose: () => void }) {
+function VoucherDetail({ voucher: v, onClose, onRedeem, busy }: { voucher: AdminVoucherDTO; onClose: () => void; onRedeem: () => void; busy: boolean }) {
   const { t, locale } = useI18n();
+  const [confirming, setConfirming] = useState(false);
+  const eligible = v.status === 'active' && !v.redeemedAt && !v.refundedAt && Date.parse(v.expiresAt) > Date.now();
   const when = (iso: string | null) => (iso ? dateTime(iso, locale) : "–");
   const facts = (rows: [string, ReactNode][]) => (
     <dl className="facts">{rows.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value ?? "–"}</dd></div>)}</dl>
@@ -190,8 +211,19 @@ function VoucherDetail({ voucher: v, onClose }: { voucher: AdminVoucherDTO; onCl
             {v.test && <span className="chip warn"><Icon name="info" />{t("business.testVoucher")}</span>}
           </div>
         </div>
-        <button type="button" className="btn btn-ghost btn-sm" onClick={onClose} aria-label={t("admin.mb.close")}><Icon name="x" /></button>
+        <button type="button" className="btn btn-ghost btn-sm" disabled={busy} onClick={onClose} aria-label={t("admin.mb.close")}><Icon name="x" /></button>
       </div>
+
+      {eligible && <div className="stack" style={{ padding: '0 20px 20px', gap: 12 }}>
+        <Notice tone="indigo">{t('admin.vo.redemption.hint')}</Notice>
+        {confirming ? <div className="stack" style={{ gap: 12 }}>
+          <p>{t('admin.vo.redemption.confirm', { code: v.code, merchant: v.merchant.name })}</p>
+          <div className="row wrap-row" style={{ gap: 10 }}>
+            <button type="button" className="btn btn-primary" disabled={busy} onClick={onRedeem}>{t(busy ? 'admin.vo.redemption.working' : 'admin.vo.redemption.confirmButton')}</button>
+            <button type="button" className="btn btn-secondary" disabled={busy} onClick={() => setConfirming(false)}>{t('admin.vo.redemption.cancel')}</button>
+          </div>
+        </div> : <div><button type="button" className="btn btn-primary" disabled={busy} onClick={() => setConfirming(true)}><Icon name="check" />{t('admin.vo.redemption.action')}</button></div>}
+      </div>}
 
       <div className="vo-grid">
         <div>
@@ -206,6 +238,10 @@ function VoucherDetail({ voucher: v, onClose }: { voucher: AdminVoucherDTO; onCl
         </div>
         <div>
           <h3>{t("admin.vo.history")}</h3>
+          {v.redeemedAt && facts([
+            [t('admin.vo.redemption.source'), t(`admin.vo.redemption.${v.redeemedByRole ?? 'unknown'}`)],
+            [t('admin.vo.redemption.actor'), v.redeemedBy?.name ?? v.redeemedBy?.id],
+          ])}
           <ol className="timeline-icons vo-timeline">
             {history.map((h) => (
               <li key={h.label} className={h.tone ? `is-${h.tone}` : undefined}>

@@ -27,6 +27,29 @@ The owner's schema exports reviewed on 2026-10-31 contained these seven tables:
 | `backend/sql/migrations/006_merchant_account_provisioning.sql` | Private recovery journal for optional admin business-account creation; no passwords | None |
 | `backend/sql/migrations/007_deal_review.sql` | Legacy `deal_images` bytes table with merchant FK and restricted access | Review note, submission/review timestamps, reviewer FK and queue index on `deals` |
 | `backend/sql/migrations/008_order_customers.sql` | No new table | Nullable `orders.customer_id` FK to `profiles.user_id`, with index; deletion sets the link to NULL |
+| `backend/sql/migrations/009_voucher_redemption_actor.sql` | No new table | Nullable `vouchers.redeemed_by` FK to profiles (delete sets NULL), actor index and `redeemed_by_role` (`admin`/`merchant`) |
+
+## Redemption attribution (009)
+
+Apply 009 before deploying admin redemption: merchant redemption and admin
+voucher/refund reads also use the new columns. The SQL is additive and replayable;
+wrap the complete file in BEGIN/COMMIT in Supabase SQL Editor. It has not been
+applied to shared Supabase by the coding agent. Existing schema exports predate
+009 and need subsequent migrations when restored.
+
+Admin voucher details offer explicit confirmation of redemption through
+`POST /api/admin/vouchers/redeem`. Both admin and business redemption atomically
+save status, timestamp, verified profile UUID and the role at redemption. Clients
+cannot choose the actor. Profile deletion sets the UUID to NULL but preserves
+the recorded role; displayed actor names come from the current profile.
+Historical actor/role values remain NULL (unknown); no backfill guesses are made.
+
+Admins can redeem any business's active, unexpired voucher, including test/unpaid
+vouchers. Refunded, previously used or expired vouchers cannot be redeemed.
+Admin/business redemption and support refunds compete on the same conditional
+row update, so only one can succeed. The voucher remains assigned to its original
+merchant and contributes once to that merchant's existing payout preview. This
+feature does not transfer money or create a settlement record.
 
 ## Order account ownership (008)
 

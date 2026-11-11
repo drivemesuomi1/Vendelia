@@ -232,6 +232,9 @@ export interface AdminVoucherDTO {
   expiresAt: string;
   cancellableUntil: string | null;
   redeemedAt: string | null;
+  /** Role at redemption, or unknown for historical rows. */
+  redeemedByRole: 'admin' | 'merchant' | null;
+  redeemedBy: { id: string; name: string | null } | null;
   refundedAt: string | null;
   recipientName: string | null;
   merchant: { id: string; name: string };

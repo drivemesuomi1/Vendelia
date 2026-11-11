@@ -72,7 +72,9 @@ npm run build
 - **Backend:** database health, catalogue metadata/list/detail, server-priced cart quotes,
   guest test orders, voucher PDFs/email and public voucher lookup are implemented.
   Checkout requires migration `001_orders_vouchers.sql` and explicit payment bypass configuration;
-  real payments remain unimplemented; merchant-authorized redemption is implemented.
+  real payments remain unimplemented; merchant and admin redemption are implemented.
+  Apply `009_voucher_redemption_actor.sql` before deploying redemption attribution:
+  vouchers record the acting profile UUID and its admin/merchant role.
   Merchant login, membership and the owned-deal list are database-backed; apply
   migration 005 and follow [merchant login setup](docs/merchant-login.md). Deal
   creation/editing, admin review, merchant redemption and admin voucher views

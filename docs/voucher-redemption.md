@@ -4,8 +4,13 @@
 
 The customer presents a voucher to the business providing the service. That
 business checks the code and confirms redemption through its own portal. Admins
-inspect vouchers for support and oversight; they do not redeem on behalf of each
-business. These requirements are implemented by commits 52c255f and 20b7641.
+can also redeem a voucher through the admin voucher detail screen after explicit
+confirmation. The database distinguishes admin and business redemptions.
+
+Apply `backend/sql/migrations/009_voucher_redemption_actor.sql` before deployment.
+It adds nullable `vouchers.redeemed_by` (FK to `profiles.user_id`, deletion sets
+NULL) and `redeemed_by_role` (`admin` or `merchant`). Old rows remain unknown.
+No new environment variables are required.
 
 - Business page: `/{locale}/business/redeem`. Enter code, check validity, then
   explicitly confirm marking it used. Test/unpaid vouchers are visibly labelled.
@@ -13,6 +18,8 @@ business. These requirements are implemented by commits 52c255f and 20b7641.
   order/buyer/business and lifecycle timestamps, or browse the latest 25 issued
   and latest 25 used vouchers. `?code=VND-...` links to a voucher. Refresh the
   page to retrieve newly issued/redeemed rows; the list is not a live subscription.
+  Active, unexpired vouchers offer “Redeem as admin” and a confirmation step.
+  Success refreshes the lists and shows attribution in voucher history.
 - All three supported languages (Finnish, Swedish, English) are available.
 
 ## Server enforcement and files
@@ -23,17 +30,32 @@ app-wide guard in `backend/src/app.ts` restricts `/api/admin/*` to active admins
 Admin accounts do not automatically receive merchant redemption privileges.
 The redemption mutation also rejects a supplied foreign Origin.
 
+`POST /api/admin/vouchers/redeem` accepts `{ code }`, requires an active admin
+session and returns `{ voucher: AdminVoucherDTO }`. It derives the actor from
+the verified session, never request fields. Used/refunded/expired vouchers return
+409; missing vouchers return 404. Test/unpaid vouchers remain redeemable.
+Both paths use conditional updates to prevent duplicate redemption and races with
+refunds. Admin redemption keeps the voucher's merchant and contributes once to
+that merchant's payout preview, with no actual payment transfer.
+
+Admin DTOs expose `redeemedByRole` and `redeemedBy` (current profile name/UUID).
+After profile deletion the actor is NULL, while the role at redemption remains.
+Existing redeemed rows without attribution are displayed as historical/unknown.
+
 `backend/src/modules/orders/service.ts` performs one conditional database update:
 
 ```sql
 UPDATE public.vouchers v
-SET status = 'redeemed', redeemed_at = now()
+SET status = 'redeemed', redeemed_at = now(),
+    redeemed_by = $3, redeemed_by_role = 'merchant'
 FROM public.order_items oi
 WHERE oi.id = v.order_item_id
   AND v.code = $1
   AND v.merchant_id = $2
   AND v.status = 'active'
   AND v.expires_at > now()
+  AND v.redeemed_at IS NULL
+  AND v.refunded_at IS NULL
 RETURNING v.price_cents, oi.vat_bps;
 ```
 
@@ -98,8 +120,11 @@ Use a test voucher in the preview environment:
 5. Try to redeem it again: the backend must refuse.
 
 `backend/tests/merchant-auth.test.ts` covers ownership isolation, unauthenticated
-and admin-role refusal, foreign Origin refusal, concurrent redemption (one 200,
+and admin-role refusal on the merchant endpoint, foreign Origin refusal, concurrent redemption (one 200,
 one 409), persisted database state, repeat use, expiry and refunded refusal.
+It also covers admin redemption authorization, verified actor/role attribution,
+ignored forged actor fields, business/admin and admin/refund races, repeat-use
+refusal, historical unknown actors and inclusion in the owning merchant's preview.
 `backend/tests/deals.test.ts` covers admin-only detail/list access, unknown codes,
 buyer/order details and moving to the used list after redemption.
 

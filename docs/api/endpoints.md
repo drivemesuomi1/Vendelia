@@ -67,10 +67,12 @@ and server-secret setup; see [provisioning](../merchant-account-provisioning.md)
 See [admin business setup](../admin-businesses.md). Other admin routes below remain
 planned unless otherwise documented.
 
+| Method | Endpoint | Behavior |
+|---|---|---|
 | GET | `/api/admin/deals?status` | Review queue |
 | GET | `/api/admin/vouchers?view=bought\|used` | Admin-only latest 25 issued or redeemed vouchers from the database |
 | GET | `/api/admin/vouchers/:code` | Admin-only voucher, buyer, order and business details |
-|---|---|---|
+| POST | `/api/admin/vouchers/redeem` | Implemented after migration 009: `{ code }` atomically redeems an active, unexpired voucher, recording the verified admin UUID/role; returns `{ voucher }` |
 | POST | `/api/admin/deals/:id/review` | `{ decision: approve|reject, note? }` |
 | GET/POST | `/api/admin/merchants` | List / create business records, with optional new login provisioning |
 | GET | `/api/admin/merchants/:id` | Business details |

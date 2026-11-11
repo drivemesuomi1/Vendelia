@@ -1004,7 +1004,21 @@
         "sent": "Sent",
         "failed": "Sending failed"
       },
-      "payout": "Business receives"
+      "payout": "Business receives",
+      "redemption": {
+        "action": "Redeem as admin",
+        "hint": "Admin redemption marks this voucher as used and records your account as the administrator who redeemed it.",
+        "confirm": "Redeem {code} for {merchant}? The voucher will be marked as used and cannot be redeemed again.",
+        "confirmButton": "Confirm admin redemption",
+        "cancel": "Cancel",
+        "working": "Redeeming…",
+        "success": "Voucher redeemed successfully. Recorded as an admin redemption.",
+        "source": "Redeemed through",
+        "actor": "Redeemed by",
+        "admin": "Admin",
+        "merchant": "Business",
+        "unknown": "Not recorded (historical)"
+      }
     }
   },
   "errors": {

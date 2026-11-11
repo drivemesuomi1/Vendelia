@@ -246,18 +246,36 @@ export class OrderService {
    * still be active and unexpired at that moment and two tills cannot both redeem it. Refusals return why,
    * with the same results as the lookup. The payout uses the current commission, like the portal's payout box.
    */
-  async redeemForMerchant(rawCode: string, merchantId: string): Promise<{ redeemed: boolean; voucher: RedeemLookupDTO }> {
+  async redeemForMerchant(rawCode: string, merchantId: string, actorId: string): Promise<{ redeemed: boolean; voucher: RedeemLookupDTO }> {
     const parsed = voucherCodeSchema.safeParse(rawCode);
     if (!parsed.success) return { redeemed: false, voucher: { code: rawCode.trim().toUpperCase(), result: 'not_found' } };
     const [row] = await this.sql<{ price_cents: number; vat_bps: number }[]>`
-      UPDATE public.vouchers v SET status = 'redeemed', redeemed_at = now()
+      UPDATE public.vouchers v SET status = 'redeemed', redeemed_at = now(),
+        redeemed_by = ${actorId}, redeemed_by_role = 'merchant'
       FROM public.order_items oi
       WHERE oi.id = v.order_item_id AND v.code = ${parsed.data} AND v.merchant_id = ${merchantId}
-        AND v.status = 'active' AND v.expires_at > now()
+        AND v.status = 'active' AND v.expires_at > now() AND v.redeemed_at IS NULL AND v.refunded_at IS NULL
       RETURNING v.price_cents, oi.vat_bps`;
     const voucher = await this.lookupForMerchant(parsed.data, merchantId);
     if (!row) return { redeemed: false, voucher };
     return { redeemed: true, voucher: { ...voucher, payoutCents: payoutCents(row.price_cents, row.vat_bps, this.policy) } };
+  }
+
+  /** Admin support redemption: same single-use/expiry rules, attributed to the verified admin. */
+  async redeemForAdmin(rawCode: string, actorId: string): Promise<AdminVoucherDTO> {
+    const parsed = voucherCodeSchema.safeParse(rawCode);
+    if (!parsed.success) throw new HttpProblem(400, 'invalidVoucherCode');
+    const [updated] = await this.sql<{ code: string }[]>`
+      UPDATE public.vouchers SET status = 'redeemed', redeemed_at = now(),
+        redeemed_by = ${actorId}, redeemed_by_role = 'admin'
+      WHERE code = ${parsed.data} AND status = 'active' AND expires_at > now()
+        AND redeemed_at IS NULL AND refunded_at IS NULL
+      RETURNING code`;
+    const voucher = await this.adminVoucher(parsed.data);
+    if (!voucher) throw new HttpProblem(404, 'voucher_not_found');
+    if (!updated) throw new HttpProblem(409, voucher.refundedAt || voucher.status === 'refunded'
+      ? 'redeem_refunded' : voucher.redeemedAt || voucher.status === 'redeemed' ? 'redeem_redeemed' : 'redeem_expired');
+    return voucher;
   }
 
   /** Current-rate earnings preview for the session's merchant, with no buyer contact information. */
@@ -430,12 +448,14 @@ export class OrderService {
       title: LocalizedText; option_label: LocalizedText | null; recipient_name: string | null;
       issued_at: string; expires_at: string; cancellable_until: string | null; redeemed_at: string | null; refunded_at: string | null;
       merchant_id: string; merchant_name: string; deal_id: string; slug: string;
+      redeemed_by: string | null; redeemed_by_role: 'admin' | 'merchant' | null; redeemed_by_name: string | null;
       order_id: string; number: string; order_status: string; email: string; first_name: string; last_name: string; phone: string | null;
       payment_method: string; total_cents: number; created_at: string; paid_at: string | null; email_status: string;
     }[]>`
       SELECT v.code, v.status, v.is_test, v.price_cents, oi.vat_bps, oi.title, oi.option_label, v.recipient_name,
         to_json(v.issued_at) AS issued_at, to_json(v.expires_at) AS expires_at, to_json(v.cancellable_until) AS cancellable_until,
         to_json(v.redeemed_at) AS redeemed_at, to_json(v.refunded_at) AS refunded_at,
+        v.redeemed_by, v.redeemed_by_role, actor.display_name AS redeemed_by_name,
         v.merchant_id, m.display_name AS merchant_name, v.deal_id, d.slug,
         o.id AS order_id, o.number, o.status AS order_status, o.email, o.first_name, o.last_name, o.phone,
         o.payment_method, o.total_cents, to_json(o.created_at) AS created_at, to_json(o.paid_at) AS paid_at, o.email_status
@@ -444,6 +464,7 @@ export class OrderService {
       JOIN public.orders o ON o.id = v.order_id
       JOIN public.merchants m ON m.id = v.merchant_id
       JOIN public.deals d ON d.id = v.deal_id
+      LEFT JOIN public.profiles actor ON actor.user_id = v.redeemed_by
       WHERE ${where} ORDER BY ${order} LIMIT ${limit}`;
     return rows.map((r) => ({
       code: r.code,
@@ -453,6 +474,8 @@ export class OrderService {
       priceCents: r.price_cents, vatBps: r.vat_bps, payoutCents: payoutCents(r.price_cents, r.vat_bps, this.policy),
       issuedAt: iso(r.issued_at), expiresAt: iso(r.expires_at), cancellableUntil: isoOrNull(r.cancellable_until),
       redeemedAt: isoOrNull(r.redeemed_at), refundedAt: isoOrNull(r.refunded_at), recipientName: r.recipient_name,
+      redeemedByRole: r.redeemed_by_role,
+      redeemedBy: r.redeemed_by ? { id: r.redeemed_by, name: r.redeemed_by_name } : null,
       merchant: { id: r.merchant_id, name: r.merchant_name }, deal: { id: r.deal_id, slug: r.slug },
       order: {
         id: r.order_id, number: r.number, status: r.order_status, email: r.email, name: `${r.first_name} ${r.last_name}`.trim(),

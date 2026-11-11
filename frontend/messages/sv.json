@@ -1004,7 +1004,21 @@
         "sent": "Skickat",
         "failed": "Sändningen misslyckades"
       },
-      "payout": "Företaget får"
+      "payout": "Företaget får",
+      "redemption": {
+        "action": "Lös in som administratör",
+        "hint": "Administratörsinlösen markerar presentkortet som använt och registrerar ditt konto som administratören som löste in det.",
+        "confirm": "Lös in {code} för {merchant}? Presentkortet markeras som använt och kan inte lösas in igen.",
+        "confirmButton": "Bekräfta administratörsinlösen",
+        "cancel": "Avbryt",
+        "working": "Löser in…",
+        "success": "Presentkortet har lösts in. Registrerat som en administratörsinlösen.",
+        "source": "Inlösarens roll",
+        "actor": "Inlöst av",
+        "admin": "Administratör",
+        "merchant": "Företag",
+        "unknown": "Inte registrerat (historiskt)"
+      }
     }
   },
   "errors": {

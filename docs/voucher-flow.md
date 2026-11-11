@@ -2,6 +2,11 @@
 
 Customer details → checkout → order and vouchers saved → PDF voucher emailed.
 
+Apply `009_voucher_redemption_actor.sql` before deploying redemption attribution.
+Admins can confirm redemption from admin voucher details; business redemption
+remains restricted to its own merchant. Both save the acting profile and role on
+the voucher. See [redemption](voucher-redemption.md) for rules and deployment.
+
 Apply migration `008_order_customers.sql` before deploying account ownership.
 Signed-in checkout saves the verified session's profile UUID in `orders.customer_id`
 for any role; guest checkout saves NULL. Account voucher lists and individual PDFs

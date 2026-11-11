@@ -32,7 +32,7 @@ it('merchant login, membership revocation, suspension and deal/voucher ownership
     CREATE TABLE auth.users(id uuid PRIMARY KEY, email text, email_confirmed_at timestamptz, deleted_at timestamptz, banned_until timestamptz);`);
   await sql.unsafe(await fixture('./fixtures/catalogue-schema.sql'));
   await sql.unsafe(await fixture('../sql/seed-catalogue.sql'));
-  for (const name of ['001_orders_vouchers.sql', '002_profiles.sql', '003_auth_sessions.sql', '005_merchant_members.sql', '005_merchant_members.sql', '008_order_customers.sql']) {
+  for (const name of ['001_orders_vouchers.sql', '002_profiles.sql', '003_auth_sessions.sql', '005_merchant_members.sql', '005_merchant_members.sql', '008_order_customers.sql', '009_voucher_redemption_actor.sql', '009_voucher_redemption_actor.sql']) {
     await sql.begin(async tx => { await tx.unsafe('SET LOCAL client_min_messages=warning;\n' + await fixture(`../sql/migrations/${name}`)); });
   }
   const original = (await sql`SELECT id FROM public.merchants`)[0]!.id as string;
@@ -117,8 +117,9 @@ it('merchant login, membership revocation, suspension and deal/voucher ownership
     const done = racing.find(r => r.statusCode === 200)!;
     assert.equal(done.statusCode, 200); assert.equal(done.json().result, 'redeemed'); assert.equal(done.json().payoutCents, 7565);
     assert.ok(done.json().redeemedAt);
-    const [saved] = await sql`SELECT status, redeemed_at FROM public.vouchers WHERE code='VND-ABCD-EFGH'`;
+    const [saved] = await sql`SELECT status, redeemed_at, redeemed_by, redeemed_by_role FROM public.vouchers WHERE code='VND-ABCD-EFGH'`;
     assert.equal(saved!.status, 'redeemed'); assert.ok(saved!.redeemed_at);
+    assert.equal(saved!.redeemed_by, ids.a); assert.equal(saved!.redeemed_by_role, 'merchant');
     // Earnings preview uses existing redeemed rows, never a client-supplied business ID.
     assert.equal((await app.inject({ url: '/api/merchant/payouts' })).statusCode, 401);
     assert.equal((await app.inject({ url: '/api/merchant/payouts', headers: { cookie: cookieOf(admin) } })).statusCode, 403);
@@ -173,6 +174,46 @@ it('merchant login, membership revocation, suspension and deal/voucher ownership
     if (race[1]!.statusCode === 200) assert.equal((await refund(raceCode)).json().error, 'refundAlreadyRedeemed');
     const duplicate = await Promise.all([refund(twiceCode), refund(twiceCode)]);
     assert.deepEqual(duplicate.map(r => r.statusCode).sort(), [200, 409]);
+    // Admin redemption has its own guarded endpoint and records the verified actor/role.
+    const adminRedeem = (code: string, authCookie = cookieOf(admin), extra: Record<string, string> = {}) =>
+      app.inject({ method: 'POST', url: '/api/admin/vouchers/redeem', headers: { cookie: authCookie, ...extra },
+        payload: { code, redeemed_by: ids.a, redeemed_by_role: 'merchant' } });
+    for (const code of ['VND-ADMN-AAAA', 'VND-ADMN-RACE', 'VND-ADMN-RFND', 'VND-ADMN-EXPD']) {
+      await sql`INSERT INTO public.vouchers(code,qr_payload,order_id,order_item_id,deal_id,option_id,merchant_id,is_test,price_cents,expires_at)
+        VALUES (${code},'https://example.com',${order},${item},${deal},${option},${original},true,8900,now()+interval '1 month')`;
+    }
+    assert.equal((await app.inject({ method: 'POST', url: '/api/admin/vouchers/redeem', payload: { code: 'VND-ADMN-AAAA' } })).statusCode, 401);
+    assert.equal((await adminRedeem('VND-ADMN-AAAA', cookie)).statusCode, 403);
+    assert.equal((await adminRedeem('VND-ADMN-AAAA', cookieOf(customer))).statusCode, 403);
+    assert.equal((await adminRedeem('VND-ADMN-AAAA', cookieOf(admin), { origin: 'https://evil.example' })).statusCode, 403);
+    assert.equal((await adminRedeem('invalid')).statusCode, 400);
+    assert.equal((await adminRedeem('VND-ZZZZ-ZZZZ')).statusCode, 404);
+    const adminDone = await adminRedeem('vnd-admn-aaaa');
+    assert.equal(adminDone.statusCode, 200, adminDone.body);
+    assert.equal(adminDone.json().voucher.status, 'redeemed');
+    assert.equal(adminDone.json().voucher.redeemedByRole, 'admin');
+    assert.deepEqual(adminDone.json().voucher.redeemedBy, { id: ids.admin, name: 'admin' });
+    const [adminSaved] = await sql`SELECT redeemed_by, redeemed_by_role, redeemed_at FROM public.vouchers WHERE code='VND-ADMN-AAAA'`;
+    assert.equal(adminSaved!.redeemed_by, ids.admin); assert.equal(adminSaved!.redeemed_by_role, 'admin');
+    assert.equal((await adminRedeem('VND-ADMN-AAAA')).statusCode, 409);
+    assert.equal((await refund('VND-ADMN-AAAA')).json().error, 'refundAlreadyRedeemed');
+    const merchantAfterAdmin = await app.inject({ method: 'POST', url: '/api/merchant/vouchers/redeem', headers: { cookie }, payload: { code: 'VND-ADMN-AAAA' } });
+    assert.equal(merchantAfterAdmin.statusCode, 409);
+    assert.equal((await sql`SELECT redeemed_by FROM public.vouchers WHERE code='VND-ADMN-AAAA'`)[0]!.redeemed_by, ids.admin);
+    const earnings = (await app.inject({ url: '/api/merchant/payouts', headers: { cookie } })).json();
+    assert.ok(earnings.rows.some((r: { code: string }) => r.code === 'VND-ADMN-AAAA'));
+    await sql`UPDATE public.vouchers SET issued_at=now()-interval '2 days', expires_at=now()-interval '1 day' WHERE code='VND-ADMN-EXPD'`;
+    assert.equal((await adminRedeem('VND-ADMN-EXPD')).json().error, 'redeem_expired');
+    assert.equal((await adminRedeem(refundCode)).json().error, 'redeem_refunded');
+    const mixed = await Promise.all([adminRedeem('VND-ADMN-RACE'), app.inject({ method: 'POST', url: '/api/merchant/vouchers/redeem', headers: { cookie }, payload: { code: 'VND-ADMN-RACE' } })]);
+    assert.deepEqual(mixed.map(r => r.statusCode).sort(), [200, 409]);
+    const winner = (await sql`SELECT redeemed_by, redeemed_by_role FROM public.vouchers WHERE code='VND-ADMN-RACE'`)[0]!;
+    assert.equal(winner.redeemed_by, mixed[0]!.statusCode === 200 ? ids.admin : ids.a);
+    assert.equal(winner.redeemed_by_role, mixed[0]!.statusCode === 200 ? 'admin' : 'merchant');
+    const refundRace = await Promise.all([adminRedeem('VND-ADMN-RFND'), refund('VND-ADMN-RFND')]);
+    assert.deepEqual(refundRace.map(r => r.statusCode).sort(), [200, 409]);
+    const old = (await app.inject({ url: '/api/admin/vouchers/VND-USED-ABCD', headers: { cookie: cookieOf(admin) } })).json().voucher;
+    assert.equal(old.redeemedByRole, null); assert.equal(old.redeemedBy, null);
     await app.inject({ method: 'POST', url: '/api/auth/logout', headers: { cookie }, payload: {} });
     assert.equal((await read()).statusCode, 401);
     await sql`DELETE FROM public.merchant_members WHERE user_id=${ids.b}`;

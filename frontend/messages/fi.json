@@ -1004,7 +1004,21 @@
         "sent": "Lähetetty",
         "failed": "Lähetys epäonnistui"
       },
-      "payout": "Yritys saa"
+      "payout": "Yritys saa",
+      "redemption": {
+        "action": "Lunasta ylläpitäjänä",
+        "hint": "Ylläpitäjän lunastus merkitsee lahjakortin käytetyksi ja tallentaa tilisi lunastuksen tehneeksi ylläpitäjäksi.",
+        "confirm": "Lunastetaanko {code} yritykselle {merchant}? Lahjakortti merkitään käytetyksi, eikä sitä voi lunastaa uudelleen.",
+        "confirmButton": "Vahvista ylläpitäjän lunastus",
+        "cancel": "Peruuta",
+        "working": "Lunastetaan…",
+        "success": "Lahjakortti lunastettu. Lunastus kirjattiin ylläpitäjän tekemäksi.",
+        "source": "Lunastuksen tekijän rooli",
+        "actor": "Lunastanut",
+        "admin": "Ylläpitäjä",
+        "merchant": "Yritys",
+        "unknown": "Ei tallennettu (vanha lunastus)"
+      }
     }
   },
   "errors": {

@@ -90,6 +90,16 @@ export async function orderRoutes(app: FastifyInstance, { service, auth, origins
     return { voucher };
   });
 
+  app.post('/api/admin/vouchers/redeem', async (request, reply) => {
+    // Also guarded by the app-wide admin/origin hook; derive attribution from the session.
+    const user = await auth.current(sessionToken(request.headers.cookie));
+    if (!user) throw new HttpProblem(401, 'invalidLogin');
+    if (user.role !== 'admin') throw new HttpProblem(403, 'forbidden');
+    const parsed = redeemLookupSchema.safeParse(request.body);
+    if (!parsed.success) return reply.code(400).send({ error: 'invalidVoucherCode', message: 'Invalid voucher code' });
+    return { voucher: await service.redeemForAdmin(parsed.data.code, user.id) };
+  });
+
   // Changes a voucher, so a request from another site is refused even with a valid session cookie.
   app.post("/api/merchant/vouchers/redeem", async (request, reply) => {
     if (request.headers.origin && !origins.includes(request.headers.origin)) throw new HttpProblem(403, 'forbidden');
@@ -98,7 +108,7 @@ export async function orderRoutes(app: FastifyInstance, { service, auth, origins
     if (user.role !== 'merchant' || !user.merchant) throw new HttpProblem(403, 'forbidden');
     const parsed = redeemLookupSchema.safeParse(request.body);
     if (!parsed.success) return reply.code(400).send({ error: "invalidVoucherCode", message: "Invalid voucher code" });
-    const { redeemed, voucher } = await service.redeemForMerchant(parsed.data.code, user.merchant.id);
+    const { redeemed, voucher } = await service.redeemForMerchant(parsed.data.code, user.merchant.id, user.id);
     if (!redeemed) return reply.code(409).send({ error: `redeem_${voucher.result}`, message: "Voucher cannot be redeemed", voucher });
     return voucher;
   });
