@@ -35,6 +35,15 @@ export function DealMap({ point, address }: { point: MapPoint; address: string }
   const map = useRef<LeafletMap | null>(null);
   const tiles = useRef<TileLayer | null>(null);
   const [view, setView] = useState<View>("map");
+  // iPhone and iPad open Apple Maps; everything else opens Google Maps. Decided after mount so the
+  // server render (Google) and the first client render match.
+  const google = `https://www.google.com/maps/search/?api=1&query=${point.lat},${point.lon}`;
+  const [mapsUrl, setMapsUrl] = useState(google);
+  useEffect(() => {
+    const ios = /iPhone|iPad|iPod/.test(navigator.userAgent)
+      || (navigator.userAgent.includes("Macintosh") && navigator.maxTouchPoints > 1); // iPadOS reports as Mac
+    setMapsUrl(ios ? `https://maps.apple.com/?ll=${point.lat},${point.lon}&q=${encodeURIComponent(address)}` : google);
+  }, [google, point.lat, point.lon, address]);
 
   useEffect(() => {
     let cancelled = false;
@@ -99,7 +108,7 @@ export function DealMap({ point, address }: { point: MapPoint; address: string }
           <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
         </svg>
       </button>
-      <a className="deal-map-open" href={`https://www.openstreetmap.org/?mlat=${point.lat}&mlon=${point.lon}#map=17/${point.lat}/${point.lon}`} target="_blank" rel="noopener noreferrer">
+      <a className="deal-map-open" href={mapsUrl} target="_blank" rel="noopener noreferrer">
         <Icon name="pin" />{t("deal.mapOpen")}
       </a>
     </div>
