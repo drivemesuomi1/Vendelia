@@ -881,6 +881,8 @@
       "merchantInactive": "This business isn't active, so the deal won't be shown on the site even after approval.",
       "feedback": "Feedback to the business",
       "feedbackHint": "Shown on this deal's card in the business portal. Required when rejecting; optional with an approval.",
+      "unpublishReason": "Reason for removing from sale",
+      "unpublishHint": "Shown on this deal's card in the business portal so they know what to fix.",
       "lastFeedback": "Last feedback sent"
     },
     "ov": {
@@ -1054,6 +1056,17 @@
         "merchant": "Business",
         "unknown": "Not recorded (historical)"
       }
+    },
+    "de": {
+      "title": "Edit deal",
+      "sub": "Editing a deal of {name} as an admin.",
+      "edit": "Edit deal",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "saved": "Changes saved",
+      "note": "Saved straight away. The deal keeps its status.",
+      "liveNote": "This deal is live. Your changes go on sale straight away, without a new review.",
+      "keepNote": "The deal keeps its review status. The business sees your changes in its portal."
     }
   },
   "errors": {

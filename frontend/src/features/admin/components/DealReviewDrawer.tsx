@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import type { DealInput, MerchantStatus } from "@vendelia/shared";
 import { Dialog } from "@/components/ui/Dialog";
@@ -28,8 +29,11 @@ type Decide = (id: string, decision: "approve" | "reject", note?: string) => voi
  * Preview, reject-reason field and the approve / reject / take-off-sale buttons for one deal.
  * Used in the drawer (browser demo) and on the full review page. Mount with a `key` of the deal id.
  */
-export function DealReviewForm({ deal, variant, onDecision, onDone }: {
+export function DealReviewForm({ deal, variant, onDecision, onDone, editHref, editLabel }: {
   deal: ReviewableDeal;
+  /** When set, an edit link sits opposite the status chip, aligned with the preview. */
+  editHref?: string;
+  editLabel?: string;
   variant: "drawer" | "page";
   onDecision: Decide;
   onDone: () => void;
@@ -39,9 +43,18 @@ export function DealReviewForm({ deal, variant, onDecision, onDone }: {
   const [noteError, setNoteError] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // A live deal is already approved, so feedback only appears once the admin chooses to take it off sale.
+  const live = deal.status === "live";
+  const [unpublishing, setUnpublishing] = useState(false);
+  const showNote = !live || unpublishing;
 
   // The comment goes to the business with either decision; rejecting needs one so they know what to fix.
   const decide = async (decision: "approve" | "reject") => {
+    if (decision === "reject" && live && !unpublishing) {
+      setUnpublishing(true);
+      requestAnimationFrame(() => document.getElementById("dr-note")?.focus());
+      return;
+    }
     if (decision === "reject" && !note.trim()) return setNoteError(true);
     setBusy(true);
     setError(null);
@@ -56,23 +69,29 @@ export function DealReviewForm({ deal, variant, onDecision, onDone }: {
 
   const body = (
     <>
-      <div className="row" style={{ gap: 8 }}><DealChip status={deal.status === "draft" ? "pending" : deal.status} /></div>
+      <div className="review-top">
+        <DealChip status={deal.status === "draft" ? "pending" : deal.status} />
+        {editHref && <Link className="btn btn-ghost btn-sm" href={editHref}><Icon name="doc" />{editLabel}</Link>}
+      </div>
       {deal.merchantStatus && deal.merchantStatus !== "active" && <Notice tone="warn" icon="info">{t("admin.dr.merchantInactive")}</Notice>}
       {error && <Notice tone="danger" icon="xc">{t(`errors.${error}`)}</Notice>}
       {deal.reviewNote && <p className={`review-note${deal.status === "rejected" ? "" : " ok"}`}><span><b>{t("admin.dr.lastFeedback")}:</b> {deal.reviewNote}</span></p>}
       <DealPreview input={deal.input} businessName={deal.merchantName} />
-      <div className="mb-field">
-        <label htmlFor="dr-note">{t("admin.dr.feedback")}</label>
+      {showNote && <div className="mb-field">
+        <label htmlFor="dr-note">{t(live ? "admin.dr.unpublishReason" : "admin.dr.feedback")}</label>
         <textarea id="dr-note" className="input" rows={4} maxLength={1000} value={note} onChange={(e) => { setNote(e.target.value); setNoteError(false); }} aria-invalid={noteError || undefined} aria-describedby="dr-note-hint" />
-        <p className="hint" id="dr-note-hint">{t("admin.dr.feedbackHint")}</p>
+        <p className="hint" id="dr-note-hint">{t(live ? "admin.dr.unpublishHint" : "admin.dr.feedbackHint")}</p>
         {noteError && <p className="err-msg"><Icon name="xc" />{t("admin.dr.reasonRequired")}</p>}
-      </div>
+      </div>}
     </>
   );
   const actions = (
     <>
       {deal.status !== "live" && (
         <button className="btn btn-primary" type="button" onClick={() => decide("approve")} disabled={busy}><Icon name="check" />{t("admin.dr.approve")}</button>
+      )}
+      {live && unpublishing && (
+        <button className="btn btn-secondary" type="button" onClick={() => { setUnpublishing(false); setNote(""); setNoteError(false); }} disabled={busy}>{t("admin.mb.cancel")}</button>
       )}
       {deal.status !== "rejected" && (
         <button className="btn btn-danger" type="button" onClick={() => decide("reject")} disabled={busy}>

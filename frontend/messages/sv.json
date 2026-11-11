@@ -881,6 +881,8 @@
       "merchantInactive": "Företaget är inte aktivt, så erbjudandet visas inte på webbplatsen ens efter godkännande.",
       "feedback": "Återkoppling till företaget",
       "feedbackHint": "Visas på erbjudandets kort i företagsportalen. Krävs vid avslag, valfritt vid godkännande.",
+      "unpublishReason": "Orsak till borttagning från försäljning",
+      "unpublishHint": "Visas på erbjudandets kort i företagsportalen så att företaget vet vad som ska rättas.",
       "lastFeedback": "Senast skickad återkoppling"
     },
     "ov": {
@@ -1054,6 +1056,17 @@
         "merchant": "Företag",
         "unknown": "Inte registrerat (historiskt)"
       }
+    },
+    "de": {
+      "title": "Redigera erbjudande",
+      "sub": "Du redigerar ett erbjudande från {name} som administratör.",
+      "edit": "Redigera erbjudande",
+      "save": "Spara ändringar",
+      "saving": "Sparar…",
+      "saved": "Ändringarna sparade",
+      "note": "Sparas direkt. Erbjudandet behåller sin status.",
+      "liveNote": "Erbjudandet är till salu. Dina ändringar syns direkt, utan ny granskning.",
+      "keepNote": "Erbjudandet behåller sin granskningsstatus. Företaget ser dina ändringar i sin portal."
     }
   },
   "errors": {

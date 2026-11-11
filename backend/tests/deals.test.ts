@@ -214,6 +214,20 @@ it('business creates and edits deals, admin reviews them, approved deals go publ
     assert.equal(demoPdf.statusCode, 200); assert.equal(demoPdf.rawPayload.subarray(0, 5).toString(), '%PDF-');
     assert.equal((await app.inject({ url: '/api/demo/vouchers/VND-ZZZZ-ZZZZ/pdf' })).statusCode, 404);
 
+    // Admin edits: any business's deal, status kept (a live deal stays live), photos stored under the deal's business.
+    const liveId = sectioned.json().id as string;
+    const adminEdit = deal({ imageUrl, title: { fi: 'Admin muokkasi', sv: '', en: 'Edited by admin' }, options: [opt('Kotisiivous', '3 h', 9900, 14700)] });
+    assert.equal((await as(a, 'PUT', `/api/admin/deals/${liveId}`, adminEdit)).statusCode, 403);
+    assert.equal((await as(admin, 'PUT', `/api/admin/deals/${liveId}`, adminEdit, { origin: 'https://evil.example' })).statusCode, 403);
+    assert.equal((await as(admin, 'PUT', '/api/admin/deals/00000000-0000-4000-8000-0000000000ff', adminEdit)).statusCode, 404);
+    assert.equal((await as(admin, 'PUT', `/api/admin/deals/${liveId}`, deal({ zip: '1' }))).statusCode, 400);
+    const edited2 = await as(admin, 'PUT', `/api/admin/deals/${liveId}`, adminEdit);
+    assert.equal(edited2.statusCode, 200); assert.equal(edited2.json().status, 'live');
+    const liveNow = (await app.inject({ url: `/api/deals/${sectioned.json().slug}` })).json();
+    assert.equal(liveNow.title.en, 'Edited by admin'); assert.deepEqual(liveNow.options.map((o: { priceCents: number }) => o.priceCents), [9900]);
+    const adminPhoto = await as(admin, 'POST', `/api/admin/deals/${liveId}/uploads`, { contentType: 'image/jpeg', data: jpeg.toString('base64') });
+    assert.equal(adminPhoto.statusCode, 201); assert.ok(String(adminPhoto.json().url).includes(`/storage/${merchantA}/`));
+
     // Suspending a business ends its portal session, so it can no longer change deals.
     await sql`UPDATE public.merchants SET status = 'suspended' WHERE id = ${merchantA}`;
     assert.equal((await as(a, 'PUT', `/api/merchant/deals/${id}`, deal({ imageUrl }))).statusCode, 401);

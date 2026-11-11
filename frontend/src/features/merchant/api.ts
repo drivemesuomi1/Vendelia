@@ -28,9 +28,9 @@ export function resizeImage(file: File): Promise<string> {
 }
 
 /** Resizes in the browser and stores the photo with the deal data; returns its public URL. */
-export async function uploadImage(file: File) {
+export async function uploadImage(file: File, endpoint = "/api/merchant/uploads") {
   const dataUrl = await resizeImage(file);
-  return api<{ url: string }>("/api/merchant/uploads", { body: { contentType: "image/jpeg", data: dataUrl.slice(dataUrl.indexOf(",") + 1) } });
+  return api<{ url: string }>(endpoint, { body: { contentType: "image/jpeg", data: dataUrl.slice(dataUrl.indexOf(",") + 1) } });
 }
 
 export const lookupVoucher = (code: string) => api<RedeemLookupDTO>("/api/merchant/vouchers/lookup", { body: { code } });

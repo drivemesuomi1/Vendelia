@@ -36,6 +36,8 @@ export function DealReviewPage({ deal, fromBusiness }: { deal: AdminDealDTO; fro
       <DealReviewForm
         deal={deal}
         variant="page"
+        editHref={`${base}/deals/${deal.id}/edit${fromBusiness ? "?from=business" : ""}`}
+        editLabel={t("admin.de.edit")}
         onDecision={async (id, decision, note) => { await reviewDeal(id, decision, note); }}
         onDone={() => { router.push(back); router.refresh(); }}
       />

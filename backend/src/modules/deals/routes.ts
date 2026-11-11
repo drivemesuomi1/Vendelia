@@ -98,6 +98,26 @@ export async function dealRoutes(app: FastifyInstance, { repository, auth, origi
     return { deal };
   });
 
+  // Admin edits of any business's deal; /api/admin/* is guarded (admin session, same-site writes) by the app-wide hook.
+  app.put<{ Params: { id: string } }>('/api/admin/deals/:id', async (request, reply) => {
+    const id = dealId(request.params.id);
+    const parsed = dealInputSchema.safeParse(request.body);
+    if (!parsed.success) return reply.code(400).send(validationProblem(parsed.error.issues));
+    return repository.adminUpdate(id, parsed.data);
+  });
+
+  // Photos an admin adds to a deal are stored under the deal's own business.
+  app.post<{ Params: { id: string } }>('/api/admin/deals/:id/uploads', { bodyLimit: 1_450_000 }, async (request, reply) => {
+    const merchantId = await repository.merchantOfDeal(dealId(request.params.id));
+    if (!merchantId) throw new HttpProblem(404, 'deal_not_found');
+    const parsed = dealImageUploadSchema.safeParse(request.body);
+    if (!parsed.success) throw new HttpProblem(400, 'unsupported_file_type');
+    const data = Buffer.from(parsed.data.data, 'base64');
+    if (!data.length || data.length > 1_048_576 || !sniff(data, parsed.data.contentType)) throw new HttpProblem(400, 'unsupported_file_type');
+    const url = await images.upload(merchantId, parsed.data.contentType, data);
+    return reply.code(201).send({ url });
+  });
+
   app.post<{ Params: { id: string } }>('/api/admin/deals/:id/review', async request => {
     const id = dealId(request.params.id);
     const parsed = dealReviewSchema.safeParse(request.body);

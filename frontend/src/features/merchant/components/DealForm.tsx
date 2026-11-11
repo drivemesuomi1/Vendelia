@@ -58,6 +58,8 @@ function toSections(input?: DealInput): Section[] {
  * With `onSave` (demo mode, no API) the deal is handed to the caller and photos are kept as resized data URLs.
  * `onPreview` adds a Preview button next to submit; `onInvalid` runs when a submit is refused, so a caller showing
  * the preview instead of the form can bring the form (and its errors) back.
+ * `admin` edits a business's deal as an admin: saved through the admin API (status kept), photos stored under the
+ * deal's business, then back to `admin.doneHref`.
  */
 export function DealForm({
   dealId,
@@ -67,6 +69,7 @@ export function DealForm({
   onPreview,
   onInvalid,
   formId,
+  admin,
 }: {
   dealId?: string;
   initial?: DealInput;
@@ -75,6 +78,7 @@ export function DealForm({
   onPreview?: () => void;
   onInvalid?: () => void;
   formId?: string;
+  admin?: { save: (input: DealInput) => Promise<unknown>; upload: (file: File) => Promise<string>; doneHref: string };
 }) {
   const { t, locale } = useI18n();
   const { meta } = useAppData();
@@ -188,11 +192,12 @@ export function DealForm({
     if (!input) return;
     setBusy(true);
     try {
-      if (onSave) await onSave(input);
+      if (admin) await admin.save(input);
+      else if (onSave) await onSave(input);
       else if (dealId) await updateDeal(dealId, input);
       else await createDeal(input);
-      toast(t("business.submitted"));
-      router.push(`/${locale}/business`);
+      toast(t(admin ? "admin.de.saved" : "business.submitted"));
+      router.push(admin ? admin.doneHref : `/${locale}/business`);
       router.refresh();
     } catch (e2) {
       if (e2 instanceof ApiError) setErrors(Object.keys(e2.fields).length ? e2.fields : { _: e2.code });
@@ -202,7 +207,7 @@ export function DealForm({
   }
 
   // Browser demo mode keeps resized photos as data URLs; otherwise each file is stored and its URL returned.
-  const uploadPhoto = async (file: File) => (onSave ? resizeImage(file) : (await uploadImage(file)).url);
+  const uploadPhoto = async (file: File) => (admin ? admin.upload(file) : onSave ? resizeImage(file) : (await uploadImage(file)).url);
 
   const L = ({ k, label, cls = "" }: { k: keyof SplitDTO; label: string; cls?: string }) =>
     split ? <div className={`summary-line ${cls}`}><span>{label}</span><span>{k === "commissionCents" || k === "commissionVatCents" ? "−" : ""}{formatMoney(split[k], locale)}</span></div> : null;
@@ -389,10 +394,10 @@ export function DealForm({
           <PhotoManager photos={photos} onChange={setPhotos} upload={uploadPhoto} error={errors.imageUrl ?? errors["galleryUrls"] ?? Object.entries(errors).find(([k]) => k.startsWith("galleryUrls."))?.[1]} />
         </Field>
         <div className="form-actions">
-          <p className="form-actions-note"><Icon name="clock" />{t("business.reviewNote")}</p>
+          <p className="form-actions-note"><Icon name={admin ? "info" : "clock"} />{t(admin ? "admin.de.note" : "business.reviewNote")}</p>
           <div className="form-actions-btns">
             {onPreview && <button className="btn btn-secondary" type="button" onClick={onPreview}><Icon name="eye" />{t("business.preview")}</button>}
-            <button className="btn btn-primary" type="submit" disabled={busy}><Icon name="send" />{t(busy ? "business.submitting" : "business.submitReview")}</button>
+            <button className="btn btn-primary" type="submit" disabled={busy}><Icon name={admin ? "check" : "send"} />{t(busy ? (admin ? "admin.de.saving" : "business.submitting") : admin ? "admin.de.save" : "business.submitReview")}</button>
           </div>
         </div>
       </div>

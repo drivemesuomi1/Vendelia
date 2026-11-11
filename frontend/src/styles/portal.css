@@ -430,6 +430,8 @@
 .dp-gallery img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
 .review-page{display:flex;flex-direction:column;gap:16px;max-width:880px}
 .review-page .panel{padding:24px}
+.review-top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:34px}
+.review-top .btn{margin-right:-8px}
 .review-actions{display:flex;flex-wrap:wrap;gap:10px}
 .pui dialog.drawer-wide{width:min(640px,100%)}
 .drawer-foot.two{display:flex;flex-wrap:wrap;gap:8px}

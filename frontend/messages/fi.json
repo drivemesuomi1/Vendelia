@@ -881,6 +881,8 @@
       "merchantInactive": "Yritys ei ole aktiivinen, joten diili ei näy sivustolla hyväksynnänkään jälkeen.",
       "feedback": "Palaute yritykselle",
       "feedbackHint": "Näkyy yrityksen portaalissa tämän diilin kortilla. Pakollinen hylättäessä, vapaaehtoinen hyväksyttäessä.",
+      "unpublishReason": "Syy myynnistä poistamiseen",
+      "unpublishHint": "Näkyy yrityksen portaalissa tämän diilin kortilla, jotta yritys tietää mitä korjata.",
       "lastFeedback": "Viimeksi lähetetty palaute"
     },
     "ov": {
@@ -1054,6 +1056,17 @@
         "merchant": "Yritys",
         "unknown": "Ei tallennettu (vanha lunastus)"
       }
+    },
+    "de": {
+      "title": "Muokkaa diiliä",
+      "sub": "Muokkaat yrityksen {name} diiliä ylläpitäjänä.",
+      "edit": "Muokkaa diiliä",
+      "save": "Tallenna muutokset",
+      "saving": "Tallennetaan…",
+      "saved": "Muutokset tallennettu",
+      "note": "Tallennetaan heti. Diilin tila pysyy ennallaan.",
+      "liveNote": "Tämä diili on myynnissä. Muutoksesi tulevat myyntiin heti ilman uutta tarkistusta.",
+      "keepNote": "Diilin tarkistustila pysyy ennallaan. Yritys näkee muutoksesi portaalissaan."
     }
   },
   "errors": {

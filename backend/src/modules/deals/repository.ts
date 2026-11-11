@@ -152,36 +152,58 @@ export class DealRepository {
     });
   }
 
-  /** Any edit sends the deal back to review (a live deal leaves the site until approved again). */
+  /** Any edit by the business sends the deal back to review (a live deal leaves the site until approved again). */
   async update(merchantId: string, id: string, input: DealInput): Promise<{ id: string; slug: string; status: DealStatus }> {
     return this.sql.begin(async tx => {
       const [deal] = await tx<{ id: string; slug: string }[]>`
         SELECT id, slug FROM public.deals WHERE id = ${id} AND merchant_id = ${merchantId} FOR UPDATE`;
       if (!deal) throw new HttpProblem(404, 'deal_not_found');
-      await this.checkReferences(tx, input);
-      await tx`UPDATE public.deals SET ${tx(this.fields(input))}, status = 'pending', review_note = NULL,
-        submitted_at = now(), updated_at = now() WHERE id = ${id}`;
-      await tx`INSERT INTO public.deal_cities (deal_id, city_id) VALUES (${id}, ${input.cityId}) ON CONFLICT DO NOTHING`;
-
-      const existing = new Map((await tx<{ id: string; price_cents: number }[]>`
-        SELECT id, price_cents FROM public.deal_options WHERE deal_id = ${id}`).map(o => [o.id, o.price_cents]));
-      const kept = new Set<string>();
-      for (const [i, option] of input.options.entries()) {
-        const current = option.id ? existing.get(option.id) : undefined;
-        if (option.id && current !== undefined) {
-          kept.add(option.id);
-          await tx`UPDATE public.deal_options SET ${tx({ ...optionColumns(option), sort_order: i, active: true })},
-            updated_at = now() WHERE id = ${option.id}`;
-          if (current !== option.priceCents) await this.recordPrice(tx, option.id, option.priceCents);
-        } else {
-          await this.addOption(tx, id, option, i);
-        }
-      }
-      // Removed options are only switched off, so vouchers already sold keep pointing at them.
-      const removed = [...existing.keys()].filter(optionId => !kept.has(optionId));
-      if (removed.length) await tx`UPDATE public.deal_options SET active = false, updated_at = now() WHERE id IN ${tx(removed)}`;
+      await this.save(tx, id, input);
+      await tx`UPDATE public.deals SET status = 'pending', review_note = NULL, submitted_at = now() WHERE id = ${id}`;
       return { id, slug: deal.slug, status: 'pending' as const };
     });
+  }
+
+  /** An admin edit of any business's deal. The status and feedback stay as they are, so a live deal stays live. */
+  async adminUpdate(id: string, input: DealInput): Promise<{ id: string; slug: string; status: DealStatus }> {
+    return this.sql.begin(async tx => {
+      const [deal] = await tx<{ id: string; slug: string; status: DealStatus }[]>`
+        SELECT id, slug, status FROM public.deals WHERE id = ${id} FOR UPDATE`;
+      if (!deal) throw new HttpProblem(404, 'deal_not_found');
+      await this.save(tx, id, input);
+      return deal;
+    });
+  }
+
+  /** The business a deal belongs to, for storing photos an admin adds to it. */
+  async merchantOfDeal(id: string): Promise<string | null> {
+    const [row] = await this.sql<{ merchant_id: string }[]>`SELECT merchant_id FROM public.deals WHERE id = ${id}`;
+    return row?.merchant_id ?? null;
+  }
+
+  /** Writes the submitted details, cities and options of an existing deal; the caller holds the row lock. */
+  private async save(tx: TransactionSql, id: string, input: DealInput) {
+    await this.checkReferences(tx, input);
+    await tx`UPDATE public.deals SET ${tx(this.fields(input))}, updated_at = now() WHERE id = ${id}`;
+    await tx`INSERT INTO public.deal_cities (deal_id, city_id) VALUES (${id}, ${input.cityId}) ON CONFLICT DO NOTHING`;
+
+    const existing = new Map((await tx<{ id: string; price_cents: number }[]>`
+      SELECT id, price_cents FROM public.deal_options WHERE deal_id = ${id}`).map(o => [o.id, o.price_cents]));
+    const kept = new Set<string>();
+    for (const [i, option] of input.options.entries()) {
+      const current = option.id ? existing.get(option.id) : undefined;
+      if (option.id && current !== undefined) {
+        kept.add(option.id);
+        await tx`UPDATE public.deal_options SET ${tx({ ...optionColumns(option), sort_order: i, active: true })},
+          updated_at = now() WHERE id = ${option.id}`;
+        if (current !== option.priceCents) await this.recordPrice(tx, option.id, option.priceCents);
+      } else {
+        await this.addOption(tx, id, option, i);
+      }
+    }
+    // Removed options are only switched off, so vouchers already sold keep pointing at them.
+    const removed = [...existing.keys()].filter(optionId => !kept.has(optionId));
+    if (removed.length) await tx`UPDATE public.deal_options SET active = false, updated_at = now() WHERE id IN ${tx(removed)}`;
   }
 
   async adminList(status: DealStatus | null, merchantId: string | null = null): Promise<AdminDealDTO[]> {
