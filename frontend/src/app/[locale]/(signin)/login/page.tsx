@@ -7,7 +7,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return { title: getT(await resolveLocale(params))("auth.loginTitle"), robots: { index: false } };
 }
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
-  const { next } = await searchParams;
-  return <LoginForm next={next} demo={demoAccountEnabled(process.env)} />;
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string; reason?: string }> }) {
+  const { next, reason } = await searchParams;
+  return <LoginForm next={next} reason={reason} demo={demoAccountEnabled(process.env)} />;
 }

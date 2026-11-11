@@ -41,6 +41,7 @@ const PATHS = {
   "eye": "<path d=\"M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/>",
   "send": "<path d=\"M21 3 10 14\"/><path d=\"M21 3 14.5 21l-4.5-7-7-4.5z\"/>",
   "download": "<path d=\"M12 4v11\"/><path d=\"m7 10 5 5 5-5\"/><path d=\"M5 20h14\"/>",
+  "user": "<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 3.6-6 8-6s8 2 8 6\"/>",
 } as const;
 
 export type IconName = keyof typeof PATHS;

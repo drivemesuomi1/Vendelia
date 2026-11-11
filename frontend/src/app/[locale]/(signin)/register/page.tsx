@@ -6,7 +6,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return { title: getT(await resolveLocale(params))("auth.registerTitle"), robots: { index: false } };
 }
 
-export default async function RegisterPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
-  const { next } = await searchParams;
-  return <RegisterForm next={next} />;
+export default async function RegisterPage({ searchParams }: { searchParams: Promise<{ next?: string; reason?: string }> }) {
+  const { next, reason } = await searchParams;
+  return <RegisterForm next={next} reason={reason} />;
 }

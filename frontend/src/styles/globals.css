@@ -461,8 +461,6 @@ dialog.drawer[open]{display:flex}
 /* ---------- Full-stack app additions ---------- */
 .mt{margin-top:var(--s3)}
 .mb{margin-bottom:var(--s2)}
-.auth-wrap{max-width:560px;padding-top:var(--s5);padding-bottom:var(--s5)}
-.auth-wrap .card{margin:0 auto}
 details>summary{cursor:pointer}
 .biz .btn{padding-left:0}
 
