@@ -9,6 +9,38 @@ in `public.merchants`. With **Create business login** selected, the backend also
 creates an Auth user, merchant profile and owner membership. Without it, only the
 business is saved. See [account provisioning](merchant-account-provisioning.md).
 
+## Shared Business IDs (migration 010)
+
+Apply `backend/sql/migrations/010_shared_business_ids.sql` before deploying this
+flow (SQL Editor: wrap the complete file in BEGIN/COMMIT). It permits separate
+merchant rows to share a Finnish Business ID, e.g. branches or child businesses.
+No existing merchant, Auth identity, membership or deal is merged or reassigned.
+UUID `merchants.id` remains the primary key used for all ownership/relationships.
+The format and Finnish check-digit validation still apply.
+
+Submit Add business normally. If the Business ID is registered, the server
+returns 409 `business_id_confirmation_required` with `businesses` containing only
+matching UUIDs, display names and registered company names. No business or Auth
+account is created by that warning. A centered warning popup lists the matches
+above the drawer, trapping keyboard focus until the admin chooses Proceed or
+Cancel (initial focus is on Cancel). Cancel/Escape/backdrop returns to editing without
+saving. Proceed resubmits with `allowDuplicateBusinessId: true`; changing/reopening
+the form clears confirmation. Dismissal and repeat clicks are disabled while
+creation is in progress. English, Finnish and Swedish are supported.
+
+Both creation paths check under the same Business ID advisory lock, including
+the final provisioning transaction, so a new unconfirmed duplicate cannot slip
+through a concurrent create. The flag is a request-only acknowledgement, not a
+merchant column. Only active admins can use it. A newly provisioned login still
+requires a distinct Auth email; sharing a Business ID never links/reuses another
+business's sign-in account. This does not add a parent/child hierarchy table.
+
+The migration removes Business ID uniqueness from merchants and the provisioning
+journal, retaining non-unique lookup indexes. Provisioning retries now use the
+unique non-secret details fingerprint; see [recovery](merchant-account-provisioning.md).
+Existing schema exports predate this change. Migration 010 was not applied to
+shared Supabase by the coding agent; application/deployment remain owner steps.
+
 The business portal now has [database-backed login](merchant-login.md), using
 separately provisioned Auth users, profiles and merchant membership. Old browser-demo businesses
 are not automatically imported. Existing database merchants are listed, including
@@ -50,7 +82,7 @@ three nullable columns to the existing table, preserving existing merchant rows:
 | --- | --- | --- |
 | Name shown to customers | `merchants.display_name` | Already exists |
 | Registered company name | `merchants.company_name` | Already exists |
-| Business ID | `merchants.business_id` | Already exists; unique with country code |
+| Business ID | `merchants.business_id` | May repeat after migration 010; admin confirms existing matches |
 | Contact person | `merchants.contact_name` | New nullable text column |
 | Contact email | `merchants.public_email` | Already exists; optional |
 | Phone | `merchants.public_phone` | Already exists; optional |
@@ -97,12 +129,14 @@ Browser mutations must also pass the existing Origin check.
 | POST | `/api/admin/merchants/:id/status` | Updates status and `updated_at` |
 
 Creation body: `name`, `companyName`, `businessId`, `contactName`, `publicEmail`,
-`phone`, `cityId`, `categoryId`, `status`. An optional `login: { email, password }` is handled by the separate provisioning
+`phone`, `cityId`, `categoryId`, `status`. Optional `allowDuplicateBusinessId: true`
+acknowledges the duplicate warning. An optional `login: { email, password }` is handled by the separate provisioning
 service; unknown credential/role fields are rejected. Country
 code is set by the server to `FI`. Shared validation checks the Finnish Business
 ID's format/check digit, required fields, lengths and optional email. SQL verifies
 that the selected city/category are currently active. Duplicate Finnish Business
-IDs return 409 `business_exists`; unavailable reference rows return 400
+IDs return 409 `business_id_confirmation_required` with matching businesses until
+the admin explicitly proceeds; unavailable reference rows return 400
 `invalidMerchantReference`. Database failures surface as errors, not empty demo data.
 
 Businesses are inserted with generated UUIDs and database timestamps. A business

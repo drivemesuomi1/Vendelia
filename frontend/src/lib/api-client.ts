@@ -8,6 +8,7 @@ export class ApiError extends Error {
     public readonly status: number,
     public readonly code: string,
     public readonly fields: Record<string, string> = {},
+    public readonly businesses: NonNullable<ApiErrorDTO['businesses']> = [],
   ) {
     super(code);
   }
@@ -35,7 +36,7 @@ export async function api<T>(path: string, init: { method?: string; body?: unkno
   }
   if (!res.ok) {
     const err = (data ?? {}) as Partial<ApiErrorDTO>;
-    throw new ApiError(res.status, err.error ?? "internal_error", err.fields ?? {});
+    throw new ApiError(res.status, err.error ?? "internal_error", err.fields ?? {}, err.businesses ?? []);
   }
   return data as T;
 }

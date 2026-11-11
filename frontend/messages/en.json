@@ -850,7 +850,13 @@
       "createLogin": "Create business login",
       "signInSetupHint": "Select this to create a Supabase Auth account linked to the business. Sign-in email and a password of at least 12 characters are required.",
       "createWithLogin": "Create business and login",
-      "loginAlreadyProvisioned": "This account was already provisioned during an earlier attempt. Its original password has not been changed."
+      "loginAlreadyProvisioned": "This account was already provisioned during an earlier attempt. Its original password has not been changed.",
+      "duplicate": {
+        "title": "Business ID already registered",
+        "message": "Business ID {businessId} is already used by:",
+        "hint": "You can create a separate business with this ID, for example a branch or child business. Existing businesses and sign-in accounts will stay separate.",
+        "proceed": "Proceed and create business"
+      }
     },
     "dr": {
       "live": "Live",
@@ -1122,7 +1128,8 @@
     "invalidDealReference": "Choose an available category and city.",
     "invalidTransition": "This deal has already been reviewed. Refresh the page.",
     "tooManyPhotos": "You can add up to 8 photos.",
-    "referenceTooLow": "The regular price must be higher than the price."
+    "referenceTooLow": "The regular price must be higher than the price.",
+    "business_id_confirmation_required": "Business ID already registered"
   },
   "voucherCheck": {
     "title": "Voucher check",

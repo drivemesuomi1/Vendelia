@@ -376,6 +376,7 @@ export interface AdminRefundRowDTO {
 }
 
 export interface ApiErrorDTO {
+  businesses?: import('../schemas/merchant').BusinessIdMatch[];
   error: string;
   message: string;
   fields?: Record<string, string>;

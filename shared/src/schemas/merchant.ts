@@ -25,6 +25,7 @@ export const adminMerchantSchema = z.object({
 }).strict();
 export type AdminMerchantInput = z.infer<typeof adminMerchantSchema>;
 export const adminMerchantCreateSchema = adminMerchantSchema.extend({
+  allowDuplicateBusinessId: z.boolean().optional(),
   login: z.object({
     email: z.string().trim().toLowerCase().max(254).email({ message: 'invalidEmail' }),
     password: z.string().min(12, { message: 'merchantPasswordLength' }).max(72, { message: 'merchantPasswordLength' })
@@ -32,6 +33,8 @@ export const adminMerchantCreateSchema = adminMerchantSchema.extend({
   }).strict().optional(),
 }).strict();
 export type AdminMerchantCreateInput = z.infer<typeof adminMerchantCreateSchema>;
+
+export interface BusinessIdMatch { id: string; name: string; companyName: string }
 
 export interface AdminMerchantDTO {
   id: string;

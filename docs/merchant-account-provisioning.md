@@ -105,7 +105,13 @@ when an operation fails:
    the reserved UUID and marker and finishes the application transaction without
    creating another user or setting another password.
 
-The journal has one record per Business ID. Repeated successful submissions with
+After migration `010_shared_business_ids.sql`, the journal has one record per
+non-secret details fingerprint (business details plus normalized login email),
+with multiple operations allowed for one Business ID. Shared-ID creation requires
+explicit `allowDuplicateBusinessId: true` after reviewing the server warning.
+The confirmation flag is excluded from the fingerprint. Separate branches use
+distinct merchant/Auth UUIDs and login emails; business ownership uses UUIDs.
+Repeated successful submissions with
 identical non-secret details return the original merchant, including after a lost
 HTTP response. This is creation idempotency, not an edit/reset-password endpoint.
 Password values are excluded from the details fingerprint. Changing the password
@@ -113,9 +119,11 @@ on a retry does **not** reset an already-created account; `passwordSet=false`
 tells the UI to show the original-password notice instead of the newly typed value.
 
 For an incomplete attempt, retry with the original business details/email/password.
-A changed payload is rejected with `provisioningConflict`. After a definitive email
-or password rejection with no Auth user created at the reserved UUID, correcting
-those details is allowed. If connectivity is uncertain, preserve the original
+A changed non-secret payload starts a separate operation, never rewrites or
+adopts the earlier reserved identity. An already-used Auth email is still
+rejected. After a definitive email rejection, correcting the email can create a
+new operation; the earlier failed journal row remains for inspection. If
+connectivity is uncertain, preserve the original
 form values; they are not recoverable from the one-way details fingerprint alone.
 
 ## Recovery journal

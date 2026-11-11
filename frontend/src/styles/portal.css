@@ -273,6 +273,17 @@
 .cred dd.pw{font-size:16px;font-weight:600;letter-spacing:.03em}
 @media(max-width:600px){.cred>div{grid-template-columns:1fr auto}.cred dt{grid-column:1/-1}.mb-two{grid-template-columns:1fr}}
 .pui dialog{border:1px solid var(--line);box-shadow:0 24px 64px rgba(20,20,25,.18)}
+.pui .mb-duplicate{max-width:520px}
+.mb-duplicate-body{padding:28px;display:grid;gap:16px}
+.mb-duplicate-body h2{font-size:22px;line-height:1.25;margin:0}
+.mb-duplicate-body p{margin:0}
+.mb-duplicate-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:#fff3d6;color:#946200}
+.mb-duplicate-icon svg{width:24px;height:24px}
+.mb-duplicate-list{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:10px;max-height:220px;overflow:auto}
+.mb-duplicate-list li{display:grid;gap:4px;padding:12px 14px;overflow-wrap:anywhere}
+.mb-duplicate-list li+li{border-top:1px solid var(--line)}
+.mb-duplicate-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px;padding-top:8px}
+.mb-duplicate-actions .btn{flex:1 1 150px}
 .pui .drawer-head{border-bottom-color:var(--line)}
 .pui .drawer-foot{border-top-color:var(--line)}
 

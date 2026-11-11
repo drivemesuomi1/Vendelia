@@ -28,7 +28,7 @@ export class MerchantService {
       if (input.login) {
         const result = await this.provisioning.create(input, adminId);
         id = result.merchantId; login = result.login;
-      } else id = await this.repository.create(input);
+      } else id = await this.repository.create(input, input.allowDuplicateBusinessId ?? false);
     }
     catch (error) {
       if ((error as { code?: string }).code === '23505') throw new HttpProblem(409, 'business_exists');

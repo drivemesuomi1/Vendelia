@@ -27,7 +27,7 @@ it('business creates and edits deals, admin reviews them, approved deals go publ
   await sql.unsafe(await fixture('./fixtures/catalogue-schema.sql'));
   await sql.unsafe(await fixture('../sql/seed-catalogue.sql'));
   for (const name of ['001_orders_vouchers.sql', '002_profiles.sql', '003_auth_sessions.sql', '004_merchant_contact_and_classification.sql',
-    '005_merchant_members.sql', '006_merchant_account_provisioning.sql', '007_deal_review.sql', '007_deal_review.sql', '008_order_customers.sql', '009_voucher_redemption_actor.sql', '009_voucher_redemption_actor.sql']) {
+    '005_merchant_members.sql', '006_merchant_account_provisioning.sql', '007_deal_review.sql', '007_deal_review.sql', '008_order_customers.sql', '009_voucher_redemption_actor.sql', '009_voucher_redemption_actor.sql', '010_shared_business_ids.sql', '010_shared_business_ids.sql']) {
     await sql.begin(async tx => { await tx.unsafe('SET LOCAL client_min_messages=warning;\n' + await fixture(`../sql/migrations/${name}`)); });
   }
   // The running app no longer depends on migration 007's legacy bytes table.

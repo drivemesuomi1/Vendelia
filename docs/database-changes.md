@@ -28,6 +28,30 @@ The owner's schema exports reviewed on 2026-10-31 contained these seven tables:
 | `backend/sql/migrations/007_deal_review.sql` | Legacy `deal_images` bytes table with merchant FK and restricted access | Review note, submission/review timestamps, reviewer FK and queue index on `deals` |
 | `backend/sql/migrations/008_order_customers.sql` | No new table | Nullable `orders.customer_id` FK to `profiles.user_id`, with index; deletion sets the link to NULL |
 | `backend/sql/migrations/009_voucher_redemption_actor.sql` | No new table | Nullable `vouchers.redeemed_by` FK to profiles (delete sets NULL), actor index and `redeemed_by_role` (`admin`/`merchant`) |
+| `backend/sql/migrations/010_shared_business_ids.sql` | No new table | Removes Business ID uniqueness from merchants/provisioning; adds non-unique lookups and a unique provisioning fingerprint index |
+
+## Shared merchant Business IDs (010)
+
+Apply 010 before deploying duplicate-ID confirmation. The migration identifies
+the relevant UNIQUE constraints by their columns because constraint names differ
+between the live export and local fixtures. It removes no primary keys or foreign
+keys and preserves all rows. Replaying 006 does not restore its former journal
+uniqueness because its table already exists; 010 is replayable too.
+
+`merchants.business_id` can repeat after an admin acknowledges the warning listing
+the current business/company names. Unacknowledged duplicates return 409 without
+creating records. Exact provisioning retries still resolve to their reserved
+operation, using `details_hash` rather than Business ID. Existing Auth emails
+remain protected from adoption/reset. No parent/child hierarchy is inferred and
+merchant/deal/voucher access remains UUID-based. See [admin businesses](admin-businesses.md).
+
+The catalogue seed no longer uses `ON CONFLICT (country_code, business_id)`.
+It preserves the existing source deal's merchant UUID; if no deal exists and
+multiple merchant candidates share its Business ID, it stops for manual selection
+instead of attaching the seed deal to an arbitrary branch.
+
+The coding agent has not applied this migration to shared Supabase. Existing
+schema exports predate it; apply subsequent migrations after restoring exports.
 
 ## Redemption attribution (009)
 

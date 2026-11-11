@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { adminMerchantCreateSchema, type AdminMerchantDTO, type MerchantStatus } from "@vendelia/shared";
+import { adminMerchantCreateSchema, type AdminMerchantDTO, type MerchantStatus, type BusinessIdMatch } from "@vendelia/shared";
 import { ApiError } from "@/lib/api-client";
 import { createMerchant, setMerchantStatus } from "../api";
 import { useState, type FormEvent, type InputHTMLAttributes, type ReactNode } from "react";
@@ -23,6 +23,7 @@ export function ManageBusinesses({ businesses }: { businesses: AdminMerchantDTO[
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [duplicates, setDuplicates] = useState<BusinessIdMatch[] | null>(null);
   const [changing, setChanging] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY);
   // Passwords are sent only for explicit account provisioning; never persist them in browser storage.
@@ -42,18 +43,20 @@ export function ManageBusinesses({ businesses }: { businesses: AdminMerchantDTO[
   const count = (status: MerchantStatus) => businesses.filter(m => m.status === status).length;
   const set = (key: FormKey, value: string) => {
     setForm(f => ({ ...f, [key]: value }));
+    setDuplicates(null);
     setErrors(e => ({ ...e, [key]: undefined }));
   };
   const openForm = () => {
-    setForm(EMPTY); setErrors({}); setFailure(null); setCreateLogin(false); setIssued(null);
+    setForm(EMPTY); setErrors({}); setFailure(null); setDuplicates(null); setCreateLogin(false); setIssued(null);
     setSignInEmail(""); setTemporaryPassword(generatePassword()); setOpen(true);
   };
   const closeForm = () => {
     if (busy) return;
     setOpen(false); setSignInEmail(""); setTemporaryPassword("");
   };
-  const submit = async (event: FormEvent) => {
-    event.preventDefault();
+  const submit = async (event?: FormEvent, confirmed = false) => {
+    event?.preventDefault();
+    if (busy || (duplicates !== null && !confirmed)) return;
     const parsed = adminMerchantCreateSchema.safeParse({ ...form, ...(createLogin ? { login: { email: signInEmail, password: temporaryPassword } } : {}) });
     if (!parsed.success) {
       const fields: typeof errors = {};
@@ -65,17 +68,22 @@ export function ManageBusinesses({ businesses }: { businesses: AdminMerchantDTO[
     }
     setBusy(true); setFailure(null); setErrors({});
     try {
-      const result = await createMerchant(parsed.data, locale);
+      const result = await createMerchant({ ...parsed.data, allowDuplicateBusinessId: confirmed }, locale);
       if (result.login) setIssued({ email: result.login.email, password: result.login.passwordSet ? temporaryPassword : null, name: result.merchant.name, emailed: !!result.login.emailed });
-      setOpen(false); setSignInEmail(""); setTemporaryPassword(""); router.refresh();
+      setDuplicates(null); setOpen(false); setSignInEmail(""); setTemporaryPassword(""); router.refresh();
     } catch (error) {
       if (error instanceof ApiError) {
+        if (error.code === 'business_id_confirmation_required') {
+          setDuplicates(error.businesses);
+          return;
+        }
+        setDuplicates(null);
         const fields: typeof errors = {};
         for (const [key, value] of Object.entries(error.fields)) fields[key as keyof typeof errors] = t(`errors.${value}`);
         if (error.code === "business_exists") fields.businessId = t("admin.mb.errDuplicateId");
         setErrors(fields);
         setFailure(t(`errors.${error.code}`));
-      } else setFailure(t("errors.network"));
+      } else { setDuplicates(null); setFailure(t("errors.network")); }
     } finally { setBusy(false); }
   };
   const changeStatus = async (merchant: AdminMerchantDTO) => {
@@ -214,7 +222,7 @@ export function ManageBusinesses({ businesses }: { businesses: AdminMerchantDTO[
             <button type="button" disabled={busy} className="btn btn-ghost btn-sm" onClick={closeForm} aria-label={t("admin.mb.close")}><Icon name="x" /></button>
           </div>
           <div className="drawer-body">
-            <fieldset>
+            <fieldset disabled={busy || duplicates !== null}>
               <legend>{t("admin.mb.secCompany")}</legend>
               {field("name", t("auth.displayName"), text("name", { autoComplete: "organization" }))}
               {field("companyName", t("auth.companyName"), text("companyName"))}
@@ -235,14 +243,14 @@ export function ManageBusinesses({ businesses }: { businesses: AdminMerchantDTO[
               </div>
             </fieldset>
 
-            <fieldset>
+            <fieldset disabled={busy || duplicates !== null}>
               <legend>{t("admin.mb.secContact")}</legend>
               {field("contactName", t("auth.contactName"), text("contactName", { autoComplete: "name" }))}
               {field("publicEmail", t("admin.mb.contactEmail"), text("publicEmail", { type: "email", autoComplete: "email" }), t("admin.mb.contactEmailHint"))}
               {field("phone", t("admin.mb.phone"), text("phone", { type: "tel", autoComplete: "tel", placeholder: "+358 40 123 4567" }), t("admin.mb.optional"))}
             </fieldset>
 
-            <fieldset>
+            <fieldset disabled={busy || duplicates !== null}>
               <legend>{t("admin.mb.secLogin")}</legend>
               <label className="row" style={{ gap: 8 }}><input type="checkbox" checked={createLogin} disabled={busy} onChange={event => setCreateLogin(event.target.checked)} />{t("admin.mb.createLogin")}</label>
               <p className="hint" id="mb-signin-setup">{t("admin.mb.signInSetupHint")}</p>
@@ -265,7 +273,7 @@ export function ManageBusinesses({ businesses }: { businesses: AdminMerchantDTO[
               </div>
             </fieldset>
 
-            <fieldset>
+            <fieldset disabled={busy || duplicates !== null}>
               <legend>{t("admin.mb.initialStatus")}</legend>
               {field("status", t("admin.mb.initialStatus"), (
                 <div className="seg" role="radiogroup" id="mb-status">
@@ -278,10 +286,24 @@ export function ManageBusinesses({ businesses }: { businesses: AdminMerchantDTO[
           </div>
           <div className="drawer-foot">
             {failure && <p className="err-msg" role="alert">{failure}</p>}
-            <button className="btn btn-primary btn-block" type="submit" disabled={busy}><Icon name="check" />{t(createLogin ? "admin.mb.createWithLogin" : "admin.mb.create")}</button>
+            <button className="btn btn-primary btn-block" type="submit" disabled={busy || duplicates !== null}><Icon name="check" />{t(createLogin ? "admin.mb.createWithLogin" : "admin.mb.create")}</button>
             <button className="btn btn-secondary btn-block" type="button" disabled={busy} onClick={closeForm}>{t("admin.mb.cancel")}</button>
           </div>
         </form>
+      </Dialog>
+      <Dialog open={open && duplicates !== null} onClose={() => { if (!busy) setDuplicates(null); }}
+        className="mb-duplicate" role="alertdialog" labelledBy="mb-duplicate-title" describedBy="mb-duplicate-description" dismissible={!busy}>
+        <div className="mb-duplicate-body">
+          <span className="mb-duplicate-icon" aria-hidden="true"><Icon name="info" /></span>
+          <h2 id="mb-duplicate-title">{t('admin.mb.duplicate.title')}</h2>
+          <p id="mb-duplicate-description" className="muted">{t('admin.mb.duplicate.message', { businessId: form.businessId })}</p>
+          <ul className="mb-duplicate-list">{duplicates?.map(m => <li key={m.id}><strong>{m.name}</strong><span className="muted small">{m.companyName}</span></li>)}</ul>
+          <p className="muted small">{t('admin.mb.duplicate.hint')}</p>
+          <div className="mb-duplicate-actions" aria-busy={busy}>
+            <button type="button" className="btn btn-secondary" disabled={busy} autoFocus onClick={() => setDuplicates(null)}>{t('admin.mb.cancel')}</button>
+            <button type="button" className="btn btn-primary" disabled={busy} onClick={() => { void submit(undefined, true); }}>{t('admin.mb.duplicate.proceed')}</button>
+          </div>
+        </div>
       </Dialog>
     </>
   );

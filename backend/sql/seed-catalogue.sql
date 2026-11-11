@@ -435,6 +435,7 @@ $catalogue$::jsonb;
   merchant_data jsonb;
   option_data jsonb;
   merchant_key uuid;
+  merchant_matches integer;
   deal_key uuid;
   existing_slug text;
   existing_parent uuid;
@@ -464,23 +465,34 @@ BEGIN
     WITH ORDINALITY AS entries(item, position)
   ON CONFLICT (id) DO NOTHING;
 
-  -- 2. Merchant. Reuse an existing row with the same Finnish business ID.
-  -- The fixed UUID is only used when creating a new merchant.
+  -- 2. Merchant. Preserve the existing deal's owner; Business ID is no longer unique.
+  PERFORM pg_advisory_xact_lock(hashtextextended('FI:' || (merchant_data ->> 'businessId'), 0));
+  SELECT merchant_id INTO merchant_key FROM public.deals WHERE id=deal_key;
+  IF merchant_key IS NULL THEN
+    SELECT count(*) INTO merchant_matches FROM public.merchants
+      WHERE country_code='FI' AND business_id=merchant_data ->> 'businessId';
+    IF merchant_matches > 1 THEN
+      RAISE EXCEPTION 'Multiple merchants share the seed Business ID. Select the intended merchant UUID before seeding; no changes committed.';
+    END IF;
+    SELECT id INTO merchant_key FROM public.merchants
+      WHERE country_code='FI' AND business_id=merchant_data ->> 'businessId';
+  END IF;
+  merchant_key := coalesce(merchant_key, 'c1ea7a00-0000-4000-8000-000000000010'::uuid);
   INSERT INTO public.merchants (
     id, country_code, business_id, company_name, display_name,
     public_phone, public_email, website, status
   ) VALUES (
-    'c1ea7a00-0000-4000-8000-000000000010'::uuid,
+    merchant_key,
     'FI', merchant_data ->> 'businessId',
     merchant_data ->> 'companyName', merchant_data ->> 'name',
     merchant_data ->> 'phone', merchant_data ->> 'email',
     merchant_data ->> 'website', 'active'
   )
-  ON CONFLICT (country_code, business_id) DO NOTHING;
+  ON CONFLICT (id) DO NOTHING;
 
   SELECT id INTO STRICT merchant_key
   FROM public.merchants
-  WHERE country_code = 'FI'
+  WHERE id = merchant_key AND country_code = 'FI'
     AND business_id = merchant_data ->> 'businessId';
 
   -- Do not silently attach the source UUID to a different existing deal.

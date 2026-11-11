@@ -9,11 +9,11 @@ export class MerchantProvisioningService {
   constructor(private readonly repository: MerchantRepository, private readonly users: UserProvisioner) {}
   async create(input: AdminMerchantCreateInput, adminId: string) {
     this.users.assertConfigured();
-    const { login, ...business } = input;
+    const { login, allowDuplicateBusinessId = false, ...business } = input;
     if (!login) throw new HttpProblem(400, 'invalid_request');
     // This fingerprints only non-secret details. Passwords and their hashes never enter SQL.
     const fingerprint = createHash('sha256').update(JSON.stringify({ business, email: login.email })).digest('hex');
-    const operation = await this.repository.prepareProvisioning(business, login.email, fingerprint, adminId);
+    const operation = await this.repository.prepareProvisioning(business, login.email, fingerprint, adminId, allowDuplicateBusinessId);
     try {
       let passwordSet = false;
       const merchantId = await this.repository.completeProvisioning(operation.id, fingerprint, business, async current => {
@@ -25,7 +25,7 @@ export class MerchantProvisioningService {
         if (identity.id !== current.auth_user_id || identity.email !== login.email || identity.provisioningId !== current.id) {
           throw new HttpProblem(409, 'provisioningConflict');
         }
-      });
+      }, allowDuplicateBusinessId);
       return { merchantId, login: { email: login.email, passwordSet } };
     } catch (error) {
       const code = error instanceof HttpProblem ? error.code : 'provisioningPending';

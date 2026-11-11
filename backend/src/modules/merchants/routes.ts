@@ -3,6 +3,7 @@ import { adminMerchantCreateSchema, localeSchema, merchantStatusSchema, uuidSche
 import { HttpProblem } from '../../errors';
 import type { MerchantService } from './service';
 import { sessionToken } from '../auth/config';
+import { DuplicateBusinessIdProblem } from './repository';
 /** The app's /api/admin/* hook verifies active admin sessions for every handler. */
 export async function merchantRoutes(app: FastifyInstance, { service, auth }: { service: MerchantService; auth: import('../auth/service').AuthService }) {
   app.get('/api/admin/merchants', async () => ({ merchants: await service.list() }));
@@ -20,7 +21,14 @@ export async function merchantRoutes(app: FastifyInstance, { service, auth }: { 
     const admin = await auth.current(sessionToken(request.headers.cookie));
     if (admin?.role !== 'admin') throw new HttpProblem(403, 'forbidden');
     const locale = localeSchema.catch('fi').parse(request.headers['x-locale']);
-    return reply.code(201).send(await service.create(parsed.data, admin.id, locale));
+    try {
+      return reply.code(201).send(await service.create(parsed.data, admin.id, locale));
+    } catch (error) {
+      if (error instanceof DuplicateBusinessIdProblem) return reply.code(409).send({
+        error: error.code, message: 'Confirm shared business ID before creating this business', businesses: error.businesses,
+      });
+      throw error;
+    }
   });
   app.post<{ Params: { id: string } }>('/api/admin/merchants/:id/status', async request => {
     const parsed = merchantStatusSchema.safeParse((request.body as { status?: unknown } | null)?.status);

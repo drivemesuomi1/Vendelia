@@ -850,7 +850,13 @@
       "createLogin": "Luo yrityksen kirjautumistili",
       "signInSetupHint": "Luo yritykseen liitetty Supabase Auth -tili valitsemalla tämä. Kirjautumissähköposti ja vähintään 12 merkin salasana vaaditaan.",
       "createWithLogin": "Luo yritys ja kirjautumistili",
-      "loginAlreadyProvisioned": "Tili luotiin jo aiemmalla yrityksellä. Alkuperäistä salasanaa ei ole muutettu."
+      "loginAlreadyProvisioned": "Tili luotiin jo aiemmalla yrityksellä. Alkuperäistä salasanaa ei ole muutettu.",
+      "duplicate": {
+        "title": "Y-tunnus on jo rekisteröity",
+        "message": "Y-tunnusta {businessId} käyttävät jo:",
+        "hint": "Voit luoda samalla Y-tunnuksella erillisen yritystietueen, esimerkiksi toimipisteelle tai alayritykselle. Nykyiset yritystietueet ja kirjautumistilit pysyvät erillisinä.",
+        "proceed": "Jatka ja luo yritys"
+      }
     },
     "dr": {
       "live": "Myynnissä",
@@ -1122,7 +1128,8 @@
     "invalidDealReference": "Valitse käytössä oleva kategoria ja kaupunki.",
     "invalidTransition": "Diili on jo tarkistettu. Päivitä sivu.",
     "tooManyPhotos": "Voit lisätä enintään 8 kuvaa.",
-    "referenceTooLow": "Normaalihinnan on oltava hintaa korkeampi."
+    "referenceTooLow": "Normaalihinnan on oltava hintaa korkeampi.",
+    "business_id_confirmation_required": "Y-tunnus on jo rekisteröity"
   },
   "voucherCheck": {
     "title": "Lahjakortin tarkistus",

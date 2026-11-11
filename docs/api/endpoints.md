@@ -74,7 +74,7 @@ planned unless otherwise documented.
 | GET | `/api/admin/vouchers/:code` | Admin-only voucher, buyer, order and business details |
 | POST | `/api/admin/vouchers/redeem` | Implemented after migration 009: `{ code }` atomically redeems an active, unexpired voucher, recording the verified admin UUID/role; returns `{ voucher }` |
 | POST | `/api/admin/deals/:id/review` | `{ decision: approve|reject, note? }` |
-| GET/POST | `/api/admin/merchants` | List / create business records, with optional new login provisioning |
+| GET/POST | `/api/admin/merchants` | List / create business records, with optional new login provisioning. After migration 010, duplicate Business IDs return 409 `business_id_confirmation_required` with matching `businesses`; resend with `allowDuplicateBusinessId: true` to explicitly proceed. |
 | GET | `/api/admin/merchants/:id` | Business details |
 | POST | `/api/admin/merchants/:id/status` | Activate / suspend / mark pending |
 | GET/PUT | `/api/admin/settings/commission` | `{ rateBps }` |

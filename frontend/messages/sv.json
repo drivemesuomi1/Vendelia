@@ -850,7 +850,13 @@
       "createLogin": "Skapa företagsinloggning",
       "signInSetupHint": "Välj detta för att skapa ett Supabase Auth-konto kopplat till företaget. Inloggningsadress och ett lösenord med minst 12 tecken krävs.",
       "createWithLogin": "Skapa företag och inloggning",
-      "loginAlreadyProvisioned": "Kontot skapades redan vid ett tidigare försök. Det ursprungliga lösenordet har inte ändrats."
+      "loginAlreadyProvisioned": "Kontot skapades redan vid ett tidigare försök. Det ursprungliga lösenordet har inte ändrats.",
+      "duplicate": {
+        "title": "FO-numret är redan registrerat",
+        "message": "FO-numret {businessId} används redan av:",
+        "hint": "Du kan skapa en separat företagspost med samma FO-nummer, till exempel för en filial eller ett underföretag. Befintliga företagsposter och inloggningskonton förblir separata.",
+        "proceed": "Fortsätt och skapa företag"
+      }
     },
     "dr": {
       "live": "Live",
@@ -1122,7 +1128,8 @@
     "invalidDealReference": "Välj en tillgänglig kategori och stad.",
     "invalidTransition": "Erbjudandet har redan granskats. Uppdatera sidan.",
     "tooManyPhotos": "Du kan lägga till högst 8 bilder.",
-    "referenceTooLow": "Ordinarie pris måste vara högre än priset."
+    "referenceTooLow": "Ordinarie pris måste vara högre än priset.",
+    "business_id_confirmation_required": "FO-numret är redan registrerat"
   },
   "voucherCheck": {
     "title": "Kontroll av presentkort",

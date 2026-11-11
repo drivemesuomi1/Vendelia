@@ -45,7 +45,7 @@ it('uses the server Auth admin API with pinned UUID/metadata and sanitized provi
 });
 
 const url = process.env.TEST_PROVISIONING_DATABASE_URL;
-it('creates linked accounts, resumes partial failures, prevents duplicates/takeovers, and never stores passwords in app tables', { skip: !url }, async () => {
+it('creates separate shared-ID accounts, resumes retries, prevents takeovers, and never stores passwords in app tables', { skip: !url }, async () => {
   assert.match(new URL(url!).pathname, /^\/vendelia_test_provisioning(?:_[a-z0-9]+)?$/);
   const sql = postgres(url!, { prepare: false, idle_timeout: 1 });
   const fixture = (path: string) => readFile(new URL(path, import.meta.url), 'utf8');
@@ -53,7 +53,7 @@ it('creates linked accounts, resumes partial failures, prevents duplicates/takeo
     CREATE TABLE auth.users(id uuid PRIMARY KEY, email text UNIQUE, email_confirmed_at timestamptz, deleted_at timestamptz, banned_until timestamptz);`);
   await sql.unsafe(await fixture('./fixtures/catalogue-schema.sql'));
   await sql.unsafe(await fixture('../sql/seed-catalogue.sql'));
-  for (const name of ['002_profiles.sql','003_auth_sessions.sql','004_merchant_contact_and_classification.sql','005_merchant_members.sql','006_merchant_account_provisioning.sql','006_merchant_account_provisioning.sql']) {
+  for (const name of ['002_profiles.sql','003_auth_sessions.sql','004_merchant_contact_and_classification.sql','005_merchant_members.sql','006_merchant_account_provisioning.sql','006_merchant_account_provisioning.sql', '010_shared_business_ids.sql', '010_shared_business_ids.sql']) {
     await sql.begin(async tx => { await tx.unsafe('SET LOCAL client_min_messages=warning;\n'+await fixture(`../sql/migrations/${name}`)); });
   }
   const adminId = '00000000-0000-4000-8000-000000000001';
@@ -112,6 +112,24 @@ it('creates linked accounts, resumes partial failures, prevents duplicates/takeo
     assert.equal(passwords.get(input.login.email),input.login.password);
     const signedIn = await app.inject({ method:'POST',url:'/api/auth/merchant/login',payload:input.login });
     assert.equal(signedIn.statusCode,200); assert.equal(signedIn.json().user.merchant.id,first.json().merchant.id);
+    // A shared legal ID never reuses the parent's merchant, login or retry journal.
+    const child = { ...input, name: 'Child business', login: { email: 'child@example.com', password: 'Child!Password42' } };
+    const beforeChild = creates;
+    const warning = await create(child);
+    assert.equal(warning.statusCode,409); assert.equal(warning.json().error,'business_id_confirmation_required');
+    assert.equal(warning.json().businesses[0].id, first.json().merchant.id);
+    assert.equal(creates,beforeChild);
+    const createdChild = await create({ ...child, allowDuplicateBusinessId:true });
+    assert.equal(createdChild.statusCode,201,createdChild.body);
+    assert.notEqual(createdChild.json().merchant.id, first.json().merchant.id);
+    const childRetry = await create({ ...child, allowDuplicateBusinessId:true });
+    assert.equal(childRetry.statusCode,201); assert.equal(childRetry.json().merchant.id,createdChild.json().merchant.id);
+    assert.equal(creates,beforeChild+1);
+    const childLogin = await app.inject({ method:'POST',url:'/api/auth/merchant/login',payload:child.login });
+    assert.equal(childLogin.statusCode,200); assert.equal(childLogin.json().user.merchant.id,createdChild.json().merchant.id);
+    const sameEmail = await create({ ...child, name:'Cannot take parent login', login:input.login, allowDuplicateBusinessId:true });
+    assert.equal(sameEmail.statusCode,409); assert.equal(sameEmail.json().error,'email_taken');
+    assert.equal((await sql`SELECT count(*)::int AS n FROM public.merchants WHERE business_id=${input.businessId}`)[0]!.n,2);
     // Existing identities are never attached, promoted or reset by the form.
     const duplicate = { ...base,businessId:businessId('2345678'),login:{ email:'existing@example.com',password:'Never!Overwrite42' } };
     const denied = await create(duplicate); assert.equal(denied.statusCode,409); assert.equal(denied.json().error,'email_taken');
@@ -132,7 +150,8 @@ it('creates linked accounts, resumes partial failures, prevents duplicates/takeo
     assert.equal((await sql`SELECT state FROM public.merchant_account_provisioning WHERE id=${pending!.id}`)[0]!.state,'complete');
     const noAccount={ ...base,businessId:businessId('4567890') };
     const beforePlain=creates; assert.equal((await create(noAccount)).statusCode,201); assert.equal(creates,beforePlain);
-    assert.equal((await create(noAccount)).statusCode,409);
+    assert.equal((await create(noAccount)).json().error,'business_id_confirmation_required');
+    assert.equal((await create({ ...noAccount,name:'Plain child',allowDuplicateBusinessId:true })).statusCode,201);
     const [rls]=await sql`SELECT relrowsecurity FROM pg_class WHERE oid='public.merchant_account_provisioning'::regclass`;
     assert.equal(rls!.relrowsecurity,true);
   } finally { await app.close(); }
