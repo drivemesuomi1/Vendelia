@@ -9,18 +9,22 @@ import { useState } from "react";
 import { useAppData } from "@/lib/meta-context";
 import { formatDate, loc, locList, expiryFromToday } from "@/lib/format";
 import { BuyBox } from "./BuyBox";
+import { DealMap } from "./DealMap";
+import type { MapPoint } from "../geocode";
 
 
 /** Full deal page: what's included, terms, how to use, location, refunds and the seller. `preview` renders a draft (nothing can be bought). */
-export function DealDetail({ deal, preview = false }: { deal: DealDetailDTO; preview?: boolean }) {
+export function DealDetail({ deal, preview = false, mapPoint = null }: { deal: DealDetailDTO; preview?: boolean; mapPoint?: MapPoint | null }) {
   const { t, locale } = useI18n();
   const { meta } = useAppData();
   const city = meta.cities.find((c) => c.id === deal.cityId);
   const category = meta.categories.find((c) => c.id === deal.categoryId);
   const expiry = formatDate(expiryFromToday(meta.voucherValidityMonths), locale);
-  const address = deal.serviceArea
-    ? loc(deal.serviceArea, locale)
-    : `${deal.meetingPoint ? t("deal.meetingPoint") + " " : ""}${deal.street}, ${deal.zip} ${loc(city?.name, locale)}`;
+  // Some businesses type the whole address into the street field ("Kuunsäde 3a, LT 1, 02210 Espoo"); don't repeat postcode and city then.
+  const street = deal.street.trim();
+  const fullStreet = /\b\d{5}\b/.test(street) ? street : `${street}, ${deal.zip} ${loc(city?.name, locale)}`;
+  const address = street ? `${deal.meetingPoint ? t("deal.meetingPoint") + " " : ""}${fullStreet}` : "";
+  const serviceArea = deal.serviceArea ? loc(deal.serviceArea, locale) : "";
   const jump = (id: string) => (e: React.MouseEvent) => {
     e.preventDefault();
     const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -52,7 +56,7 @@ export function DealDetail({ deal, preview = false }: { deal: DealDetailDTO; pre
               <a href="#s-sis" onClick={jump("s-sis")}>{t("deal.tabDescription")}</a>
               <a href="#s-ehdot" onClick={jump("s-ehdot")}>{t("deal.terms")}</a>
               <a href="#s-nain" onClick={jump("s-nain")}>{t("deal.tabHowTo")}</a>
-              <a href="#s-sijainti" onClick={jump("s-sijainti")}>{t(deal.serviceArea ? "deal.serviceAreaTitle" : "deal.location")}</a>
+              <a href="#s-sijainti" onClick={jump("s-sijainti")}>{t(address ? "deal.location" : "deal.serviceAreaTitle")}</a>
               <a href="#s-myyja" onClick={jump("s-myyja")}>{t("deal.soldBy")}</a>
             </nav>
 
@@ -75,24 +79,23 @@ export function DealDetail({ deal, preview = false }: { deal: DealDetailDTO; pre
               <Notice tone="indigo" icon="cal"><p>{t("deal.buyTodayValid", { date: expiry })}</p></Notice>
             </section>
 
-            {deal.serviceArea ? (
-              <section className="card pad stack" id="s-sijainti">
-                <h2 style={{ fontSize: 20 }}>{t("deal.serviceAreaTitle")}</h2>
+            {/* Same Location section on every deal: map and address, plus the service area for services done at the customer's place. */}
+            <section className="card pad stack" id="s-sijainti">
+              <h2 style={{ fontSize: 20 }}>{t(address ? "deal.location" : "deal.serviceAreaTitle")}</h2>
+              {address && (mapPoint
+                ? <DealMap point={mapPoint} address={address} />
+                : <div className="map" role="img" aria-label={t("deal.mapOf", { address })}><Icon name="pin" /></div>)}
+              {address && <p>{address}</p>}
+              {serviceArea && (
                 <div className="service-area">
                   <Icon name="home" />
                   <div>
                     <p style={{ fontWeight: 600 }}>{t("deal.atYourPlace")}</p>
-                    <p className="muted" style={{ marginTop: 4 }}>{address}</p>
+                    <p className="muted" style={{ marginTop: 4 }}>{serviceArea}</p>
                   </div>
                 </div>
-              </section>
-            ) : (
-              <section className="card pad stack" id="s-sijainti">
-                <h2 style={{ fontSize: 20 }}>{t("deal.location")}</h2>
-                <div className="map" role="img" aria-label={t("deal.mapOf", { address })}><Icon name="pin" /></div>
-                <p>{address}</p>
-              </section>
-            )}
+              )}
+            </section>
 
 
             <section className="card pad stack">
@@ -108,7 +111,7 @@ export function DealDetail({ deal, preview = false }: { deal: DealDetailDTO; pre
                   <p style={{ fontWeight: 600 }}>{deal.merchant.name}</p>
                   <p className="muted small">{deal.merchant.companyName} · {t("common.businessId")} {deal.merchant.businessId}</p>
                   <p className="muted small">
-                    {deal.serviceArea ? "" : `${address} · `}{t("deal.phone")} <a href={`tel:${deal.merchant.phone.replace(/\s/g, "")}`}>{deal.merchant.phone}</a>
+                    {address ? `${address} · ` : ""}{t("deal.phone")} <a href={`tel:${deal.merchant.phone.replace(/\s/g, "")}`}>{deal.merchant.phone}</a>
                     {deal.merchant.email && <> · <a href={`mailto:${deal.merchant.email}`}>{deal.merchant.email}</a></>}
                   </p>
                   {deal.merchant.website && (
