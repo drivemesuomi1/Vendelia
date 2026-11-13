@@ -11,6 +11,7 @@ import { ApiError } from "@/lib/api-client";
 import { registerCustomer } from "../api";
 import { AuthSplit, CartReason } from "./AuthSplit";
 import { GoogleButton } from "./GoogleButton";
+import { OtpStep } from "./OtpStep";
 import { authQuery, safeNext } from "./LoginForm";
 
 type FieldName = "email" | "password";
@@ -25,6 +26,7 @@ export function RegisterForm({ next, reason }: { next?: string; reason?: string 
   const [show, setShow] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  const [step, setStep] = useState<"details" | "code">("details");
   const err = (k: FieldName | "_") => (errors[k] ? t(`errors.${errors[k]}`) : undefined);
 
   async function submit(e: FormEvent) {
@@ -36,7 +38,15 @@ export function RegisterForm({ next, reason }: { next?: string; reason?: string 
       return setErrors(n);
     }
     setErrors({});
+    setStep("code");
+  }
+
+  // UI only for now: the code is not checked yet; the account is created once all six digits are in.
+  async function verify() {
+    const parsed = accountSchema.safeParse(f);
+    if (!parsed.success) return setStep("details");
     setBusy(true);
+    setErrors({});
     try {
       await registerCustomer(parsed.data);
       router.push(safeNext(next, `/${locale}/account`));
@@ -69,6 +79,14 @@ export function RegisterForm({ next, reason }: { next?: string; reason?: string 
         : hint && <span className="signin-field-hint" id={`${name}-hint`}>{hint}</span>}
     </label>
   );
+
+  if (step === "code") {
+    return (
+      <AuthSplit>
+        <OtpStep email={f.email.trim()} busy={busy} error={err("_")} onVerify={verify} onBack={() => { setStep("details"); setErrors({}); }} />
+      </AuthSplit>
+    );
+  }
 
   return (
     <AuthSplit>

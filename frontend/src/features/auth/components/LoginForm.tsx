@@ -32,6 +32,8 @@ export function LoginForm({ next, reason, error: initialError }: { next?: string
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
+  // UI only for now: the choice is not sent yet.
+  const [remember, setRemember] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -68,13 +70,22 @@ export function LoginForm({ next, reason, error: initialError }: { next?: string
             <input type="email" autoComplete="email" inputMode="email" autoFocus value={email} onChange={(e) => setEmail(e.target.value)} required aria-invalid={error ? true : undefined} />
           </span>
         </label>
-        <label className="signin-field">
-          <span>{t("auth.password")}</span>
+        <div className="signin-field">
+          <span className="signin-label-row">
+            <label htmlFor="login-password">{t("auth.password")}</label>
+            <Link className="signin-forgot" href={`/${locale}/forgot-password`}>{t("auth.forgot")}</Link>
+          </span>
           <span className="signin-box">
             <Icon name="lock" />
-            <input type={show ? "text" : "password"} autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required aria-invalid={error ? true : undefined} />
+            <input id="login-password" type={show ? "text" : "password"} autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required aria-invalid={error ? true : undefined} />
             <button type="button" className="signin-eye" onClick={() => setShow((v) => !v)} aria-pressed={show}>{t(show ? "admin.login.hide" : "admin.login.show")}</button>
           </span>
+        </div>
+
+        <label className="signin-check">
+          <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
+          <span className="signin-check-box" aria-hidden="true"><Icon name="check" /></span>
+          {t("auth.remember")}
         </label>
 
         <button className="btn btn-primary btn-block signin-submit" type="submit" disabled={busy || !email || !password}>
