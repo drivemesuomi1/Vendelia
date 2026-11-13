@@ -1,17 +1,18 @@
 import { createHash, randomBytes } from 'node:crypto';
 import type { FastifyInstance } from 'fastify';
-import { forgotPasswordSchema, localeSchema, loginSchema, resetPasswordSchema } from '@vendelia/shared';
+import { forgotPasswordSchema, localeSchema, loginSchema, registerCustomerSchema, resetPasswordSchema, verifySignupSchema } from '@vendelia/shared';
 import { HttpProblem } from '../../errors';
 import { OAUTH_COOKIE, sessionCookie, sessionToken, type AuthConfig } from './config';
 import type { OAuthProvider } from './provider';
 import type { PasswordResetService } from './password-reset';
+import type { SignupService } from './signup';
 import type { AuthService } from './service';
 const b64 = (value: Buffer | string) => Buffer.from(value).toString('base64url');
 /** Same-site relative paths only, so the post-login redirect cannot leave the site. */
 const safePath = (next: unknown) => typeof next === 'string' && next.startsWith('/') && !next.startsWith('//') && !/[\\\x00-\x20]/.test(next) && next.length < 300 ? next : '/';
 
-export async function authRoutes(app: FastifyInstance, { service, config, oauth, passwordReset }: {
-  service: AuthService; config: AuthConfig; oauth: OAuthProvider; passwordReset?: PasswordResetService;
+export async function authRoutes(app: FastifyInstance, { service, config, oauth, passwordReset, signup }: {
+  service: AuthService; config: AuthConfig; oauth: OAuthProvider; passwordReset?: PasswordResetService; signup?: SignupService;
 }) {
   // Bounded per-instance limiter supplements Supabase Auth's provider-side limits.
   const attempts = new Map<string, { count: number; until: number }>();
@@ -88,6 +89,44 @@ export async function authRoutes(app: FastifyInstance, { service, config, oauth,
     }
     limit(`reset:${parsed.data.id}`, 10);
     return { ok: true, role: await passwordReset.reset(parsed.data.id, parsed.data.token, parsed.data.password) };
+  });
+  // Customer sign-up: create a locked account and email a 6-digit code, then verify it to sign in.
+  const signupOrigin = (origin: string | undefined) => {
+    if (!signup) throw new HttpProblem(503, 'authUnavailable');
+    if (origin && !config.origins.includes(origin)) throw new HttpProblem(403, 'forbidden');
+    return signup;
+  };
+  const signupLocale = (value: unknown) => localeSchema.catch('fi').parse(value);
+  app.post('/api/auth/register', async (request, reply) => {
+    const signups = signupOrigin(request.headers.origin);
+    const parsed = registerCustomerSchema.pick({ email: true, password: true }).safeParse(request.body);
+    if (!parsed.success) throw new HttpProblem(400, parsed.error.issues[0]?.message ?? 'invalid_request');
+    // Each email gets a few codes, and the instance caps the sign-up mail it sends, every 15 minutes.
+    limit(`signup:${parsed.data.email}`, 5);
+    limit('signup', 200);
+    await signups.register(parsed.data.email, parsed.data.password, signupLocale(request.headers['x-locale']));
+    return reply.code(202).send({ ok: true });
+  });
+  app.post('/api/auth/register/resend', async (request, reply) => {
+    const signups = signupOrigin(request.headers.origin);
+    const parsed = forgotPasswordSchema.safeParse(request.body);
+    if (!parsed.success) throw new HttpProblem(400, 'invalidEmail');
+    limit(`signup:${parsed.data.email}`, 5);
+    limit('signup', 200);
+    await signups.resend(parsed.data.email, signupLocale(request.headers['x-locale']));
+    return reply.code(202).send({ ok: true });
+  });
+  app.post('/api/auth/register/verify', async (request, reply) => {
+    const signups = signupOrigin(request.headers.origin);
+    const parsed = verifySignupSchema.safeParse(request.body);
+    if (!parsed.success) throw new HttpProblem(400, 'codeInvalid');
+    // On top of the per-code limit of wrong tries, a cap per email against guessing across fresh codes.
+    limit(`verify:${parsed.data.email}`, 15);
+    const user = await signups.verify(parsed.data.email, parsed.data.code);
+    // New customers start signed in, remembered like the sign-in page's default.
+    const result = await service.loginWithIdentity({ ...user, name: null }, true);
+    await service.logout(sessionToken(request.headers.cookie));
+    return reply.header('set-cookie', sessionCookie(result.token, config.secure, result.cookieMaxAge)).send({ user: result.user });
   });
   app.get('/api/auth/config', async () => ({ configured: !!config.url && !!config.key }));
   app.get('/api/auth/me', async request => ({ user: await service.current(sessionToken(request.headers.cookie)) }));

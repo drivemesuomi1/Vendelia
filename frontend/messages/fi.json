@@ -1189,7 +1189,11 @@
     "business_id_confirmation_required": "Y-tunnus on jo rekisteröity",
     "resetLinkInvalid": "Salasanan vaihtolinkki on vanhentunut tai jo käytetty.",
     "weakPassword": "Valitse vahvempi salasana.",
-    "samePassword": "Uusi salasana ei voi olla sama kuin vanha."
+    "samePassword": "Uusi salasana ei voi olla sama kuin vanha.",
+    "codeInvalid": "Koodi ei ole oikein. Tarkista se ja yritä uudelleen.",
+    "codeExpired": "Koodi on vanhentunut. Lähetä uusi koodi.",
+    "mailUnavailable": "Sähköpostia ei voitu lähettää juuri nyt. Yritä hetken kuluttua uudelleen.",
+    "emailNotConfirmed": "Tilin luominen on kesken. Luo tili uudelleen, niin saat uuden vahvistuskoodin."
   },
   "voucherCheck": {
     "title": "Lahjakortin tarkistus",

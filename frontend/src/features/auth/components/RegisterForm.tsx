@@ -8,7 +8,7 @@ import { Icon, type IconName } from "@/components/ui/Icon";
 import { LogoSymbol } from "@/components/ui/Logo";
 import { useI18n } from "@/i18n/I18nProvider";
 import { ApiError } from "@/lib/api-client";
-import { registerCustomer } from "../api";
+import { registerCustomer, resendSignupCode, verifySignup } from "../api";
 import { AuthSplit, CartReason } from "./AuthSplit";
 import { GoogleButton } from "./GoogleButton";
 import { OtpStep } from "./OtpStep";
@@ -28,6 +28,8 @@ export function RegisterForm({ next, reason }: { next?: string; reason?: string 
   const [busy, setBusy] = useState(false);
   const [step, setStep] = useState<"details" | "code">("details");
   const err = (k: FieldName | "_") => (errors[k] ? t(`errors.${errors[k]}`) : undefined);
+  const problem = (e2: unknown): Record<string, string> =>
+    e2 instanceof ApiError ? (Object.keys(e2.fields).length ? e2.fields : { _: e2.code }) : { _: "network" };
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -38,23 +40,34 @@ export function RegisterForm({ next, reason }: { next?: string; reason?: string 
       return setErrors(n);
     }
     setErrors({});
-    setStep("code");
+    setBusy(true);
+    try {
+      // Creates the locked account and emails the code; the account works once the code is entered.
+      await registerCustomer(parsed.data, locale);
+      setStep("code");
+    } catch (e2) {
+      setErrors(problem(e2));
+    } finally {
+      setBusy(false);
+    }
   }
 
-  // UI only for now: the code is not checked yet; the account is created once all six digits are in.
-  async function verify() {
-    const parsed = accountSchema.safeParse(f);
-    if (!parsed.success) return setStep("details");
+  async function verify(code: string) {
     setBusy(true);
     setErrors({});
     try {
-      await registerCustomer(parsed.data);
+      await verifySignup({ email: f.email.trim(), code });
       router.push(safeNext(next, `/${locale}/account`));
       router.refresh();
     } catch (e2) {
-      setErrors(e2 instanceof ApiError ? (Object.keys(e2.fields).length ? e2.fields : { _: e2.code }) : { _: "network" });
+      setErrors(problem(e2));
       setBusy(false);
     }
+  }
+
+  async function resend() {
+    setErrors({});
+    try { await resendSignupCode(f.email.trim(), locale); } catch (e2) { setErrors(problem(e2)); }
   }
 
   const field = (name: FieldName, icon: IconName, input: { type: string; autoComplete: string; inputMode?: "email" }, hint?: string) => (
@@ -83,7 +96,7 @@ export function RegisterForm({ next, reason }: { next?: string; reason?: string 
   if (step === "code") {
     return (
       <AuthSplit>
-        <OtpStep email={f.email.trim()} busy={busy} error={err("_")} onVerify={verify} onBack={() => { setStep("details"); setErrors({}); }} />
+        <OtpStep email={f.email.trim()} busy={busy} error={err("_")} onVerify={verify} onResend={resend} onBack={() => { setStep("details"); setErrors({}); }} />
       </AuthSplit>
     );
   }

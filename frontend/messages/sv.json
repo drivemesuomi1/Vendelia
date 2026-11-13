@@ -1189,7 +1189,11 @@
     "business_id_confirmation_required": "FO-numret är redan registrerat",
     "resetLinkInvalid": "Länken för lösenordsbyte har gått ut eller redan använts.",
     "weakPassword": "Välj ett starkare lösenord.",
-    "samePassword": "Det nya lösenordet får inte vara samma som det gamla."
+    "samePassword": "Det nya lösenordet får inte vara samma som det gamla.",
+    "codeInvalid": "Koden stämmer inte. Kontrollera den och försök igen.",
+    "codeExpired": "Koden har gått ut. Skicka en ny kod.",
+    "mailUnavailable": "E-posten kunde inte skickas just nu. Försök igen om en stund.",
+    "emailNotConfirmed": "Kontot är inte klart. Skapa kontot igen för att få en ny verifieringskod."
   },
   "voucherCheck": {
     "title": "Kontroll av presentkort",

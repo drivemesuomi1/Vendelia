@@ -1,6 +1,7 @@
 import { MerchantProvisioningService } from "./modules/merchants/provisioning";
-import { SupabaseUserProvisioner, type PasswordAdmin, type UserProvisioner } from "./modules/auth/user-provisioner";
+import { SupabaseUserProvisioner, type SignupAdmin, type UserProvisioner } from "./modules/auth/user-provisioner";
 import { PasswordResetService } from "./modules/auth/password-reset";
+import { SignupService } from "./modules/auth/signup";
 import { MerchantRepository } from "./modules/merchants/repository";
 import { MerchantService } from "./modules/merchants/service";
 import { merchantRoutes, merchantPortalRoutes } from "./modules/merchants/routes";
@@ -27,7 +28,7 @@ import { orderConfig, platformConfig, type OrderConfig, type PlatformConfig } fr
 
 export function buildApp(database: Sql, options: {
   config?: PlatformConfig; orders?: OrderConfig; mailer?: Mailer; logger?: boolean;
-  auth?: AuthConfig; passwordProvider?: PasswordProvider; oauthProvider?: OAuthProvider; userProvisioner?: UserProvisioner; passwordAdmin?: PasswordAdmin;
+  auth?: AuthConfig; passwordProvider?: PasswordProvider; oauthProvider?: OAuthProvider; userProvisioner?: UserProvisioner; passwordAdmin?: SignupAdmin;
   dealImages?: DealImageStorage;
 } = {}) {
   const app = Fastify({ logger: options.logger ?? false });
@@ -87,7 +88,8 @@ export function buildApp(database: Sql, options: {
     images: options.dealImages ?? new SupabaseDealImageStorage() });
   // Reset links point at authSettings.siteUrl: the public site in production, the local frontend in development.
   const passwordReset = new PasswordResetService(database, options.passwordAdmin ?? supabaseAdmin, mailer, authSettings.siteUrl);
-  app.register(authRoutes, { service: authService, config: authSettings, oauth: options.oauthProvider ?? new SupabaseGoogleProvider(authSettings), passwordReset });
+  const signup = new SignupService(database, options.passwordAdmin ?? supabaseAdmin, mailer);
+  app.register(authRoutes, { service: authService, config: authSettings, oauth: options.oauthProvider ?? new SupabaseGoogleProvider(authSettings), passwordReset, signup });
   app.register(healthRoutes, { database });
   app.register(catalogueRoutes, { service });
   app.register(orderRoutes, { service: orders, auth: authService, origins: authSettings.origins });

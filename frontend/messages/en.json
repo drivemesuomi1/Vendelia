@@ -1189,7 +1189,11 @@
     "business_id_confirmation_required": "Business ID already registered",
     "resetLinkInvalid": "The password reset link has expired or was already used.",
     "weakPassword": "Choose a stronger password.",
-    "samePassword": "Your new password must be different from the old one."
+    "samePassword": "Your new password must be different from the old one.",
+    "codeInvalid": "That code isn't right. Check it and try again.",
+    "codeExpired": "The code has expired. Send a new code.",
+    "mailUnavailable": "We couldn't send the email right now. Please try again shortly.",
+    "emailNotConfirmed": "Your account isn't finished yet. Create the account again to get a new code."
   },
   "voucherCheck": {
     "title": "Voucher check",

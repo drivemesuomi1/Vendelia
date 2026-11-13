@@ -12,6 +12,8 @@ export const loginSchema = z.object({
 });
 
 export const forgotPasswordSchema = z.object({ email });
+/** The 6-digit code emailed at sign-up. */
+export const verifySignupSchema = z.object({ email, code: z.string().regex(/^\d{6}$/, { message: "codeInvalid" }) });
 export const resetPasswordSchema = z.object({
   id: z.string().uuid(),
   token: z.string().regex(/^[a-f0-9]{64}$/),

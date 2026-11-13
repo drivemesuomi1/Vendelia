@@ -8,14 +8,15 @@ const LENGTH = 6;
 const RESEND_SECONDS = 30;
 
 /**
- * Six-box email code entry shown after the sign-up details. UI only for now: the code is not checked yet,
- * `onVerify` runs once all six digits are in. Paste fills every box; backspace steps back.
+ * Six-box entry for the code emailed at sign-up. `onVerify` runs once all six digits are in; `onResend` sends a
+ * new code. Paste fills every box; backspace steps back.
  */
-export function OtpStep({ email, busy, error, onVerify, onBack }: {
+export function OtpStep({ email, busy, error, onVerify, onResend, onBack }: {
   email: string;
   busy: boolean;
   error?: string;
   onVerify: (code: string) => void;
+  onResend: () => void;
   onBack: () => void;
 }) {
   const { t } = useI18n();
@@ -92,7 +93,7 @@ export function OtpStep({ email, busy, error, onVerify, onBack }: {
       </button>
 
       <div className="otp-links">
-        <button type="button" className="otp-link" disabled={wait > 0} onClick={() => setWait(RESEND_SECONDS)}>
+        <button type="button" className="otp-link" disabled={wait > 0} onClick={() => { setWait(RESEND_SECONDS); setDigits(Array(LENGTH).fill("")); boxes.current[0]?.focus(); onResend(); }}>
           {wait > 0 ? t("auth.otpResendIn", { s: wait }) : t("auth.otpResend")}
         </button>
         <button type="button" className="otp-link" onClick={onBack}><Icon name="left" />{t("auth.otpChange")}</button>
