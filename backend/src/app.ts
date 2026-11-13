@@ -9,7 +9,7 @@ import { SupabaseDealImageStorage, type DealImageStorage } from "./modules/deals
 import { authConfig, sessionToken, type AuthConfig } from "./modules/auth/config";
 import { AuthRepository } from "./modules/auth/repository";
 import { AuthService } from "./modules/auth/service";
-import { SupabasePasswordProvider, type PasswordProvider } from "./modules/auth/provider";
+import { SupabaseGoogleProvider, SupabasePasswordProvider, type OAuthProvider, type PasswordProvider } from "./modules/auth/provider";
 import { authRoutes } from "./modules/auth/routes";
 import cors from "@fastify/cors";
 import Fastify, { type FastifyError } from "fastify";
@@ -26,7 +26,7 @@ import { orderConfig, platformConfig, type OrderConfig, type PlatformConfig } fr
 
 export function buildApp(database: Sql, options: {
   config?: PlatformConfig; orders?: OrderConfig; mailer?: Mailer; logger?: boolean;
-  auth?: AuthConfig; passwordProvider?: PasswordProvider; userProvisioner?: UserProvisioner;
+  auth?: AuthConfig; passwordProvider?: PasswordProvider; oauthProvider?: OAuthProvider; userProvisioner?: UserProvisioner;
   dealImages?: DealImageStorage;
 } = {}) {
   const app = Fastify({ logger: options.logger ?? false });
@@ -83,7 +83,7 @@ export function buildApp(database: Sql, options: {
   app.register(merchantRoutes, { service: new MerchantService(merchantRepository, provisioning, mailer, merchantMail), auth: authService });
   app.register(dealRoutes, { repository: new DealRepository(database), auth: authService, origins: authSettings.origins,
     images: options.dealImages ?? new SupabaseDealImageStorage() });
-  app.register(authRoutes, { service: authService, config: authSettings });
+  app.register(authRoutes, { service: authService, config: authSettings, oauth: options.oauthProvider ?? new SupabaseGoogleProvider(authSettings) });
   app.register(healthRoutes, { database });
   app.register(catalogueRoutes, { service });
   app.register(orderRoutes, { service: orders, auth: authService, origins: authSettings.origins });

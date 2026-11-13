@@ -10,6 +10,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { ApiError } from "@/lib/api-client";
 import { registerCustomer } from "../api";
 import { AuthSplit, CartReason } from "./AuthSplit";
+import { GoogleButton } from "./GoogleButton";
 import { authQuery, safeNext } from "./LoginForm";
 
 type FieldName = "email" | "password";
@@ -88,6 +89,7 @@ export function RegisterForm({ next, reason }: { next?: string; reason?: string 
           {busy ? <><span className="signin-spin" aria-hidden="true" />{t("auth.creating")}</> : <>{t("auth.createAccount")}<Icon name="right" /></>}
         </button>
         <p className="signin-terms">{t("auth.registerTerms")}</p>
+        <GoogleButton next={next ? safeNext(next, "/") : undefined} />
 
         <div className="signin-alt">
           <p>{t("auth.haveAccount")} <Link href={`/${locale}/login${authQuery(next, reason)}`}>{t("auth.login")}</Link></p>

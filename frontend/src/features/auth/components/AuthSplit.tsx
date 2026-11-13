@@ -1,66 +1,82 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { LangSwitch } from "@/components/layout/LangSwitch";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { LogoSymbol } from "@/components/ui/Logo";
 import { useI18n } from "@/i18n/I18nProvider";
-import { formatPct } from "@/lib/format";
 import { useAppData } from "@/lib/meta-context";
 
 const PERKS: [IconName, string][] = [["ticket", "auth.perkVouchers"], ["refund", "auth.perkRefund"], ["gift", "auth.perkGift"]];
-/** Photos behind the brand panel, shown in turn with a slow zoom. */
-const SLIDES = [
-  { src: "/deals/cleava/kotisiivous.webp", position: "50% 40%" },
-  { src: "/banner/home-services.webp", position: "52% 50%" },
-  { src: "/deals/cleava/tiimi.webp", position: "50% 30%" },
-  { src: "/deals/cleava/pinnat.webp", position: "50% 55%" },
-];
-const SLIDE_MS = 6000;
+/** Small glass chips floating around the vouchers. */
+const CHIPS: IconName[] = ["pin", "gift", "refund"];
+
+/** One drawn voucher: logo and placeholder lines above the perforation, a barcode on the stub. No text, purely decorative. */
+function Ticket({ front = false }: { front?: boolean }) {
+  return (
+    <div className={`tk${front ? " tk-front" : ""}`}>
+      <div className="tk-body">
+        <span className="tk-logo"><LogoSymbol height={18} tight /></span>
+        <span className="tk-line" /><span className="tk-line short" />
+      </div>
+      <div className="tk-stub">
+        <span className="tk-code" />
+        {front && (
+          <span className="tk-check">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
 
 /**
- * Full-screen split used by customer sign-in, registration and the business application: a brand panel with photos
- * and what the visitor gets (`claim`, `perks`; hidden on phones), and the form beside it. `panel={false}` drops the
- * photo panel for a single centred column. Motion stops for people who prefer reduced motion.
+ * Full-screen split used by customer sign-in, registration and the business application: a decorative brand panel
+ * (drifting light and a fan of vouchers that tilts toward the pointer; hidden on phones) with the form beside it.
+ * `panel={false}` drops the panel for a single centred column. Motion stops for people who prefer reduced motion.
  */
-export function AuthSplit({ children, claim = "auth.loginClaim", perks = PERKS, panel = true }: { children: ReactNode; claim?: string; perks?: [IconName, string][]; panel?: boolean }) {
+export function AuthSplit({ children, panel = true }: { children: ReactNode; panel?: boolean }) {
   const { t, locale } = useI18n();
   const { meta } = useAppData();
-  const [slide, setSlide] = useState(0);
+  const brand = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const timer = setInterval(() => setSlide((s) => (s + 1) % SLIDES.length), SLIDE_MS);
-    return () => clearInterval(timer);
+    const el = brand.current;
+    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches || !window.matchMedia("(hover: hover)").matches) return;
+    let frame = 0;
+    const move = (e: PointerEvent) => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const r = el.getBoundingClientRect();
+        el.style.setProperty("--px", ((e.clientX - r.left) / r.width - 0.5).toFixed(3));
+        el.style.setProperty("--py", ((e.clientY - r.top) / r.height - 0.5).toFixed(3));
+      });
+    };
+    const leave = () => { el.style.setProperty("--px", "0"); el.style.setProperty("--py", "0"); };
+    el.addEventListener("pointermove", move);
+    el.addEventListener("pointerleave", leave);
+    return () => { cancelAnimationFrame(frame); el.removeEventListener("pointermove", move); el.removeEventListener("pointerleave", leave); };
   }, []);
 
   return (
     <main className={`signin${panel ? "" : " no-panel"}`}>
-      {panel && <aside className="signin-brand" aria-hidden="true">
-        <div className="signin-slides">
-          {SLIDES.map((s, i) => (
-            <img key={s.src} src={s.src} alt="" className={i === slide ? "is-on" : undefined} style={{ objectPosition: s.position }} />
-          ))}
-        </div>
-        <div className="signin-shade" />
-
+      {panel && <aside className="signin-brand" aria-hidden="true" ref={brand}>
+        <span className="signin-glow a" /><span className="signin-glow b" />
+        <span className="signin-grid" />
         <Link href={`/${locale}`} className="signin-mark" tabIndex={-1}><LogoSymbol height={30} tight /></Link>
-
-        <div className="signin-copy">
-          <p className="signin-eyebrow">Vendelia</p>
-          <p className="signin-claim">{t(claim)}</p>
-          <ul className="signin-perks">
-            {perks.map(([icon, key], i) => (
-              <li key={key} style={{ animationDelay: `${240 + i * 110}ms` }}>
-                <span><Icon name={icon} /></span>{t(key, { days: meta.refundWindowDays, rate: formatPct(meta.commissionBps, locale) })}
-              </li>
-            ))}
-          </ul>
-          <div className="signin-dots">
-            {SLIDES.map((s, i) => <span key={s.src} className={i === slide ? "is-on" : undefined} />)}
+        <div className="signin-stage">
+          <div className="signin-fan">
+            <Ticket /><Ticket /><Ticket front />
+            {CHIPS.map((icon) => <span key={icon} className={`signin-chip c-${icon}`}><Icon name={icon} /></span>)}
           </div>
         </div>
+        <ul className="signin-perks">
+          {PERKS.map(([icon, key]) => (
+            <li key={key}><Icon name={icon} />{t(key, { days: meta.refundWindowDays })}</li>
+          ))}
+        </ul>
       </aside>}
 
       <section className="signin-main">

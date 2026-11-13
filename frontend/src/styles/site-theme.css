@@ -38,26 +38,62 @@ body.scrolled .site-theme header.site{box-shadow:0 10px 28px -20px rgba(20,20,25
 /* Customer sign-in: full-screen split, photo brand panel with motion */
 .signin{min-height:100vh;display:grid;grid-template-columns:minmax(0,1fr);background:#fff}
 @media(min-width:960px){.signin{grid-template-columns:minmax(420px,46%) 1fr}}
-.signin-brand{display:none;position:relative;overflow:hidden;flex-direction:column;justify-content:space-between;padding:40px;color:#fff;background:#151236;isolation:isolate}
+.signin-brand{display:none;position:relative;overflow:hidden;flex-direction:column;justify-content:space-between;padding:40px;color:#fff;background:#12102E;isolation:isolate}
 @media(min-width:960px){.signin-brand{display:flex}}
-.signin-slides{position:absolute;inset:0;z-index:-2}
-.signin-slides img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.06);transition:opacity 1.4s ease}
-.signin-slides img.is-on{opacity:1;animation:signin-kenburns 7s ease-out both}
-@keyframes signin-kenburns{from{transform:scale(1.12)}to{transform:scale(1.02)}}
-.signin-shade{position:absolute;inset:0;z-index:-1;
-  background:linear-gradient(180deg,rgba(21,18,54,.55) 0%,rgba(21,18,54,.1) 30%,rgba(21,18,54,.35) 55%,rgba(16,13,44,.94) 100%),
-  radial-gradient(90% 60% at 0% 0%,rgba(74,65,209,.45),transparent 60%)}
+.signin-glow{position:absolute;z-index:-2;width:70%;aspect-ratio:1;border-radius:50%;filter:blur(80px);opacity:.7;will-change:translate}
+.signin-glow.a{left:-18%;top:-12%;background:#4A41D1;animation:signin-drift 22s ease-in-out infinite alternate}
+.signin-glow.b{right:-24%;bottom:-18%;background:#0B7A75;opacity:.5;animation:signin-drift 28s ease-in-out infinite alternate-reverse}
+@keyframes signin-drift{from{translate:0 0}50%{translate:14% 10%}to{translate:-6% 22%}}
+.signin-grid{position:absolute;inset:0;z-index:-1;background-image:radial-gradient(rgba(255,255,255,.22) 1px,transparent 1.5px);background-size:24px 24px;
+  -webkit-mask-image:radial-gradient(70% 60% at 50% 50%,#000 20%,transparent 100%);mask-image:radial-gradient(70% 60% at 50% 50%,#000 20%,transparent 100%)}
 .signin-mark{width:56px;height:56px;border-radius:15px;background:#fff;display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,.25);animation:signin-rise .6s var(--ease) both}
-.signin-copy{max-width:440px}
-.signin-eyebrow{font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;opacity:.7;animation:signin-rise .6s .1s var(--ease) both}
-.signin-claim{margin-top:12px;font-size:clamp(30px,3vw,40px);font-weight:600;line-height:1.1;letter-spacing:-.03em;animation:signin-rise .7s .18s var(--ease) both}
-.signin-perks{list-style:none;margin:24px 0 0;padding:0;display:flex;flex-direction:column;gap:12px}
-.signin-perks li{display:flex;align-items:center;gap:12px;font-size:15px;color:rgba(255,255,255,.92);animation:signin-rise .6s var(--ease) both}
-.signin-perks li>span{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);flex:none}
-.signin-perks .icon{width:17px;height:17px}
-.signin-dots{display:flex;gap:6px;margin-top:28px}
-.signin-dots span{width:18px;height:3px;border-radius:2px;background:rgba(255,255,255,.3);transition:width .4s var(--ease),background .4s}
-.signin-dots span.is-on{width:34px;background:#fff}
+.signin-stage{position:absolute;inset:0;display:grid;place-items:center;perspective:1100px;pointer-events:none}
+.signin-fan{position:relative;width:clamp(300px,56%,480px);aspect-ratio:8/5;margin-top:-6%;transform-style:preserve-3d;
+  transform:rotateX(calc(var(--py,0)*-10deg)) rotateY(calc(var(--px,0)*14deg));transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.tk{--notch:11px;--tear:66%;position:absolute;inset:0;display:flex;flex-direction:column;border-radius:18px;color:#fff;
+  background:linear-gradient(160deg,rgba(255,255,255,.16),rgba(255,255,255,.06));box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);
+  -webkit-mask:radial-gradient(circle var(--notch) at 0 var(--tear),transparent 97%,#000),radial-gradient(circle var(--notch) at 100% var(--tear),transparent 97%,#000);-webkit-mask-composite:destination-in;
+  mask:radial-gradient(circle var(--notch) at 0 var(--tear),transparent 97%,#000),radial-gradient(circle var(--notch) at 100% var(--tear),transparent 97%,#000);mask-composite:intersect;
+  rotate:var(--r);translate:var(--x) var(--y);
+  animation:tk-deal .9s cubic-bezier(.2,.9,.25,1.1) both,tk-float 7s ease-in-out infinite}
+.tk:nth-child(1){--r:-12deg;--x:-13%;--y:-24%;animation-delay:.15s,1.1s;animation-duration:.9s,8.5s}
+.tk:nth-child(2){--r:9deg;--x:13%;--y:-13%;animation-delay:.27s,1.6s;animation-duration:.9s,7.5s}
+.tk:nth-child(3){--r:-2deg;--x:0%;--y:10%;animation-delay:.39s,1.3s}
+.signin-chip{position:absolute;width:52px;height:52px;border-radius:15px;display:grid;place-items:center;color:#fff;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  box-shadow:0 14px 30px -14px rgba(0,0,0,.5);transform:translateZ(60px);animation:chip-in .7s cubic-bezier(.2,.9,.25,1.2) both,chip-float 6s ease-in-out infinite}
+.signin-chip .icon{width:22px;height:22px}
+.signin-chip.c-pin{left:-16%;top:-30%;animation-delay:.7s,1.4s}
+.signin-chip.c-gift{right:-14%;top:-42%;width:44px;height:44px;border-radius:13px;animation-delay:.82s,2.2s;animation-duration:.7s,7s}
+.signin-chip.c-refund{right:-10%;bottom:-22%;background:#0B7A75;border-color:rgba(255,255,255,.22);animation-delay:.94s,1.8s;animation-duration:.7s,6.6s}
+.signin-chip.c-gift .icon{width:19px;height:19px}
+@keyframes chip-in{from{opacity:0;scale:.6}to{opacity:1;scale:1}}
+@keyframes chip-float{0%,100%{translate:0 0}50%{translate:0 -9px}}
+.signin-perks{position:relative;list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;font-size:14.5px;color:rgba(255,255,255,.82)}
+.signin-perks li{display:flex;align-items:center;gap:9px;animation:signin-rise .6s var(--ease) both}
+.signin-perks li:nth-child(2){animation-delay:.08s}.signin-perks li:nth-child(3){animation-delay:.16s}
+.signin-perks .icon{width:30px;height:30px;padding:6px;border-radius:9px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#B3AEF7;flex:none}
+@keyframes tk-deal{from{opacity:0;rotate:0deg;translate:0 46%;scale:.9}to{opacity:1;rotate:var(--r);translate:var(--x) var(--y);scale:1}}
+@keyframes tk-float{0%,100%{translate:var(--x) var(--y)}50%{translate:var(--x) calc(var(--y) - 3.5%)}}
+.tk-front{background:#fff;color:var(--navy);box-shadow:none}
+.tk-front::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 42%,rgba(74,65,209,.1) 50%,transparent 58%);translate:-100% 0;animation:tk-sheen 7s 2s ease-in-out infinite}
+@keyframes tk-sheen{0%,60%{translate:-100% 0}100%{translate:100% 0}}
+.tk-body{flex:0 0 var(--tear);display:flex;flex-direction:column;justify-content:center;gap:9px;padding:0 9%}
+.tk-logo{display:flex;margin-bottom:5px}
+.tk:not(.tk-front) .tk-logo{opacity:.55;filter:brightness(0) invert(1)}
+.tk-line{height:7px;width:62%;border-radius:4px;background:currentColor;opacity:.16}
+.tk-line.short{width:36%;opacity:.1}
+.tk-stub{flex:1;position:relative;display:flex;align-items:center;justify-content:space-between;padding:0 9%;border-top:1.5px dashed color-mix(in srgb,currentColor 22%,transparent)}
+.tk-code{position:relative;width:46%;height:46%;opacity:.75;overflow:hidden;
+  background:repeating-linear-gradient(90deg,currentColor 0 2px,transparent 2px 5px,currentColor 5px 6px,transparent 6px 10px,currentColor 10px 13px,transparent 13px 15px)}
+.tk:not(.tk-front) .tk-code{opacity:.3}
+.tk:not(.tk-front){--notch:0px}
+.tk-front .tk-code::after{content:"";position:absolute;top:0;bottom:0;left:0;width:2px;background:#4A41D1;box-shadow:0 0 10px 3px rgba(74,65,209,.55);animation:tk-scan 6s 1.6s cubic-bezier(.6,0,.4,1) infinite both}
+@keyframes tk-scan{0%{left:0;opacity:0}6%{opacity:1}34%{left:calc(100% - 2px);opacity:1}40%,100%{left:calc(100% - 2px);opacity:0}}
+.tk-check{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#0B7A75;animation:tk-pop 6s 1.6s cubic-bezier(.3,1.5,.5,1) infinite both}
+.tk-check svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:22;animation:tk-draw 6s 1.6s ease-out infinite both}
+@keyframes tk-pop{0%,36%{scale:0;opacity:0}44%,90%{scale:1;opacity:1}100%{scale:.6;opacity:0}}
+@keyframes tk-draw{0%,40%{stroke-dashoffset:22}52%,100%{stroke-dashoffset:0}}
 @keyframes signin-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes signin-pop{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
 .signin-main{display:flex;flex-direction:column;padding:20px 20px 32px}
@@ -66,7 +102,9 @@ body.scrolled .site-theme header.site{box-shadow:0 10px 28px -20px rgba(20,20,25
 .signin-back{display:inline-flex;align-items:center;gap:4px;font-size:13.5px;font-weight:500;color:var(--navy-70);text-decoration:none;padding:6px 10px 6px 6px;margin-left:-6px;border-radius:8px}
 .signin-back:hover{background:var(--hover);color:var(--navy)}
 .signin-back .icon{width:16px;height:16px}
-.signin-form{width:100%;max-width:400px;margin:auto;padding:32px 0;display:flex;flex-direction:column;gap:18px;animation:signin-rise .6s .05s var(--ease) both}
+.signin-form{width:100%;max-width:400px;margin:auto;padding:32px 0;display:flex;flex-direction:column;gap:18px}
+.signin-form>*{animation:signin-rise .55s var(--ease) both}
+.signin-form>:nth-child(2){animation-delay:55ms}.signin-form>:nth-child(3){animation-delay:110ms}.signin-form>:nth-child(4){animation-delay:165ms}.signin-form>:nth-child(5){animation-delay:220ms}.signin-form>:nth-child(6){animation-delay:275ms}.signin-form>:nth-child(7){animation-delay:330ms}.signin-form>:nth-child(n+8){animation-delay:385ms}
 .signin-mobile-mark{display:flex}
 @media(min-width:960px){.signin-mobile-mark{display:none}}
 .signin-form h1{font-size:32px;letter-spacing:-.03em}
@@ -78,12 +116,19 @@ body.scrolled .site-theme header.site{box-shadow:0 10px 28px -20px rgba(20,20,25
 .signin-box{display:flex;align-items:center;gap:10px;min-height:50px;padding:0 6px 0 14px;border:1px solid var(--line-strong);border-radius:10px;background:#fff;transition:border-color .15s,box-shadow .15s}
 .signin-box:hover{border-color:#BCBCC2}
 .signin-box:focus-within{border-color:var(--indigo);box-shadow:0 0 0 3px var(--indigo-100)}
-.signin-box .icon{width:18px;height:18px;color:var(--navy-50);flex:none}
+.signin-box .icon{width:18px;height:18px;color:var(--navy-50);flex:none;transition:color .2s,scale .25s var(--ease)}
+.signin-box:focus-within .icon{color:var(--indigo);scale:1.08}
 .signin-box input{flex:1;min-width:0;height:48px;border:0;outline:0;background:none;font-size:16px}
 .signin-box:has(input[aria-invalid="true"]){border-color:var(--danger)}
 .signin-eye{border:0;background:none;padding:6px 10px;border-radius:7px;font-size:13px;font-weight:600;color:var(--navy-70);cursor:pointer}
 .signin-eye:hover{background:var(--hover);color:var(--navy)}
-.signin-submit{min-height:50px;margin-top:4px;font-size:15px;gap:8px}
+.signin-google{min-height:50px;gap:10px;font-size:15px;font-weight:600;transition:background .15s,border-color .15s,box-shadow .2s,scale .12s}
+.signin-google:hover{box-shadow:0 6px 16px -8px rgba(20,20,25,.25)}
+.signin-google:active,.signin-submit:active:not(:disabled){scale:.985}
+.signin-or{display:flex;align-items:center;gap:12px;margin:0;font-size:13px;color:var(--navy-50)}
+.signin-or::before,.signin-or::after{content:"";flex:1;height:1px;background:var(--line)}
+.signin-submit{min-height:50px;margin-top:4px;font-size:15px;gap:8px;transition:background .15s,box-shadow .25s,scale .12s,opacity .2s}
+.signin-submit:hover:not(:disabled){box-shadow:0 10px 22px -10px rgba(59,50,179,.65)}
 .signin-submit .icon{width:18px;height:18px;transition:transform .2s}
 .signin-submit:hover:not(:disabled) .icon{transform:translateX(3px)}
 .signin-submit:disabled{opacity:.6;cursor:not-allowed}
@@ -96,8 +141,8 @@ body.scrolled .site-theme header.site{box-shadow:0 10px 28px -20px rgba(20,20,25
 .signin-biz .icon{width:16px;height:16px}
 .signin-biz .icon:last-child{color:var(--navy-50)}
 @media(prefers-reduced-motion:reduce){
-  .signin *,.signin-slides img.is-on{animation:none!important;transition:none!important}
-  .signin-slides img{transform:none}
+  .signin *,.signin *::after{animation:none!important;transition:none!important}
+  .tk-front .tk-code::after,.tk-front::after{display:none}
 }
 
 /* Sign-in: demo account link */

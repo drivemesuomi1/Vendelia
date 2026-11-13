@@ -3,6 +3,7 @@ import type { SessionUserDTO } from '@vendelia/shared';
 export interface AccountRepository {
   profile(id: string): Promise<SessionUserDTO | null>;
   createSession(hash: string, id: string, expires: string): Promise<void>;
+  ensureCustomerProfile(id: string, displayName: string): Promise<void>;
   session(hash: string): Promise<SessionUserDTO | null>;
   deleteSession(hash: string): Promise<void>;
 }
@@ -15,6 +16,10 @@ export class AuthRepository implements AccountRepository {
       WHERE p.user_id = ${id} AND p.is_active AND u.email_confirmed_at IS NOT NULL AND u.deleted_at IS NULL
         AND (u.banned_until IS NULL OR u.banned_until <= now())`;
     return row ? this.withMerchant({ ...row, merchant: null } as SessionUserDTO) : null;
+  }
+  /** First Google sign-in creates an ordinary customer profile; an existing profile (any role) is never changed. */
+  async ensureCustomerProfile(id: string, displayName: string) {
+    await this.sql`INSERT INTO public.profiles (user_id, display_name, role) VALUES (${id}, ${displayName.trim().slice(0, 120) || 'Customer'}, 'customer') ON CONFLICT (user_id) DO NOTHING`;
   }
   async createSession(hash: string, id: string, expires: string) {
     await this.sql`INSERT INTO public.auth_sessions (token_hash, user_id, expires_at) VALUES (${hash}, ${id}, ${expires})`;

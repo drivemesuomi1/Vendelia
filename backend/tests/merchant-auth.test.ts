@@ -12,7 +12,7 @@ import type { SessionUserDTO } from '@vendelia/shared';
 it('requires both merchant role and a business link for the merchant login audience', async () => {
   let user: SessionUserDTO | null = { id: '00000000-0000-4000-8000-000000000001', name: 'Account', email: 'a@example.com', role: 'admin', merchant: null };
   let writes = 0;
-  const repository: AccountRepository = { profile: async () => user, session: async () => user, createSession: async () => { writes++; }, deleteSession: async () => {} };
+  const repository: AccountRepository = { profile: async () => user, session: async () => user, ensureCustomerProfile: async () => {}, createSession: async () => { writes++; }, deleteSession: async () => {} };
   const service = new AuthService(repository, { verify: async () => ({ id: user!.id, email: user!.email }) });
   await assert.rejects(service.login('a@example.com', 'password', 'merchant'), { code: 'invalidLogin' });
   user = { ...user!, role: 'merchant' };

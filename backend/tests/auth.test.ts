@@ -17,7 +17,7 @@ it('does not establish sessions for missing profiles or non-admin users at admin
   let writes = 0;
   const repository: AccountRepository = {
     profile: async () => profile, session: async () => null,
-    createSession: async () => { writes++; }, deleteSession: async () => {},
+    ensureCustomerProfile: async () => {}, createSession: async () => { writes++; }, deleteSession: async () => {},
   };
   const service = new AuthService(repository, { verify: async () => ({ id, email: user.email }) });
   await assert.rejects(service.login(user.email, 'secret', 'admin'), { code: 'invalidLogin' });

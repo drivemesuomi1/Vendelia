@@ -2,7 +2,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import type { SessionUserDTO } from '@vendelia/shared';
 import { HttpProblem } from '../../errors';
 import { SESSION_SECONDS } from './config';
-import type { PasswordProvider } from './provider';
+import type { OAuthIdentity, PasswordProvider } from './provider';
 import type { AccountRepository } from './repository';
 export const hashSession = (token: string) => createHash('sha256').update(token).digest('hex');
 export class AuthService {
@@ -11,6 +11,15 @@ export class AuthService {
     const identity = await this.provider.verify(email, password);
     const user = await this.repository.profile(identity.id);
     if (!user || (audience !== 'any' && user.role !== audience) || (user.role === 'merchant' && !user.merchant)) throw new HttpProblem(401, 'invalidLogin');
+    const token = randomBytes(32).toString('hex');
+    await this.repository.createSession(hashSession(token), user.id, new Date(Date.now() + SESSION_SECONDS * 1000).toISOString());
+    return { user, token };
+  }
+  /** Google accounts are for customers only; staff and business logins keep their password flow. */
+  async loginWithIdentity(identity: OAuthIdentity) {
+    await this.repository.ensureCustomerProfile(identity.id, identity.name ?? identity.email.split('@')[0]!);
+    const user = await this.repository.profile(identity.id);
+    if (!user || user.role !== 'customer') throw new HttpProblem(401, 'invalidLogin');
     const token = randomBytes(32).toString('hex');
     await this.repository.createSession(hashSession(token), user.id, new Date(Date.now() + SESSION_SECONDS * 1000).toISOString());
     return { user, token };

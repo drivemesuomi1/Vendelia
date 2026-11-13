@@ -9,6 +9,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { ApiError } from "@/lib/api-client";
 import { login } from "../api";
 import { AuthSplit, CartReason } from "./AuthSplit";
+import { GoogleButton } from "./GoogleButton";
 
 /** Only same-site relative paths are accepted as a post-login destination (no open redirects). */
 export function safeNext(next: string | null | undefined, fallback: string) {
@@ -25,7 +26,7 @@ export function authQuery(next?: string, reason?: string) {
 }
 
 /** Customer sign-in, full screen like the portal sign-ins. */
-export function LoginForm({ next, reason, demo = false }: { next?: string; reason?: string; demo?: boolean }) {
+export function LoginForm({ next, reason, error: initialError }: { next?: string; reason?: string; error?: string }) {
   const { t, locale } = useI18n();
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -58,7 +59,7 @@ export function LoginForm({ next, reason, demo = false }: { next?: string; reaso
         </div>
 
         {reason === "cart" && <CartReason />}
-        {error && <p className="signin-err" role="alert"><Icon name="xc" />{error}</p>}
+        {(error || initialError === "google") && <p className="signin-err" role="alert"><Icon name="xc" />{error ?? t("auth.googleFailed")}</p>}
 
         <label className="signin-field">
           <span>{t("checkout.email")}</span>
@@ -79,18 +80,12 @@ export function LoginForm({ next, reason, demo = false }: { next?: string; reaso
         <button className="btn btn-primary btn-block signin-submit" type="submit" disabled={busy || !email || !password}>
           {busy ? <><span className="signin-spin" aria-hidden="true" />{t("admin.login.signingIn")}</> : <>{t("auth.login")}<Icon name="right" /></>}
         </button>
+        <GoogleButton next={next ? safeNext(next, "/") : undefined} />
 
         <div className="signin-alt">
           <p>{t("auth.noAccount")} <Link href={`/${locale}/register${authQuery(next, reason)}`}>{t("auth.createAccount")}</Link></p>
           <Link className="signin-biz" href={`/${locale}/register/business`}><Icon name="store" />{t("auth.forBusinesses")}<Icon name="right" /></Link>
         </div>
-        {demo && (
-          <Link className="signin-demo" href={`/${locale}/account/demo`}>
-            <span><Icon name="eye" /></span>
-            <span><b>{t("account.demoCta")}</b><small>{t("account.demoCtaHint")}</small></span>
-            <Icon name="right" />
-          </Link>
-        )}
       </form>
     </AuthSplit>
   );
