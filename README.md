@@ -86,6 +86,8 @@ npm run build
   Admin business creation/list/detail/status are database-backed;
   apply migration 004. See [admin business setup](docs/admin-businesses.md).
   Remaining contract: [docs/api/endpoints.md](docs/api/endpoints.md).
+  Public partner copy focuses on business benefits; pricing is discussed directly
+  with partners. See [partner messaging](docs/public-partner-messaging.md).
 - **Deploy:** the Vercel project builds `frontend/` (root directory `frontend`, install from the repo root).
   Set server-side `DATABASE_URL` in Vercel and leave `BACKEND_URL` unset: the existing Fastify API runs inside Next.js.
   A separately hosted API remains optional through `BACKEND_URL`. See [deployment setup](docs/database-catalogue.md#deployment).

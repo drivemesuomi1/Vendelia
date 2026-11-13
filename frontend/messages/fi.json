@@ -80,12 +80,15 @@
     "step4Text": "Varaa aika yrityksestä diilin ohjeiden mukaan ja näytä koodi paikan päällä.",
     "refundTitle": "{days} päivän palautusoikeus.",
     "refundText": "Muuttuivatko suunnitelmat? Peru käyttämätön lahjakortti Omissa lahjakorteissa {days} päivän kuluessa ostosta. Lahjakortit ovat voimassa {months} kalenterikuukautta.",
-    "bizTitle": "Onko sinulla paikallinen yritys?",
-    "bizText": "Tavoita uusia asiakkaita pääkaupunkiseudulla. Sinä päätät tarjouksesta – me hoidamme maksut, lahjakortit ja asiakastuen.",
-    "bizJoin": "Liity myyjäksi",
-    "bizPoint1": "{rate} provisio arvonlisäverottomasta myynnistä. Ei liittymis- eikä kuukausimaksuja.",
-    "bizPoint2": "Jokainen tilitysrivi näkyvissä: myynti, ALV, provisio ja tilitys.",
-    "bizPoint3": "Lunasta lahjakortit puhelimella."
+    "bizTitle": "Tavoita uusia asiakkaita Vendelian avulla.",
+    "bizText": "Esittelemme tuotteesi ja palvelusi ihmisille, jotka etsivät seuraavaa paikallista löytöään. Autamme muuttamaan näkyvyyden varauksiksi ja myynniksi.",
+    "bizJoin": "Ryhdy Vendelian kumppaniksi",
+    "bizPoint1": "Auta ihmisiä löytämään yrityksesi, kun he etsivät uutta koettavaa lähialueelta.",
+    "bizPoint2": "Esittele tuotteesi, palvelusi ja tarjouksesi yhdessä paikassa.",
+    "bizPoint3": "Luo tarjouksia sekä tarkista ja lunasta lahjakortteja yritysportaalissa.",
+    "bizPoint1Title": "Tavoita paikallisia asiakkaita",
+    "bizPoint2Title": "Tuo yrityksesi vahvuudet esiin",
+    "bizPoint3Title": "Hallitse lahjakortteja sujuvasti"
   },
   "browse": {
     "title": "Kaikki diilit",
@@ -284,7 +287,7 @@
     "forBusinesses": "Yrityksille",
     "registerTitle": "Luo tili",
     "name": "Nimi",
-    "businessTitle": "Myy Vendeliassa",
+    "businessTitle": "Ryhdy Vendelian kumppaniksi",
     "companyName": "Yrityksen virallinen nimi",
     "displayName": "Nimi asiakkaille",
     "contactName": "Yhteyshenkilö",
@@ -317,12 +320,14 @@
     "bizStep2Text": "Käymme tiedot läpi ja vastaamme yleensä yhden arkipäivän kuluessa.",
     "bizStep3": "Aloita myynti",
     "bizStep3Text": "Saat kirjautumistiedot yritysportaaliin ja voit luoda ensimmäisen diilisi.",
-    "bizWhy": "Myynti Vendeliassa",
-    "bizFactCommission": "provisio jokaisen myydyn setelin arvonlisäverottomasta hinnasta",
-    "bizFactPayoutTitle": "Lunastuksen jälkeen",
-    "bizFactPayout": "Saat maksun jokaisesta setelistä, jonka asiakas käyttää luonasi.",
-    "bizFactCities": "kaupunkia: {cities}",
-    "bizQuestions": "Kysyttävää? Lähetä sähköpostia"
+    "bizWhy": "Mitä Vendelia voi tehdä yrityksesi hyväksi",
+    "bizQuestions": "Kysyttävää? Lähetä sähköpostia",
+    "bizBenefitReachTitle": "Tavoita paikallisia asiakkaita",
+    "bizBenefitReach": "Auta ihmisiä löytämään yrityksesi, kun he etsivät uutta koettavaa lähialueelta.",
+    "bizBenefitShowcaseTitle": "Tuo yrityksesi vahvuudet esiin",
+    "bizBenefitShowcase": "Esittele tuotteesi, palvelusi ja tarjouksesi yhdessä paikassa.",
+    "bizBenefitManageTitle": "Hallitse lahjakortteja sujuvasti",
+    "bizBenefitManage": "Luo tarjouksia sekä tarkista ja lunasta lahjakortteja yritysportaalissa."
   },
   "business": {
     "qrScanner": {

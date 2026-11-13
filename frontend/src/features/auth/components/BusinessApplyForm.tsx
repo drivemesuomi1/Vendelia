@@ -6,7 +6,7 @@ import { COMPANY, registerMerchantSchema } from "@vendelia/shared";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { LogoSymbol } from "@/components/ui/Logo";
 import { useI18n } from "@/i18n/I18nProvider";
-import { formatPct, loc } from "@/lib/format";
+import { loc } from "@/lib/format";
 import { useAppData } from "@/lib/meta-context";
 import { AuthSplit } from "./AuthSplit";
 
@@ -91,9 +91,9 @@ export function BusinessApplyForm() {
     ["store", "auth.bizStep3", "auth.bizStep3Text"],
   ];
   const facts: [IconName, string, string][] = [
-    ["card", formatPct(meta.commissionBps, locale), "auth.bizFactCommission"],
-    ["bank", t("auth.bizFactPayoutTitle"), "auth.bizFactPayout"],
-    ["pin", String(meta.cities.length), "auth.bizFactCities"],
+    ["compass", "auth.bizBenefitReachTitle", "auth.bizBenefitReach"],
+    ["store", "auth.bizBenefitShowcaseTitle", "auth.bizBenefitShowcase"],
+    ["ticket", "auth.bizBenefitManageTitle", "auth.bizBenefitManage"],
   ];
 
   return (
@@ -166,10 +166,10 @@ export function BusinessApplyForm() {
       <aside className="apply-side apply-facts" aria-label={t("auth.bizWhy")}>
         <h2>{t("auth.bizWhy")}</h2>
         <ul>
-          {facts.map(([icon, value, text], i) => (
+          {facts.map(([icon, title, text], i) => (
             <li key={text} style={{ animationDelay: `${160 + i * 90}ms` }}>
               <span className="apply-step-ic"><Icon name={icon} /></span>
-              <div><b>{value}</b><p>{t(text, { cities: meta.cities.map((c) => loc(c.name, locale)).join(", ") })}</p></div>
+              <div><b>{t(title)}</b><p>{t(text)}</p></div>
             </li>
           ))}
         </ul>

@@ -80,12 +80,15 @@
     "step4Text": "Boka tid hos företaget enligt anvisningarna och visa koden på plats.",
     "refundTitle": "{days} dagars returrätt.",
     "refundText": "Ändrade planer? Avbeställ ett oanvänt presentkort i Mina presentkort inom {days} dagar från köpet. Presentkorten gäller i {months} kalendermånader.",
-    "bizTitle": "Har du ett lokalt företag?",
-    "bizText": "Nå nya kunder i huvudstadsregionen. Du bestämmer erbjudandet – vi sköter betalningar, presentkort och kundtjänst.",
-    "bizJoin": "Bli säljare",
-    "bizPoint1": "{rate} provision på försäljningen exklusive moms. Inga anslutnings- eller månadsavgifter.",
-    "bizPoint2": "Varje rad i redovisningen syns: försäljning, moms, provision och utbetalning.",
-    "bizPoint3": "Lös in presentkort med telefonen."
+    "bizTitle": "Nå nya kunder med Vendelia.",
+    "bizText": "Vi visar upp dina produkter och tjänster för människor som söker sin nästa lokala upptäckt och hjälper dig att omvandla synlighet till bokningar och försäljning.",
+    "bizJoin": "Bli partner till Vendelia",
+    "bizPoint1": "Hjälp människor att upptäcka ditt företag när de letar efter något nytt i närheten.",
+    "bizPoint2": "Presentera dina produkter, tjänster och erbjudanden på ett och samma ställe.",
+    "bizPoint3": "Skapa erbjudanden samt kontrollera och lös in presentkort i företagsportalen.",
+    "bizPoint1Title": "Nå lokala kunder",
+    "bizPoint2Title": "Visa vad som gör ditt företag unikt",
+    "bizPoint3Title": "Hantera presentkort smidigt"
   },
   "browse": {
     "title": "Alla erbjudanden",
@@ -284,7 +287,7 @@
     "forBusinesses": "För företag",
     "registerTitle": "Skapa ditt konto",
     "name": "Namn",
-    "businessTitle": "Sälj på Vendelia",
+    "businessTitle": "Bli partner till Vendelia",
     "companyName": "Företagets officiella namn",
     "displayName": "Namn som visas för kunder",
     "contactName": "Kontaktperson",
@@ -317,12 +320,14 @@
     "bizStep2Text": "Vi går igenom uppgifterna och svarar oftast inom en arbetsdag.",
     "bizStep3": "Börja sälja",
     "bizStep3Text": "Du får inloggningsuppgifter till företagsportalen och kan skapa ditt första erbjudande.",
-    "bizWhy": "Att sälja på Vendelia",
-    "bizFactCommission": "provision på det momsfria priset för varje sålt värdebevis",
-    "bizFactPayoutTitle": "Efter inlösen",
-    "bizFactPayout": "Du får betalt för varje värdebevis som en kund använder hos dig.",
-    "bizFactCities": "städer: {cities}",
-    "bizQuestions": "Frågor? Mejla oss"
+    "bizWhy": "Vad Vendelia kan göra för ditt företag",
+    "bizQuestions": "Frågor? Mejla oss",
+    "bizBenefitReachTitle": "Nå lokala kunder",
+    "bizBenefitReach": "Hjälp människor att upptäcka ditt företag när de letar efter något nytt i närheten.",
+    "bizBenefitShowcaseTitle": "Visa vad som gör ditt företag unikt",
+    "bizBenefitShowcase": "Presentera dina produkter, tjänster och erbjudanden på ett och samma ställe.",
+    "bizBenefitManageTitle": "Hantera presentkort smidigt",
+    "bizBenefitManage": "Skapa erbjudanden samt kontrollera och lös in presentkort i företagsportalen."
   },
   "business": {
     "qrScanner": {

@@ -6,7 +6,6 @@ import { getMeta, listDeals } from "@/features/deals/api";
 import { CategoryBar } from "@/features/deals/components/CategoryBar";
 import { DealGrid } from "@/features/deals/components/DealCard";
 import { PromoBanner } from "@/features/deals/components/PromoBanner";
-import { formatPct } from "@/lib/format";
 
 /** Home: promo banner, categories, current deals, how it works, merchant sign-up. */
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
@@ -70,9 +69,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               </div>
             </div>
             <ul>
-              <li><Icon name="check" /><span>{t("home.bizPoint1", { rate: formatPct(meta.commissionBps, locale) })}</span></li>
-              <li><Icon name="check" /><span>{t("home.bizPoint2")}</span></li>
-              <li><Icon name="check" /><span>{t("home.bizPoint3")}</span></li>
+              {[1, 2, 3].map(n => <li key={n}><Icon name="check" /><div><strong>{t(`home.bizPoint${n}Title`)}</strong><p>{t(`home.bizPoint${n}`)}</p></div></li>)}
             </ul>
           </div>
         </section>

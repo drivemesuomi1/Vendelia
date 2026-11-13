@@ -80,12 +80,15 @@
     "step4Text": "Book with the business as the deal describes and show your code on site.",
     "refundTitle": "{days}-day refund.",
     "refundText": "Changed your plans? Cancel an unused voucher in My vouchers within {days} days of purchase. Vouchers are valid for {months} calendar months.",
-    "bizTitle": "Run a local business?",
-    "bizText": "Reach new customers in the Helsinki region. You set the offer – we handle payments, vouchers and support.",
-    "bizJoin": "Become a seller",
-    "bizPoint1": "{rate} commission on the VAT-exclusive sale. No sign-up or monthly fees.",
-    "bizPoint2": "Every statement line is visible: sale, VAT, commission and payout.",
-    "bizPoint3": "Redeem vouchers with your phone."
+    "bizTitle": "Reach new customers with Vendelia.",
+    "bizText": "We showcase your products and services to people looking for their next local discovery, helping you turn that visibility into bookings and sales.",
+    "bizJoin": "Become a Vendelia partner",
+    "bizPoint1": "Help people discover your business when they are looking for something new nearby.",
+    "bizPoint2": "Present your products, services and offers in one place.",
+    "bizPoint3": "Create deals and check and redeem vouchers in your business portal.",
+    "bizPoint1Title": "Connect with local customers",
+    "bizPoint2Title": "Showcase what makes you stand out",
+    "bizPoint3Title": "Manage vouchers with confidence"
   },
   "browse": {
     "title": "All deals",
@@ -284,7 +287,7 @@
     "forBusinesses": "For businesses",
     "registerTitle": "Create your account",
     "name": "Name",
-    "businessTitle": "Sell on Vendelia",
+    "businessTitle": "Become a Vendelia partner",
     "companyName": "Registered company name",
     "displayName": "Name shown to customers",
     "contactName": "Contact person",
@@ -317,12 +320,14 @@
     "bizStep2Text": "We look at your details and usually reply within one working day.",
     "bizStep3": "Start selling",
     "bizStep3Text": "You get sign-in details for the business portal and can create your first deal.",
-    "bizWhy": "Selling on Vendelia",
-    "bizFactCommission": "commission on the VAT-exclusive price of each sold voucher",
-    "bizFactPayoutTitle": "After redemption",
-    "bizFactPayout": "You are paid for every voucher a customer uses with you.",
-    "bizFactCities": "cities: {cities}",
-    "bizQuestions": "Questions? Email us"
+    "bizWhy": "What Vendelia can do for your business",
+    "bizQuestions": "Questions? Email us",
+    "bizBenefitReachTitle": "Connect with local customers",
+    "bizBenefitReach": "Help people discover your business when they are looking for something new nearby.",
+    "bizBenefitShowcaseTitle": "Showcase what makes you stand out",
+    "bizBenefitShowcase": "Present your products, services and offers in one place.",
+    "bizBenefitManageTitle": "Manage vouchers with confidence",
+    "bizBenefitManage": "Create deals and check and redeem vouchers in your business portal."
   },
   "business": {
     "qrScanner": {
