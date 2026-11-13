@@ -51,6 +51,10 @@ export function Footer() {
         </div>
         <div className="legal">
           <span>© {new Date().getFullYear()} {COMPANY.name} · {t("common.businessId")} {COMPANY.businessId}</span>
+          <span className="legal-links">
+            <Link href={l("/privacy")}>{t("footer.privacy")}</Link>
+            <Link href={l("/terms")}>{t("footer.terms")}</Link>
+          </span>
         </div>
       </div>
     </footer>

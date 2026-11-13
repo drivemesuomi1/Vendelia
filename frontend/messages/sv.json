@@ -42,7 +42,9 @@
     "help": "Hjälp",
     "customerService": "Kundtjänst",
     "businessSupport": "Företagssupport",
-    "phone": "Telefon"
+    "phone": "Telefon",
+    "privacy": "Dataskyddsbeskrivning",
+    "terms": "Användarvillkor"
   },
   "home": {
     "bannerTitle": "Mer upplevelser, färre euro",

@@ -42,7 +42,9 @@
     "help": "Apua",
     "customerService": "Asiakaspalvelu",
     "businessSupport": "Yritystuki",
-    "phone": "Puhelin"
+    "phone": "Puhelin",
+    "privacy": "Tietosuojaseloste",
+    "terms": "Käyttöehdot"
   },
   "home": {
     "bannerTitle": "Enemmän elämyksiä, vähemmän euroja",

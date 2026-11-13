@@ -232,6 +232,8 @@ footer.site{border-top:1px solid var(--line);background:#fff;margin-top:var(--s6
 .foot a:hover{color:var(--indigo)}
 .foot-contact{margin:0 0 6px}.foot-contact small{display:block;font-size:12px;color:var(--navy-50)}.foot .foot-contact a{padding:2px 0}
 .legal{margin-top:var(--s4);padding-top:var(--s3);border-top:1px solid var(--line);font-size:13px;color:var(--navy-70);display:flex;flex-wrap:wrap;gap:var(--s2);justify-content:space-between}
+.legal-links{display:flex;gap:var(--s2);flex-wrap:wrap}.legal-links a{color:inherit}
+.legal-page{padding-top:var(--s3);padding-bottom:var(--s4);max-width:820px}.legal-page h1{font-size:clamp(26px,4vw,34px)}.legal-page .legal-intro{margin-top:16px;font-size:16px}.legal-page h2{font-size:18px;margin:28px 0 8px}.legal-sec p{margin:0 0 10px;line-height:1.65;color:var(--navy-70)}
 .paylogos{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .paylogos span{font-size:12px;font-weight:700;color:var(--navy-70);border:1px solid var(--line);border-radius:6px;padding:4px 8px}
 

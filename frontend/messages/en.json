@@ -42,7 +42,9 @@
     "help": "Help",
     "customerService": "Customer service",
     "businessSupport": "Business support",
-    "phone": "Phone"
+    "phone": "Phone",
+    "privacy": "Privacy policy",
+    "terms": "Terms of service"
   },
   "home": {
     "bannerTitle": "More to enjoy, less to pay",
