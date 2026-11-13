@@ -1,5 +1,6 @@
 import { MerchantProvisioningService } from "./modules/merchants/provisioning";
-import { SupabaseUserProvisioner, type UserProvisioner } from "./modules/auth/user-provisioner";
+import { SupabaseUserProvisioner, type PasswordAdmin, type UserProvisioner } from "./modules/auth/user-provisioner";
+import { PasswordResetService } from "./modules/auth/password-reset";
 import { MerchantRepository } from "./modules/merchants/repository";
 import { MerchantService } from "./modules/merchants/service";
 import { merchantRoutes, merchantPortalRoutes } from "./modules/merchants/routes";
@@ -26,7 +27,7 @@ import { orderConfig, platformConfig, type OrderConfig, type PlatformConfig } fr
 
 export function buildApp(database: Sql, options: {
   config?: PlatformConfig; orders?: OrderConfig; mailer?: Mailer; logger?: boolean;
-  auth?: AuthConfig; passwordProvider?: PasswordProvider; oauthProvider?: OAuthProvider; userProvisioner?: UserProvisioner;
+  auth?: AuthConfig; passwordProvider?: PasswordProvider; oauthProvider?: OAuthProvider; userProvisioner?: UserProvisioner; passwordAdmin?: PasswordAdmin;
   dealImages?: DealImageStorage;
 } = {}) {
   const app = Fastify({ logger: options.logger ?? false });
@@ -77,13 +78,16 @@ export function buildApp(database: Sql, options: {
   });
   app.register(merchantPortalRoutes, { repository: new MerchantRepository(database), auth: authService });
   const merchantRepository = new MerchantRepository(database);
+  const supabaseAdmin = new SupabaseUserProvisioner(authSettings.url, process.env.SUPABASE_SECRET_KEY?.trim() ?? '');
   const provisioning = new MerchantProvisioningService(merchantRepository,
-    options.userProvisioner ?? new SupabaseUserProvisioner(authSettings.url, process.env.SUPABASE_SECRET_KEY?.trim() ?? ''));
+    options.userProvisioner ?? supabaseAdmin);
   const merchantMail = { siteUrl: ordersConfig.siteUrl, supportEmail: ordersConfig.mail.businessReplyTo };
   app.register(merchantRoutes, { service: new MerchantService(merchantRepository, provisioning, mailer, merchantMail), auth: authService });
   app.register(dealRoutes, { repository: new DealRepository(database), auth: authService, origins: authSettings.origins,
     images: options.dealImages ?? new SupabaseDealImageStorage() });
-  app.register(authRoutes, { service: authService, config: authSettings, oauth: options.oauthProvider ?? new SupabaseGoogleProvider(authSettings) });
+  // Reset links point at authSettings.siteUrl: the public site in production, the local frontend in development.
+  const passwordReset = new PasswordResetService(database, options.passwordAdmin ?? supabaseAdmin, mailer, authSettings.siteUrl);
+  app.register(authRoutes, { service: authService, config: authSettings, oauth: options.oauthProvider ?? new SupabaseGoogleProvider(authSettings), passwordReset });
   app.register(healthRoutes, { database });
   app.register(catalogueRoutes, { service });
   app.register(orderRoutes, { service: orders, auth: authService, origins: authSettings.origins });

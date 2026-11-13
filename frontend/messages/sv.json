@@ -327,7 +327,18 @@
     "bizBenefitShowcaseTitle": "Visa vad som gör ditt företag unikt",
     "bizBenefitShowcase": "Presentera dina produkter, tjänster och erbjudanden på ett och samma ställe.",
     "bizBenefitManageTitle": "Hantera presentkort smidigt",
-    "bizBenefitManage": "Skapa erbjudanden samt kontrollera och lös in presentkort i företagsportalen."
+    "bizBenefitManage": "Skapa erbjudanden samt kontrollera och lös in presentkort i företagsportalen.",
+    "forgotSending": "Skickar…",
+    "resetTitle": "Välj ett nytt lösenord",
+    "resetSub": "Ange ett nytt lösenord för ditt konto. Alla andra inloggningar avslutas när du sparar det.",
+    "resetNew": "Nytt lösenord",
+    "resetSave": "Spara lösenord",
+    "resetSaving": "Sparar…",
+    "resetDone": "Lösenordet är bytt",
+    "resetDoneSub": "Du kan nu logga in med ditt nya lösenord.",
+    "resetInvalid": "Länken gäller inte längre",
+    "resetInvalidSub": "Länken för lösenordsbyte har gått ut eller redan använts. Be om en ny länk.",
+    "resetRequestNew": "Be om en ny länk"
   },
   "business": {
     "qrScanner": {
@@ -1175,7 +1186,10 @@
     "invalidTransition": "Erbjudandet har redan granskats. Uppdatera sidan.",
     "tooManyPhotos": "Du kan lägga till högst 8 bilder.",
     "referenceTooLow": "Ordinarie pris måste vara högre än priset.",
-    "business_id_confirmation_required": "FO-numret är redan registrerat"
+    "business_id_confirmation_required": "FO-numret är redan registrerat",
+    "resetLinkInvalid": "Länken för lösenordsbyte har gått ut eller redan använts.",
+    "weakPassword": "Välj ett starkare lösenord.",
+    "samePassword": "Det nya lösenordet får inte vara samma som det gamla."
   },
   "voucherCheck": {
     "title": "Kontroll av presentkort",

@@ -327,7 +327,18 @@
     "bizBenefitShowcaseTitle": "Tuo yrityksesi vahvuudet esiin",
     "bizBenefitShowcase": "Esittele tuotteesi, palvelusi ja tarjouksesi yhdessä paikassa.",
     "bizBenefitManageTitle": "Hallitse lahjakortteja sujuvasti",
-    "bizBenefitManage": "Luo tarjouksia sekä tarkista ja lunasta lahjakortteja yritysportaalissa."
+    "bizBenefitManage": "Luo tarjouksia sekä tarkista ja lunasta lahjakortteja yritysportaalissa.",
+    "forgotSending": "Lähetetään…",
+    "resetTitle": "Valitse uusi salasana",
+    "resetSub": "Kirjoita uusi salasana tilillesi. Kaikki muut kirjautumiset päättyvät, kun tallennat sen.",
+    "resetNew": "Uusi salasana",
+    "resetSave": "Tallenna salasana",
+    "resetSaving": "Tallennetaan…",
+    "resetDone": "Salasana vaihdettu",
+    "resetDoneSub": "Voit nyt kirjautua sisään uudella salasanalla.",
+    "resetInvalid": "Linkki ei ole enää voimassa",
+    "resetInvalidSub": "Salasanan vaihtolinkki on vanhentunut tai jo käytetty. Pyydä uusi linkki.",
+    "resetRequestNew": "Pyydä uusi linkki"
   },
   "business": {
     "qrScanner": {
@@ -1175,7 +1186,10 @@
     "invalidTransition": "Diili on jo tarkistettu. Päivitä sivu.",
     "tooManyPhotos": "Voit lisätä enintään 8 kuvaa.",
     "referenceTooLow": "Normaalihinnan on oltava hintaa korkeampi.",
-    "business_id_confirmation_required": "Y-tunnus on jo rekisteröity"
+    "business_id_confirmation_required": "Y-tunnus on jo rekisteröity",
+    "resetLinkInvalid": "Salasanan vaihtolinkki on vanhentunut tai jo käytetty.",
+    "weakPassword": "Valitse vahvempi salasana.",
+    "samePassword": "Uusi salasana ei voi olla sama kuin vanha."
   },
   "voucherCheck": {
     "title": "Lahjakortin tarkistus",

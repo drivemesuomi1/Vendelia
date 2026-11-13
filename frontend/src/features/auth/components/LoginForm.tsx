@@ -32,7 +32,7 @@ export function LoginForm({ next, reason, error: initialError }: { next?: string
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
-  // UI only for now: the choice is not sent yet.
+  // On: signed in for 30 days on this device. Off: signed out when the browser closes.
   const [remember, setRemember] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -42,7 +42,7 @@ export function LoginForm({ next, reason, error: initialError }: { next?: string
     setBusy(true);
     setError(null);
     try {
-      await login({ email, password });
+      await login({ email, password, remember });
       router.push(safeNext(next, `/${locale}`));
       router.refresh();
     } catch (e2) {
@@ -91,7 +91,7 @@ export function LoginForm({ next, reason, error: initialError }: { next?: string
         <button className="btn btn-primary btn-block signin-submit" type="submit" disabled={busy || !email || !password}>
           {busy ? <><span className="signin-spin" aria-hidden="true" />{t("admin.login.signingIn")}</> : <>{t("auth.login")}<Icon name="right" /></>}
         </button>
-        <GoogleButton next={next ? safeNext(next, "/") : undefined} />
+        <GoogleButton next={next ? safeNext(next, "/") : undefined} remember={remember} />
 
         <div className="signin-alt">
           <p>{t("auth.noAccount")} <Link href={`/${locale}/register${authQuery(next, reason)}`}>{t("auth.createAccount")}</Link></p>

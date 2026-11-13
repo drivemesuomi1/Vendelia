@@ -7,6 +7,15 @@ const password = z.string().min(8, { message: "passwordTooShort" }).max(200);
 export const loginSchema = z.object({
   email,
   password: z.string().min(1, { message: "required" }).max(200),
+  /** Customer sign-in: true keeps the session for 30 days, false ends it when the browser closes. */
+  remember: z.boolean().optional(),
+});
+
+export const forgotPasswordSchema = z.object({ email });
+export const resetPasswordSchema = z.object({
+  id: z.string().uuid(),
+  token: z.string().regex(/^[a-f0-9]{64}$/),
+  password,
 });
 export type LoginInput = z.infer<typeof loginSchema>;
 

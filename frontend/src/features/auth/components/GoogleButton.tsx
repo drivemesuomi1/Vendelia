@@ -3,9 +3,14 @@
 import { useI18n } from "@/i18n/I18nProvider";
 
 /** Starts Google sign-in. A plain link: the server redirects to Google and back, then sets the session cookie. */
-export function GoogleButton({ next }: { next?: string }) {
+export function GoogleButton({ next, remember = true }: { next?: string; remember?: boolean }) {
   const { t } = useI18n();
-  const href = `/api/auth/google${next ? `?next=${encodeURIComponent(next)}` : ""}`;
+  const query = new URLSearchParams();
+  if (next) query.set("next", next);
+  // Follows the sign-in page's "Remember me" box; elsewhere Google sign-in is remembered.
+  if (!remember) query.set("remember", "0");
+  const qs = query.toString();
+  const href = `/api/auth/google${qs ? `?${qs}` : ""}`;
   return (
     <>
       <p className="signin-or" aria-hidden="true"><span>{t("auth.or")}</span></p>

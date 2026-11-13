@@ -8,17 +8,22 @@ export interface UserProvisioner {
   create(input: { id: string; email: string; password: string; provisioningId: string }): Promise<ProvisionedUser>;
 }
 
+/** Password changes and app_metadata (where the reset token hash is kept) through the Auth admin API. */
+export interface PasswordAdmin {
+  updateUser(id: string, changes: { password?: string; appMetadata?: Record<string, unknown> }): Promise<void>;
+}
+
 /** Server-only Auth admin API. Never exposes the secret key, raw provider errors or passwords. */
-export class SupabaseUserProvisioner implements UserProvisioner {
+export class SupabaseUserProvisioner implements UserProvisioner, PasswordAdmin {
   constructor(private readonly url: string, private readonly secretKey: string) {}
   assertConfigured() {
     if (!this.url || !this.secretKey) throw new HttpProblem(503, 'provisioningNotConfigured');
   }
-  private async request(path: string, body?: unknown): Promise<Response> {
+  private async request(path: string, body?: unknown, method = body ? 'POST' : 'GET'): Promise<Response> {
     this.assertConfigured();
     try {
       return await fetch(`${this.url}/auth/v1/admin/users${path}`, {
-        method: body ? 'POST' : 'GET', redirect: 'error', cache: 'no-store',
+        method, redirect: 'error', cache: 'no-store',
         headers: {
           apikey: this.secretKey,
           // Legacy service-role keys are JWTs. Opaque sb_secret keys are handled by the API gateway.
@@ -55,5 +60,17 @@ export class SupabaseUserProvisioner implements UserProvisioner {
       throw new HttpProblem(503, 'provisioningPending');
     }
     return this.user(response);
+  }
+  async updateUser(id: string, changes: { password?: string; appMetadata?: Record<string, unknown> }) {
+    const response = await this.request(`/${encodeURIComponent(id)}`, {
+      ...(changes.password ? { password: changes.password } : {}),
+      ...(changes.appMetadata ? { app_metadata: changes.appMetadata } : {}),
+    }, 'PUT').catch(() => { throw new HttpProblem(503, 'authUnavailable'); });
+    if (response.ok) return;
+    const data = await response.json().catch(() => null) as { code?: string; error_code?: string } | null;
+    const code = data?.error_code ?? data?.code ?? '';
+    if (code === 'weak_password') throw new HttpProblem(400, 'weakPassword');
+    if (code === 'same_password') throw new HttpProblem(400, 'samePassword');
+    throw new HttpProblem(503, 'authUnavailable');
   }
 }

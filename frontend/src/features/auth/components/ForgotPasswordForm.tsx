@@ -2,19 +2,36 @@
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
+import { ApiError } from "@/lib/api-client";
+import { forgotPassword } from "../api";
 import { Icon } from "@/components/ui/Icon";
 import { LogoSymbol } from "@/components/ui/Logo";
 import { useI18n } from "@/i18n/I18nProvider";
 import { AuthSplit } from "./AuthSplit";
 
-/** Password reset request. UI only for now: no email is sent yet, the confirmation is shown either way. */
+/** Password reset request. The confirmation is the same whether or not the email has an account. */
 export function ForgotPasswordForm() {
   const { t, locale } = useI18n();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const valid = /^\S+@\S+\.\S+$/.test(email.trim());
 
-  const submit = (e: FormEvent) => { e.preventDefault(); if (valid) setSent(true); };
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    if (!valid || busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await forgotPassword(email.trim(), locale);
+      setSent(true);
+    } catch (e2) {
+      setError(t(`errors.${e2 instanceof ApiError ? e2.code : "network"}`));
+    } finally {
+      setBusy(false);
+    }
+  }
   const back = <Link className="otp-link" href={`/${locale}/login`}><Icon name="left" />{t("auth.backToLogin")}</Link>;
 
   return (
@@ -36,6 +53,7 @@ export function ForgotPasswordForm() {
             <h1>{t("auth.forgotTitle")}</h1>
             <p className="muted">{t("auth.forgotSub")}</p>
           </div>
+          {error && <p className="signin-err" role="alert"><Icon name="xc" />{error}</p>}
           <label className="signin-field">
             <span>{t("checkout.email")}</span>
             <span className="signin-box">
@@ -43,8 +61,8 @@ export function ForgotPasswordForm() {
               <input type="email" autoComplete="email" inputMode="email" autoFocus value={email} onChange={(e) => setEmail(e.target.value)} required />
             </span>
           </label>
-          <button className="btn btn-primary btn-block signin-submit" type="submit" disabled={!valid}>
-            {t("auth.forgotSend")}<Icon name="right" />
+          <button className="btn btn-primary btn-block signin-submit" type="submit" disabled={!valid || busy}>
+            {busy ? <><span className="signin-spin" aria-hidden="true" />{t("auth.forgotSending")}</> : <>{t("auth.forgotSend")}<Icon name="right" /></>}
           </button>
           <div className="otp-links">{back}</div>
         </form>

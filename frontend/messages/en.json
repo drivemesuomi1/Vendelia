@@ -327,7 +327,18 @@
     "bizBenefitShowcaseTitle": "Showcase what makes you stand out",
     "bizBenefitShowcase": "Present your products, services and offers in one place.",
     "bizBenefitManageTitle": "Manage vouchers with confidence",
-    "bizBenefitManage": "Create deals and check and redeem vouchers in your business portal."
+    "bizBenefitManage": "Create deals and check and redeem vouchers in your business portal.",
+    "forgotSending": "Sending…",
+    "resetTitle": "Choose a new password",
+    "resetSub": "Enter a new password for your account. Saving it signs you out everywhere else.",
+    "resetNew": "New password",
+    "resetSave": "Save password",
+    "resetSaving": "Saving…",
+    "resetDone": "Password changed",
+    "resetDoneSub": "You can now sign in with your new password.",
+    "resetInvalid": "This link no longer works",
+    "resetInvalidSub": "The password reset link has expired or was already used. Ask for a new one.",
+    "resetRequestNew": "Get a new link"
   },
   "business": {
     "qrScanner": {
@@ -1175,7 +1186,10 @@
     "invalidTransition": "This deal has already been reviewed. Refresh the page.",
     "tooManyPhotos": "You can add up to 8 photos.",
     "referenceTooLow": "The regular price must be higher than the price.",
-    "business_id_confirmation_required": "Business ID already registered"
+    "business_id_confirmation_required": "Business ID already registered",
+    "resetLinkInvalid": "The password reset link has expired or was already used.",
+    "weakPassword": "Choose a stronger password.",
+    "samePassword": "Your new password must be different from the old one."
   },
   "voucherCheck": {
     "title": "Voucher check",
