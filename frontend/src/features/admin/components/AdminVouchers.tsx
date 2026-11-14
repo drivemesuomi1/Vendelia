@@ -214,9 +214,9 @@ function VoucherDetail({ voucher: v, onClose, onRedeem, busy }: { voucher: Admin
         <button type="button" className="btn btn-ghost btn-sm" disabled={busy} onClick={onClose} aria-label={t("admin.mb.close")}><Icon name="x" /></button>
       </div>
 
-      {eligible && <div className="stack" style={{ padding: '0 20px 20px', gap: 12 }}>
+      {eligible && <div style={{ display: 'flex', flexDirection: 'column', padding: '24px 20px', gap: 20 }}>
         <Notice tone="indigo">{t('admin.vo.redemption.hint')}</Notice>
-        {confirming ? <div className="stack" style={{ gap: 12 }}>
+        {confirming ? <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <p>{t('admin.vo.redemption.confirm', { code: v.code, merchant: v.merchant.name })}</p>
           <div className="row wrap-row" style={{ gap: 10 }}>
             <button type="button" className="btn btn-primary" disabled={busy} onClick={onRedeem}>{t(busy ? 'admin.vo.redemption.working' : 'admin.vo.redemption.confirmButton')}</button>

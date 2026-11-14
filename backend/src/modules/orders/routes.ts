@@ -42,6 +42,15 @@ export async function orderRoutes(app: FastifyInstance, { service, auth, origins
     return sendPdf(reply, pdf);
   });
 
+  // Customers can only ask for a refund; an admin decides. The request is emailed to customer service.
+  app.post("/api/me/vouchers/refund-request", async (request) => {
+    if (request.headers.origin && !origins.includes(request.headers.origin)) throw new HttpProblem(403, 'forbidden');
+    const user = await auth.current(sessionToken(request.headers.cookie));
+    if (!user) throw new HttpProblem(401, "invalidLogin");
+    const body = (request.body ?? {}) as { code?: unknown; reason?: unknown };
+    return service.requestRefund(user, String(body.code ?? ''), body.reason);
+  });
+
   // Sample vouchers for the demo account page; only when the demo account is switched on.
   if (demoAccountEnabled(process.env)) {
     app.get<{ Params: { code: string }; Querystring: { locale?: string } }>("/api/demo/vouchers/:code/pdf", async (request, reply) => {
@@ -73,6 +82,7 @@ export async function orderRoutes(app: FastifyInstance, { service, auth, origins
   // Admin order, refund and voucher views; /api/admin/* is guarded by the app-wide admin hook.
   app.get("/api/admin/orders", async () => ({ orders: await service.adminOrders() }));
   app.get('/api/admin/refunds', async () => service.adminRefunds());
+  app.get('/api/admin/refund-requests', async () => service.adminRefundRequests());
   app.get<{ Querystring: { test?: string } }>('/api/admin/finance', async (request) => service.adminFinance(request.query.test === '1'));
   app.post('/api/admin/refunds', async (request, reply) => {
     const parsed = redeemLookupSchema.safeParse(request.body);

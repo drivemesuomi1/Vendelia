@@ -1,7 +1,7 @@
 import { createHash, randomBytes, randomInt } from "node:crypto";
 import type { Sql } from "postgres";
 import {
-  TEST_PAYMENT_METHOD, demoAccount, uuidSchema, voucherCodeSchema, voucherQrPayload,
+  COMPANY, TEST_PAYMENT_METHOD, demoAccount, uuidSchema, voucherCodeSchema, voucherQrPayload,
   type AdminFinanceDayDTO, type AdminFinanceDTO, type AdminFinanceMerchantDTO, type AdminOrderDTO, type AdminVoucherDTO, type CheckoutInput, type CreateOrderResponse, type Locale, type LocalizedList, type LocalizedText,
   type OrderDTO, type PaymentMethod, type RedeemLookupDTO, type VoucherDTO, type VoucherStatus, type MerchantPayoutPreviewDTO, type SessionUserDTO,
 } from "@vendelia/shared";
@@ -9,6 +9,7 @@ import type { OrderConfig, PlatformConfig } from "../../config";
 import { HttpProblem } from "../../errors";
 import type { CatalogueService } from "../catalogue/service";
 import { buildVoucherEmail } from "../vouchers/email";
+import { buildRefundRequestEmail } from "../vouchers/refund-request-email";
 import type { Mailer } from "../vouchers/mailer";
 import { renderVoucherPdf, type VoucherDocument } from "../vouchers/pdf";
 import { pick, voucherText } from "../vouchers/text";
@@ -200,7 +201,60 @@ export class OrderService {
       const loaded = await this.load(order.id);
       if (loaded) vouchers.push(...this.toDto(loaded).vouchers);
     }
-    return vouchers;
+    if (!vouchers.length) return vouchers;
+    const pending = await this.sql<{ code: string; created_at: string }[]>`
+      SELECT v.code, to_json(r.created_at) AS created_at FROM public.refund_requests r
+      JOIN public.vouchers v ON v.id = r.voucher_id
+      WHERE r.status = 'pending' AND v.code IN ${this.sql(vouchers.map((v) => v.code))}`;
+    const requested = new Map(pending.map((r) => [r.code, iso(r.created_at)]));
+    return vouchers.map((v) => ({ ...v, refundRequestedAt: requested.get(v.code) ?? null }));
+  }
+
+  /**
+   * A customer asks for a refund; nothing is refunded here. Stores one pending request per voucher, emails
+   * customer service and leaves the decision to an admin (see refundForAdmin).
+   */
+  async requestRefund(user: Pick<SessionUserDTO, 'id' | 'email' | 'name'>, rawCode: string, rawReason?: unknown): Promise<VoucherDTO> {
+    const parsed = voucherCodeSchema.safeParse(rawCode);
+    if (!parsed.success) throw new HttpProblem(400, 'invalidVoucherCode');
+    const reason = typeof rawReason === 'string' ? rawReason.trim().slice(0, 1000) : '';
+    const [row] = await this.sql<{ id: string; order_id: string; status: VoucherStatus; redeemed_at: string | null;
+      refunded_at: string | null; cancellable_until: string | null }[]>`
+      SELECT v.id, v.order_id, v.status, to_json(v.redeemed_at) AS redeemed_at, to_json(v.refunded_at) AS refunded_at,
+        to_json(v.cancellable_until) AS cancellable_until
+      FROM public.vouchers v JOIN public.orders o ON o.id = v.order_id
+      WHERE v.code = ${parsed.data} AND (o.customer_id = ${user.id}
+        OR (o.customer_id IS NULL AND lower(o.email) = ${user.email.toLowerCase()}))`;
+    if (!row) throw new HttpProblem(404, 'voucher_not_found');
+    if (row.status !== 'active' || row.redeemed_at || row.refunded_at) throw new HttpProblem(409, 'refundNotEligible');
+    if (!row.cancellable_until || Date.parse(row.cancellable_until) < Date.now()) throw new HttpProblem(409, 'refundWindowClosed');
+    const [created] = await this.sql<{ id: string }[]>`
+      INSERT INTO public.refund_requests (voucher_id, requested_by, reason)
+      VALUES (${row.id}, ${user.id}, ${reason || null}) ON CONFLICT DO NOTHING RETURNING id`;
+    const voucher = (await this.forCustomer(user)).find((v) => v.code === parsed.data);
+    if (!voucher) throw new HttpProblem(404, 'voucher_not_found');
+    if (created) {
+      const mail = buildRefundRequestEmail({ code: voucher.code, orderNumber: voucher.orderNumber, deal: pick(voucher.title, 'fi'),
+        amountCents: voucher.priceCents, customerName: user.name, customerEmail: user.email, reason, test: voucher.test });
+      try { await this.mailer.send({ to: COMPANY.customerEmail, replyTo: user.email, attachments: [], ...mail }); }
+      catch (error) { console.error(`Refund request email failed for ${voucher.code}:`, error instanceof Error ? error.message : error); }
+    }
+    return voucher;
+  }
+
+  /** Open customer refund requests for the admin refunds screen, oldest first. */
+  async adminRefundRequests() {
+    const rows = await this.sql<{ code: string; reason: string | null; created_at: string; title: LocalizedText;
+      option_label: LocalizedText | null; price_cents: number; number: string; email: string; first_name: string; last_name: string }[]>`
+      SELECT v.code, r.reason, to_json(r.created_at) AS created_at, oi.title, oi.option_label, v.price_cents,
+        o.number, o.email, o.first_name, o.last_name
+      FROM public.refund_requests r
+      JOIN public.vouchers v ON v.id = r.voucher_id JOIN public.order_items oi ON oi.id = v.order_item_id
+      JOIN public.orders o ON o.id = v.order_id
+      WHERE r.status = 'pending' ORDER BY r.created_at LIMIT 100`;
+    return { requests: rows.map((r) => ({ code: r.code, reason: r.reason, requestedAt: iso(r.created_at), title: r.title,
+      optionLabel: r.option_label, priceCents: r.price_cents, orderNumber: r.number, email: r.email,
+      name: `${r.first_name} ${r.last_name}`.trim() })) };
   }
 
   /** Same account ownership rule as the portal; another account's linked order never falls back to email. */
@@ -271,6 +325,8 @@ export class OrderService {
       WHERE code = ${parsed.data} AND status = 'active' AND expires_at > now()
         AND redeemed_at IS NULL AND refunded_at IS NULL
       RETURNING code`;
+    if (updated) await this.sql`UPDATE public.refund_requests SET status = 'approved', resolved_at = now()
+      WHERE status = 'pending' AND voucher_id = (SELECT id FROM public.vouchers WHERE code = ${parsed.data})`;
     const voucher = await this.adminVoucher(parsed.data);
     if (!voucher) throw new HttpProblem(404, 'voucher_not_found');
     if (!updated) throw new HttpProblem(409, voucher.refundedAt || voucher.status === 'refunded'

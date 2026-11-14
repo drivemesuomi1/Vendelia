@@ -5,4 +5,5 @@ import { api } from "@/lib/api-client";
 
 export const listMyVouchers = () => api<{ vouchers: VoucherDTO[] }>("/api/me/vouchers");
 
-export const cancelVoucher = (code: string) => api<VoucherDTO>("/api/me/vouchers/cancel", { body: { code } });
+/** Customers can only request a refund; an admin approves it. */
+export const requestRefund = (code: string, reason: string) => api<VoucherDTO>("/api/me/vouchers/refund-request", { body: { code, reason } });

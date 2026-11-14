@@ -1023,3 +1023,16 @@ ALTER TABLE public.vouchers ENABLE ROW LEVEL SECURITY;
 
 \unrestrict raymZdbdn6LVnfPpCksVGFICzDLIxEk60gj3nI83MOWLO2TsJyV9f4IEq1rxAod
 
+
+-- 011_refund_requests: customers request refunds, admins approve.
+CREATE TABLE IF NOT EXISTS public.refund_requests (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  voucher_id uuid NOT NULL REFERENCES public.vouchers(id) ON DELETE CASCADE,
+  requested_by uuid REFERENCES public.profiles(user_id) ON DELETE SET NULL,
+  reason text,
+  status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved')),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  resolved_at timestamptz
+);
+CREATE UNIQUE INDEX IF NOT EXISTS refund_requests_one_pending_idx
+  ON public.refund_requests(voucher_id) WHERE status = 'pending';

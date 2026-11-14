@@ -2,7 +2,7 @@
 
 import { Fragment, useEffect, useState, type FormEvent } from 'react';
 import Link from 'next/link';
-import type { AdminRefundListDTO, AdminVoucherDTO } from '@vendelia/shared';
+import type { AdminRefundListDTO, AdminRefundRequestDTO, AdminVoucherDTO } from '@vendelia/shared';
 import { VOUCHER_CODE_RE } from '@vendelia/shared';
 import { Field, TextInput } from '@/components/ui/Field';
 import { Icon } from '@/components/ui/Icon';
@@ -23,6 +23,7 @@ export function RefundsPanel() {
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [data, setData] = useState<AdminRefundListDTO | null>(null);
+  const [requests, setRequests] = useState<AdminRefundRequestDTO[]>([]);
   const [listError, setListError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [version, setVersion] = useState(0);
@@ -35,8 +36,16 @@ export function RefundsPanel() {
       .then(value => { if (active) setData(value); })
       .catch(e => { if (active) setListError(e instanceof ApiError ? e.code : 'network'); })
       .finally(() => { if (active) setLoading(false); });
+    api<{ requests: AdminRefundRequestDTO[] }>('/api/admin/refund-requests')
+      .then(value => { if (active) setRequests(value.requests); })
+      .catch(() => { if (active) setRequests([]); });
     return () => { active = false; };
   }, [version]);
+  function review(requestCode: string) {
+    setCode(requestCode); setVoucher(null); setDone(false); setError(null); setBusy(true);
+    api<{ voucher: AdminVoucherDTO }>(`/api/admin/vouchers/${encodeURIComponent(requestCode)}`)
+      .then(r => setVoucher(r.voucher)).catch(e => setError(e instanceof ApiError ? e.code : 'network')).finally(() => setBusy(false));
+  }
   async function lookup(e: FormEvent) {
     e.preventDefault(); setError(null); setVoucher(null); setDone(false);
     const normalized = code.trim().toUpperCase();
@@ -66,6 +75,10 @@ export function RefundsPanel() {
   return (
     <div className="refund-page">
       <Notice tone="indigo">{tr('notice')}</Notice>
+      <section className="panel" aria-label={tr('requestsTitle')}>
+        <div className="panel-h"><div><h2>{tr('requestsTitle')} {requests.length > 0 && <span className="chip warn">{requests.length}</span>}</h2><p className="muted small">{tr('requestsHint')}</p></div></div>
+        {!requests.length ? <p className="payout-loading">{tr('requestsEmpty')}</p> : <div className="table-wrap"><table className="refund-table"><thead><tr><th>{t('vouchers.code')}</th><th>{t('business.colDeal')}</th><th>{tr('customer')}</th><th className="num">{t('business.colPrice')}</th><th>{tr('requestedAt')}</th><th><span className="sr-only">{tr('requestsReview')}</span></th></tr></thead><tbody>{requests.map(r => <tr key={r.code}><td><span className="mono">{r.code}</span><span className="payout-deal">{r.orderNumber}</span></td><td>{itemTitle(r.title, null, r.optionLabel, locale)}{r.reason && <span className="payout-deal">{tr('reasonLabel')}: {r.reason}</span>}</td><td><span>{r.name}</span><span className="payout-deal">{r.email}</span></td><td className="num">{formatMoney(r.priceCents, locale)}</td><td className="small">{dateTime(r.requestedAt, locale)}</td><td><button className="btn btn-secondary btn-sm" type="button" onClick={() => review(r.code)}>{tr('requestsReview')}</button></td></tr>)}</tbody></table></div>}
+      </section>
       <section className="refund-workspace">
         <div className="panel refund-entry">
           <span className="attn-ic indigo"><Icon name="refund" /></span>

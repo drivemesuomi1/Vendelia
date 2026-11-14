@@ -13,7 +13,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { ApiError } from "@/lib/api-client";
 import { formatDate, formatMoney, itemTitle } from "@/lib/format";
 import { logout } from "@/features/auth/api";
-import { cancelVoucher } from "../api";
+import { requestRefund } from "../api";
 import { VoucherCard } from "./VoucherCard";
 import { VoucherStatus } from "./VoucherStatus";
 
@@ -58,13 +58,14 @@ export function AccountPortal({ section, user, initial, demo = false }: { sectio
   const [filter, setFilter] = useState<Filter>("active");
   const [showing, setShowing] = useState<VoucherDTO | null>(null);
   const [cancelling, setCancelling] = useState<VoucherDTO | null>(null);
+  const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const base = `/${locale}/account${demo ? "/demo" : ""}`;
   const active = vouchers.filter((v) => v.status === "active");
   const soon = active.filter((v) => daysLeft(v.expiresAt) <= SOON_DAYS);
-  const cancellable = active.filter((v) => v.cancellableUntil && daysLeft(v.cancellableUntil) >= 0);
+  const cancellable = active.filter((v) => v.cancellableUntil && daysLeft(v.cancellableUntil) >= 0 && !v.refundRequestedAt);
   const orders = useMemo(() => {
     const byNumber = new Map<string, VoucherDTO[]>();
     for (const v of vouchers) byNumber.set(v.orderNumber, [...(byNumber.get(v.orderNumber) ?? []), v]);
@@ -83,9 +84,10 @@ export function AccountPortal({ section, user, initial, demo = false }: { sectio
     setBusy(true);
     setError(null);
     try {
-      const updated = await cancelVoucher(cancelling.code);
+      const updated = await requestRefund(cancelling.code, reason.trim());
       setVouchers((vs) => vs.map((v) => (v.code === updated.code ? updated : v)));
       setCancelling(null);
+      setReason("");
       toast(t("vouchers.cancelled"));
     } catch (e) {
       setError(t(`errors.${e instanceof ApiError ? e.code : "network"}`));
@@ -236,12 +238,16 @@ export function AccountPortal({ section, user, initial, demo = false }: { sectio
                         <dd>{formatDate((v.status === "redeemed" ? v.redeemedAt : v.status === "refunded" ? v.refundedAt : v.expiresAt) ?? v.expiresAt, locale)}</dd>
                       </div>
                     </dl>
-                    {v.cancellableUntil && <p className="hint">{t("vouchers.freeCancelUntil", { date: formatDate(v.cancellableUntil, locale) })}</p>}
+                    {v.refundRequestedAt
+                      ? <p className="hint">{t("vouchers.refundPendingHint", { date: formatDate(v.refundRequestedAt, locale) })}</p>
+                      : v.cancellableUntil && <p className="hint">{t("vouchers.freeCancelUntil", { date: formatDate(v.cancellableUntil, locale) })}</p>}
                   </div>
                   <div className="acct-card-actions">
                     {v.status === "active" && <button type="button" className="btn btn-primary btn-sm" onClick={() => setShowing(v)}><Icon name="scan" />{t("vouchers.show")}</button>}
                     {v.status !== "refunded" && <a className="btn btn-secondary btn-sm" href={pdfHref(v.code)} download><Icon name="download" />{t("account.pdf")}</a>}
-                    {v.cancellableUntil && <button type="button" className="btn btn-ghost btn-sm acct-cancel" onClick={() => { setError(null); setCancelling(v); }}>{t("vouchers.cancelRefund")}</button>}
+                    {v.refundRequestedAt
+                      ? <span className="chip warn"><Icon name="clock" />{t("vouchers.refundPending")}</span>
+                      : v.status === "active" && v.cancellableUntil && daysLeft(v.cancellableUntil) >= 0 && <button type="button" className="btn btn-ghost btn-sm acct-cancel" onClick={() => { setError(null); setReason(""); setCancelling(v); }}>{t("vouchers.cancelRefund")}</button>}
                   </div>
                 </li>
               ))}
@@ -278,6 +284,10 @@ export function AccountPortal({ section, user, initial, demo = false }: { sectio
             <h2 id="cancel-title" style={{ fontSize: 20 }}>{t("vouchers.cancelTitle")}</h2>
             <p>{title(cancelling)} · <span className="mono">{cancelling.code}</span></p>
             <p className="muted">{t("vouchers.cancelBody", { amount: formatMoney(cancelling.priceCents, locale) })}</p>
+            <label className="stack" htmlFor="refund-reason">
+              <span className="small">{t("vouchers.refundReason")}</span>
+              <textarea id="refund-reason" className="input" rows={3} maxLength={1000} value={reason} onChange={(e) => setReason(e.target.value)} />
+            </label>
             {error && <Notice tone="danger" icon="xc">{error}</Notice>}
             <div className="row wrap-row" style={{ justifyContent: "flex-end" }}>
               <button className="btn btn-secondary" onClick={() => setCancelling(null)}>{t("vouchers.keep")}</button>

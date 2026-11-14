@@ -162,6 +162,8 @@ export interface VoucherDTO {
   redeemedAt: string | null;
   refundedAt: string | null;
   cancellableUntil: string | null;
+  /** When the customer asked for a refund that an admin has not decided yet. */
+  refundRequestedAt?: string | null;
   recipientName: string | null;
   orderNumber: string;
   imageUrl: string;
@@ -358,6 +360,13 @@ export interface AdminMerchantRowDTO {
   liveDeals: number;
   createdAt: string;
 }
+
+/** A customer's open refund request, waiting for an admin. */
+export interface AdminRefundRequestDTO {
+  code: string; reason: string | null; requestedAt: string; title: LocalizedText; optionLabel: LocalizedText | null;
+  priceCents: number; orderNumber: string; email: string; name: string;
+}
+export interface AdminRefundRequestListDTO { requests: AdminRefundRequestDTO[] }
 
 export interface AdminRefundListDTO {
   refunds: AdminVoucherDTO[];
