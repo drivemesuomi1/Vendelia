@@ -9,6 +9,7 @@ import type { OrderConfig, PlatformConfig } from "../../config";
 import { HttpProblem } from "../../errors";
 import type { CatalogueService } from "../catalogue/service";
 import { buildVoucherEmail } from "../vouchers/email";
+import { buildRefundEmail } from "../vouchers/refund-email";
 import { buildRefundRequestEmail } from "../vouchers/refund-request-email";
 import type { Mailer } from "../vouchers/mailer";
 import { renderVoucherPdf, type VoucherDocument } from "../vouchers/pdf";
@@ -51,6 +52,8 @@ export function endOfHelsinkiDay(date: Date): Date {
     .format(new Date(endUtc)))?.[1];
   return new Date(endUtc - Number(offset ?? 2) * 3_600_000);
 }
+const itemTitleText = (v: AdminVoucherDTO, locale: Locale) =>
+  [pick(v.title, locale), v.optionLabel ? pick(v.optionLabel, locale) : ''].filter(Boolean).join(' – ');
 const addDays = (date: Date, days: number) => new Date(date.getTime() + days * 86_400_000);
 /** Normalizes a timestamp read with to_json(...) to "…Z" ISO form. */
 const iso = (value: string) => new Date(value).toISOString();
@@ -387,7 +390,22 @@ export class OrderService {
     if (!voucher) throw new HttpProblem(404, 'voucher_not_found');
     if (!updated) throw new HttpProblem(409, voucher.status === 'redeemed' || voucher.redeemedAt
       ? 'refundAlreadyRedeemed' : voucher.status === 'refunded' || voucher.refundedAt ? 'refundAlreadyRefunded' : 'refundNotEligible');
+    await this.sendRefundEmail(voucher);
     return voucher;
+  }
+
+  /** Tells the customer their refund was recorded. A mail failure is logged and never undoes the refund. */
+  private async sendRefundEmail(voucher: AdminVoucherDTO) {
+    try {
+      const [order] = await this.sql<{ locale: Locale }[]>`
+        SELECT o.locale FROM public.orders o JOIN public.vouchers v ON v.order_id = o.id WHERE v.code = ${voucher.code}`;
+      const locale = order?.locale ?? 'fi';
+      const mail = buildRefundEmail({ locale, name: voucher.order.name, code: voucher.code,
+        deal: itemTitleText(voucher, locale), amountCents: voucher.priceCents });
+      await this.mailer.send({ to: voucher.order.email, attachments: [], ...mail });
+    } catch (error) {
+      console.error(`Refund email failed for ${voucher.code}:`, error instanceof Error ? error.message : error);
+    }
   }
 
   async adminRefunds() {
