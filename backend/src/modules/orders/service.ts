@@ -253,6 +253,10 @@ export class OrderService {
 
   /** Open customer refund requests for the admin refunds screen, oldest first. */
   async adminRefundRequests() {
+    // Close requests whose voucher was refunded in the meantime, however that happened.
+    await this.sql`UPDATE public.refund_requests r SET status = 'approved', resolved_at = now()
+      FROM public.vouchers v WHERE v.id = r.voucher_id AND r.status = 'pending'
+        AND (v.status = 'refunded' OR v.refunded_at IS NOT NULL)`;
     const rows = await this.sql<{ code: string; reason: string | null; created_at: string; title: LocalizedText;
       option_label: LocalizedText | null; price_cents: number; number: string; email: string; first_name: string; last_name: string }[]>`
       SELECT v.code, r.reason, to_json(r.created_at) AS created_at, oi.title, oi.option_label, v.price_cents,
@@ -260,7 +264,8 @@ export class OrderService {
       FROM public.refund_requests r
       JOIN public.vouchers v ON v.id = r.voucher_id JOIN public.order_items oi ON oi.id = v.order_item_id
       JOIN public.orders o ON o.id = v.order_id
-      WHERE r.status = 'pending' ORDER BY r.created_at LIMIT 100`;
+      WHERE r.status = 'pending' AND v.status IN ('active', 'expired') AND v.redeemed_at IS NULL AND v.refunded_at IS NULL
+      ORDER BY r.created_at LIMIT 100`;
     return { requests: rows.map((r) => ({ code: r.code, reason: r.reason, requestedAt: iso(r.created_at), title: r.title,
       optionLabel: r.option_label, priceCents: r.price_cents, orderNumber: r.number, email: r.email,
       name: `${r.first_name} ${r.last_name}`.trim() })) };
