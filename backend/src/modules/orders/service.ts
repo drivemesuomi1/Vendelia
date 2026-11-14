@@ -43,6 +43,14 @@ export function voucherExpiry(issued: Date, months: number): Date {
     .format(new Date(endUtc)))?.[1];
   return new Date(endUtc - Number(offset ?? 2) * 3_600_000);
 }
+/** Last moment (23:59:59.999, Helsinki time) of the calendar day the given instant falls on. */
+export function endOfHelsinkiDay(date: Date): Date {
+  const [year, month, day] = helsinkiDate(date);
+  const endUtc = Date.UTC(year, month, day, 23, 59, 59, 999);
+  const offset = /GMT([+-]\d+)/.exec(new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Helsinki", timeZoneName: "shortOffset" })
+    .format(new Date(endUtc)))?.[1];
+  return new Date(endUtc - Number(offset ?? 2) * 3_600_000);
+}
 const addDays = (date: Date, days: number) => new Date(date.getTime() + days * 86_400_000);
 /** Normalizes a timestamp read with to_json(...) to "…Z" ISO form. */
 const iso = (value: string) => new Date(value).toISOString();
@@ -99,7 +107,7 @@ export class OrderService {
     const now = new Date();
     const issuedAt = now.toISOString();
     const expiresAt = voucherExpiry(now, this.policy.voucherValidityMonths).toISOString();
-    const cancellableUntil = addDays(now, this.policy.refundWindowDays).toISOString();
+    const cancellableUntil = endOfHelsinkiDay(addDays(now, this.policy.refundWindowDays)).toISOString();
     const recipient = input.gift.enabled ? input.gift.recipientName : null;
 
     // JSON goes in as text for the same reason (Drizzle also turns off json/jsonb serialization).
@@ -227,7 +235,8 @@ export class OrderService {
         OR (o.customer_id IS NULL AND lower(o.email) = ${user.email.toLowerCase()}))`;
     if (!row) throw new HttpProblem(404, 'voucher_not_found');
     if (row.status !== 'active' || row.redeemed_at || row.refunded_at) throw new HttpProblem(409, 'refundNotEligible');
-    if (!row.cancellable_until || Date.parse(row.cancellable_until) < Date.now()) throw new HttpProblem(409, 'refundWindowClosed');
+    // The page shows only the date, so the window runs to the end of that day (also for vouchers bought before this rule).
+    if (!row.cancellable_until || endOfHelsinkiDay(new Date(row.cancellable_until)).getTime() < Date.now()) throw new HttpProblem(409, 'refundWindowClosed');
     const [created] = await this.sql<{ id: string }[]>`
       INSERT INTO public.refund_requests (voucher_id, requested_by, reason)
       VALUES (${row.id}, ${user.id}, ${reason || null}) ON CONFLICT DO NOTHING RETURNING id`;

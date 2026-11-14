@@ -21,6 +21,12 @@ type Section = "overview" | "vouchers" | "orders";
 type Filter = "active" | "all";
 type User = { name: string; email: string };
 const SOON_DAYS = 14;
+/** The refund window runs to the end of the Finnish calendar day shown on the card. */
+const refundOpen = (iso: string) => {
+  const day = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Helsinki" }).format(new Date(iso));
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Helsinki" }).format(new Date());
+  return day >= today;
+};
 const daysLeft = (iso: string) => Math.ceil((new Date(iso).getTime() - Date.now()) / 86_400_000);
 
 /** Sidebar shell of the customer account (same look as the portals). The demo account signs "out" to the sign-in page. */
@@ -65,7 +71,7 @@ export function AccountPortal({ section, user, initial, demo = false }: { sectio
   const base = `/${locale}/account${demo ? "/demo" : ""}`;
   const active = vouchers.filter((v) => v.status === "active");
   const soon = active.filter((v) => daysLeft(v.expiresAt) <= SOON_DAYS);
-  const cancellable = active.filter((v) => v.cancellableUntil && daysLeft(v.cancellableUntil) >= 0 && !v.refundRequestedAt);
+  const cancellable = active.filter((v) => v.cancellableUntil && refundOpen(v.cancellableUntil) && !v.refundRequestedAt);
   const orders = useMemo(() => {
     const byNumber = new Map<string, VoucherDTO[]>();
     for (const v of vouchers) byNumber.set(v.orderNumber, [...(byNumber.get(v.orderNumber) ?? []), v]);
@@ -247,7 +253,7 @@ export function AccountPortal({ section, user, initial, demo = false }: { sectio
                     {v.status !== "refunded" && <a className="btn btn-secondary btn-sm" href={pdfHref(v.code)} download><Icon name="download" />{t("account.pdf")}</a>}
                     {v.refundRequestedAt
                       ? <span className="chip warn"><Icon name="clock" />{t("vouchers.refundPending")}</span>
-                      : v.status === "active" && v.cancellableUntil && daysLeft(v.cancellableUntil) >= 0 && <button type="button" className="btn btn-ghost btn-sm acct-cancel" onClick={() => { setError(null); setReason(""); setCancelling(v); }}>{t("vouchers.cancelRefund")}</button>}
+                      : v.status === "active" && v.cancellableUntil && refundOpen(v.cancellableUntil) && <button type="button" className="btn btn-ghost btn-sm acct-cancel" onClick={() => { setError(null); setReason(""); setCancelling(v); }}>{t("vouchers.cancelRefund")}</button>}
                   </div>
                 </li>
               ))}
