@@ -42,5 +42,17 @@ export const registerMerchantSchema = z.object({
 });
 export type RegisterMerchantInput = z.infer<typeof registerMerchantSchema>;
 
+/** "Sell on Vendelia" application: the sign-up details without a password, emailed to business support. */
+export const businessApplicationSchema = registerMerchantSchema.omit({ password: true }).extend({
+  categoryId: z.string().min(1, { message: "required" }).max(60),
+  // Optional, but when given it must look like a web address: "example.fi" or "https://example.fi/page".
+  website: z.string().trim().max(200)
+    .refine((v) => v === "" || /^(https?:\/\/)?([a-z0-9-]+\.)+[a-z]{2,}(:\d+)?([/?#]\S*)?$/i.test(v), { message: "invalidWebsite" })
+    .optional().default(""),
+  message: z.string().trim().max(2000).optional().default(""),
+  locale: z.enum(["fi", "sv", "en"]).optional().default("fi"),
+});
+export type BusinessApplicationInput = z.infer<typeof businessApplicationSchema>;
+
 export const ROLES = ["customer", "merchant", "admin"] as const;
 export type Role = (typeof ROLES)[number];

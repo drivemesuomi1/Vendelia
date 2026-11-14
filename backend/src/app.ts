@@ -23,6 +23,7 @@ import { healthRoutes } from "./modules/health/routes";
 import { orderRoutes } from "./modules/orders/routes";
 import { OrderService } from "./modules/orders/service";
 import { createMailer, type Mailer } from "./modules/vouchers/mailer";
+import { businessRoutes } from "./modules/business/routes";
 import { HttpProblem } from "./errors";
 import { orderConfig, platformConfig, type OrderConfig, type PlatformConfig } from "./config";
 
@@ -90,6 +91,7 @@ export function buildApp(database: Sql, options: {
   const passwordReset = new PasswordResetService(database, options.passwordAdmin ?? supabaseAdmin, mailer, authSettings.siteUrl);
   const signup = new SignupService(database, options.passwordAdmin ?? supabaseAdmin, mailer);
   app.register(authRoutes, { service: authService, config: authSettings, oauth: options.oauthProvider ?? new SupabaseGoogleProvider(authSettings), passwordReset, signup });
+  app.register(businessRoutes, { sql: database, mailer, origins: authSettings.origins, to: ordersConfig.mail.businessReplyTo });
   app.register(healthRoutes, { database });
   app.register(catalogueRoutes, { service });
   app.register(orderRoutes, { service: orders, auth: authService, origins: authSettings.origins });
