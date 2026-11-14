@@ -97,9 +97,9 @@ export function RefundsPanel() {
             <p className="mono">{voucher.code}</p><p><strong>{itemTitle(voucher.title, null, voucher.optionLabel, locale)}</strong></p>
             <RefundFacts voucher={voucher} />
             {voucher.test && <p className="chip warn">{t('business.testVoucher')}</p>}
-            {done ? <Notice icon="checkc">{tr('success')}</Notice>
+            <div style={{ marginTop: 24 }}>{done ? <Notice icon="checkc">{tr('success')}</Notice>
               : unused ? <div className="refund-confirm"><p className="small">{t('admin.refundScreen.confirm', { amount: formatMoney(voucher.priceCents, locale) })}</p><button className="btn btn-danger" disabled={busy} type="button" onClick={refund}><Icon name="refund" />{tr(busy ? 'working' : 'confirmButton')}</button></div>
-              : <Notice tone="warn">{tr(voucher.status === 'refunded' ? 'alreadyRefunded' : 'notUnused')}</Notice>}
+              : <Notice tone="warn">{tr(voucher.status === 'refunded' ? 'alreadyRefunded' : 'notUnused')}</Notice>}</div>
           </>}
         </div>
       </section>
