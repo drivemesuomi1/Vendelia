@@ -8,9 +8,10 @@ Auth: httpOnly session cookie `vd_session`. Roles: `customer`, `merchant`, `admi
 
 Implemented: `POST /api/auth/login`, `POST /api/auth/admin/login`,
 `GET /api/auth/me`, `GET /api/auth/config`, `POST /api/auth/logout`, and
-`GET /api/me/vouchers`, `POST /api/auth/merchant/login` and `GET /api/merchant/deals`. Login requires Supabase Auth credentials, an active
-confirmed profile and migrations 002/003. Admin login additionally requires the
-admin role. See [account setup](../accounts.md).
+`GET /api/me/vouchers`, `POST /api/auth/merchant/login` and `GET /api/merchant/deals`. Login requires Supabase Auth credentials and an active
+confirmed profile with an exact role match: `/api/auth/login` is customer-only,
+`/api/auth/admin/login` is admin-only, and `/api/auth/merchant/login` is
+merchant-only with an active business membership. See [account setup](../accounts.md).
 
 The remaining authentication/merchant endpoints below are a planned contract,
 not implemented signup functionality. Merchant ownership uses migration 005;

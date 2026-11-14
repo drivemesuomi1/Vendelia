@@ -33,7 +33,12 @@ export function Header({ home }: { home?: boolean }) {
   };
   const count = cart.count;
   const cartLabel = t(count === 1 ? "nav.cartOne" : "nav.cartMany", { n: count });
-  const portal = user?.role === "admin" ? { href: `/${locale}/admin`, label: t("nav.admin"), icon: "grid" as const } : { href: `/${locale}/business`, label: t("nav.forBusinesses"), icon: "store" as const };
+  const portal = !user || user.role === "customer"
+    ? { href: `/${locale}/business`, label: t("nav.forBusinesses"), icon: "store" as const }
+    : null;
+  const accountHref = user?.role === "admin" ? `/${locale}/admin`
+    : user?.role === "merchant" ? `/${locale}/business`
+      : `/${locale}/account`;
 
   const searchForm = (id: string, placeholder: string, cls = "") => (
     <form className={`search ${cls}`} role="search" onSubmit={search}>
@@ -52,9 +57,9 @@ export function Header({ home }: { home?: boolean }) {
             <CityPicker />
             {searchForm("q1", t("nav.searchPlaceholder"), "hdr-search")}
             <nav className="nav" aria-label={t("nav.main")}>
-              {/* Account: signed in shows the person's initial and opens their account; signed out offers sign-in. */}
+              {/* My account opens the portal for the signed-in role; signed-out visitors get customer sign-in. */}
               {user ? (
-                <Link className="nav-account" href={`/${locale}/account`} title={`${user.name} (${user.email})`} aria-label={t("nav.account")}>
+                <Link className="nav-account" href={accountHref} title={`${user.name} (${user.email})`} aria-label={t("nav.account")}>
                   <span className="nav-avatar" aria-hidden="true">{(user.name || user.email).trim().charAt(0).toUpperCase()}</span>
                   <span className="lbl">{t("nav.account")}</span>
                 </Link>
@@ -63,9 +68,9 @@ export function Header({ home }: { home?: boolean }) {
                   <Icon name="user" /><span className="lbl">{t("auth.login")}</span>
                 </Link>
               )}
-              <Link href={portal.href} title={portal.label} aria-label={portal.label}>
+              {portal && <Link href={portal.href} title={portal.label} aria-label={portal.label}>
                 <Icon name={portal.icon} /><span className="lbl">{portal.label}</span>
-              </Link>
+              </Link>}
               <span className="nav-sep" aria-hidden="true" />
               <LangSwitch />
               <button className="navbtn cart" onClick={() => cart.openDrawer()} aria-haspopup="dialog" aria-label={cartLabel}>

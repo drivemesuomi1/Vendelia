@@ -14,8 +14,11 @@ new file, not an earlier copy of `002_admin_accounts.sql`. Application of this n
 migration is still a separate database-owner step.
 
 Login is now implemented through `backend/src/modules/auth/`. The customer
-`/login` form and staff `/admin` form use Supabase Auth password verification,
-then require an active profile. The admin form additionally requires `role = 'admin'`.
+`/login` form, staff `/admin` form and business `/business` form use Supabase Auth
+password verification, then require an active profile with the matching role.
+Customer login requires `role = 'customer'`; admin and merchant identities must
+use their own portal login routes. Merchant login also requires an active
+`merchant_members` link.
 The admin sidebar displays `profiles.display_name` above the Auth email; the
 portal title remains the translated Admin label. The name is not read from Auth
 user metadata, so an empty display-name field in the Auth dashboard is harmless.
@@ -151,15 +154,16 @@ After applying both migrations and provisioning the confirmed Auth user/profile:
 2. Sign out; refresh a protected page to verify the session no longer works.
 3. Log in, then set the profile's `is_active = false` in SQL Editor. The next
    protected request must deny access. Restore the flag explicitly to test again.
-4. `/en/login` accepts active, confirmed identities with any supported profile
-   role. `/api/auth/me` returns the current profile-derived user, without tokens.
+4. `/en/login` accepts only active, confirmed customer profiles. Admins and
+   merchants are rejected there and use `/en/admin` or `/en/business` instead.
+   The home-page “My account” link routes each signed-in role to its own portal.
+   `/api/auth/me` returns the current profile-derived user, without tokens.
 5. `/en/account/vouchers` displays purchases belonging to the signed-in user's
    confirmed email. It returns real records, not the admin portal's sample orders.
 
-Credentials are never inserted into application tables. Account profiles must
-currently be provisioned explicitly; public signup, confirmation callbacks,
-password recovery UI and account editing are not implemented by this change.
-Do not treat the existing registration forms as a working signup workflow.
+Credentials are never inserted into application tables. Customer signup,
+confirmation and password recovery are implemented separately; see the auth
+routes and API documentation.
 
 ## Session lifecycle and remaining scope
 

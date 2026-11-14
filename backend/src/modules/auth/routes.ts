@@ -16,7 +16,7 @@ export async function authRoutes(app: FastifyInstance, { service, config, oauth,
 }) {
   // Bounded per-instance limiter supplements Supabase Auth's provider-side limits.
   const attempts = new Map<string, { count: number; until: number }>();
-  for (const [path, audience] of [['/api/auth/login', 'any'], ['/api/auth/admin/login', 'admin'], ['/api/auth/merchant/login', 'merchant']] as const) {
+  for (const [path, audience] of [['/api/auth/login', 'customer'], ['/api/auth/admin/login', 'admin'], ['/api/auth/merchant/login', 'merchant']] as const) {
     app.post(path, async (request, reply) => {
       const origin = request.headers.origin;
       if (origin && !config.origins.includes(origin)) throw new HttpProblem(403, 'forbidden');
@@ -29,7 +29,7 @@ export async function authRoutes(app: FastifyInstance, { service, config, oauth,
       if (entry.count >= 5 || (attempts.size >= 1000 && !attempts.has(key))) throw new HttpProblem(429, 'tooManyAttempts');
       entry.count++; attempts.set(key, entry);
       // "Remember me" is offered on the customer sign-in only; staff and business sessions keep their fixed length.
-      const result = await service.login(parsed.data.email, parsed.data.password, audience, audience === 'any' ? parsed.data.remember : undefined);
+      const result = await service.login(parsed.data.email, parsed.data.password, audience, audience === 'customer' ? parsed.data.remember : undefined);
       await service.logout(sessionToken(request.headers.cookie));
       return reply.header('set-cookie', sessionCookie(result.token, config.secure, result.cookieMaxAge)).send({ user: result.user });
     });

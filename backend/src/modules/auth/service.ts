@@ -7,10 +7,10 @@ import type { AccountRepository } from './repository';
 export const hashSession = (token: string) => createHash('sha256').update(token).digest('hex');
 export class AuthService {
   constructor(private readonly repository: AccountRepository, private readonly provider: PasswordProvider) {}
-  async login(email: string, password: string, audience: 'any' | 'admin' | 'merchant' = 'any', remember?: boolean) {
+  async login(email: string, password: string, audience: 'customer' | 'admin' | 'merchant' = 'customer', remember?: boolean) {
     const identity = await this.provider.verify(email, password);
     const user = await this.repository.profile(identity.id);
-    if (!user || (audience !== 'any' && user.role !== audience) || (user.role === 'merchant' && !user.merchant)) throw new HttpProblem(401, 'invalidLogin');
+    if (!user || user.role !== audience || (user.role === 'merchant' && !user.merchant)) throw new HttpProblem(401, 'invalidLogin');
     return this.startSession(user, remember);
   }
   /** Google accounts are for customers only; staff and business logins keep their password flow. */
